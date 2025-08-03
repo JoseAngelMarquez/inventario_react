@@ -1,10 +1,14 @@
-const db = require('../config/db');
+const pool = require('../config/db');
 
-const Usuario = {
-  buscarPorUsuario: (usuario, callback) => {
-    const sql = 'SELECT * FROM usuarios WHERE usuario = ?';
-    db.query(sql, [usuario], callback);
+class Usuario {
+  static async buscarPorUsuario(usuario) {
+    try {
+      const [rows] = await pool.query('SELECT * FROM usuarios WHERE usuario = ?', [usuario]);
+      return rows;
+    } catch (error) {
+      throw error;
+    }
   }
-};
+}
 
 module.exports = Usuario;

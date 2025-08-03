@@ -1,11 +1,9 @@
-// src/App.js
 import React from "react";
 import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
 import Login from "./pages/Login";
-import AdminPage from "./pages/AdminPage";
 import PrestamistaPage from "./pages/PrestamistaPage";
-import ProtectedRoute from "./components/ProtectedRoute.js";
-
+import ProtectedRoute from "./components/ProtectedRoute";
+import Materiales from "./pages/Materiales";
 function App() {
   return (
     <Router>
@@ -16,7 +14,7 @@ function App() {
           path="/admin"
           element={
             <ProtectedRoute rolPermitido="admin">
-              <AdminPage />
+              <Materiales />
             </ProtectedRoute>
           }
         />

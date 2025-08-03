@@ -1,61 +1,66 @@
-// src/pages/Login.js
-import React, { useState } from "react";
-import { useNavigate } from "react-router-dom";
-import InputText from "../components/InputText";
-import { loginUsuario } from "../services/usuarioService";
+import React, { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
+import { login } from '../services/usuarioService';
 
-function Login() {
-  const [usuario, setUsuario] = useState("");
-  const [contrasena, setContrasena] = useState("");
-  const [error, setError] = useState("");
+const Login = () => {
+  const [usuario, setUsuario] = useState('');
+  const [contrasena, setContrasena] = useState('');
+  const [mensaje, setMensaje] = useState('');
+  const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
 
-  const handleLogin = async (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    setError("");
+    setMensaje('');
+    setLoading(true);
 
     try {
-      const datos = await loginUsuario({ usuario, contrasena });
-      const { usuario: user } = datos;
+      const data = await login(usuario, contrasena);
 
-      alert(`Bienvenido ${user.usuario} (${user.rol})`);
+      // Guardar usuario en localStorage
+      localStorage.setItem('usuario', JSON.stringify(data.usuario));
 
-      localStorage.setItem("usuario", JSON.stringify(user));
-
-      if (user.rol === "admin") {
-        navigate("/admin");
-      } else if (user.rol === "prestamista") {
-        navigate("/prestamista");
+      // Redireccionar según el rol
+      if (data.usuario.rol === 'admin') {
+        navigate('/admin');
+      } else if (data.usuario.rol === 'prestamista') {
+        navigate('/prestamista');
       } else {
-        setError("Rol no reconocido");
+        setMensaje('Rol no reconocido');
       }
-    } catch (err) {
-      setError(err.message);
+    } catch (error) {
+      if (error.response && error.response.data && error.response.data.mensaje) {
+        setMensaje(error.response.data.mensaje);
+      } else {
+        setMensaje('Error en la conexión con el servidor');
+      }
+    } finally {
+      setLoading(false);
     }
   };
 
   return (
-    <div style={{ maxWidth: "400px", margin: "auto", marginTop: "100px" }}>
-      <h2>Iniciar Sesión</h2>
-      <form onSubmit={handleLogin}>
-        <InputText
-          label="Usuario"
-          value={usuario}
-          onChange={(e) => setUsuario(e.target.value)}
-          required
-        />
-        <InputText
-          label="Contraseña"
-          type="password"
-          value={contrasena}
-          onChange={(e) => setContrasena(e.target.value)}
-          required
-        />
-        <button type="submit">Ingresar</button>
-      </form>
-      {error && <p style={{ color: "red" }}>{error}</p>}
-    </div>
+    <form onSubmit={handleSubmit}>
+      <input
+        type="text"
+        placeholder="Usuario"
+        value={usuario}
+        onChange={(e) => setUsuario(e.target.value)}
+        required
+      />
+      <input
+        type="password"
+        placeholder="Contraseña"
+        value={contrasena}
+        onChange={(e) => setContrasena(e.target.value)}
+        required
+      />
+      <button type="submit" disabled={loading}>
+        {loading ? 'Ingresando...' : 'Ingresar'}
+      </button>
+      <p>{mensaje}</p>
+    </form>
   );
-}
+};
 
 export default Login;

@@ -1,27 +1,37 @@
-const db = require("../config/db");
+const db = require('../config/db');
 
 class Material {
   static async obtenerTodos() {
-    const [rows] = await db.query("SELECT * FROM materiales");
+    const [rows] = await db.query('SELECT * FROM materiales');
     return rows;
   }
 
-  static async crear({ nombre, tipo, cantidad_disponible, descripcion }) {
-    await db.query(
-      "INSERT INTO materiales (nombre, tipo, cantidad_disponible, descripcion) VALUES (?, ?, ?, ?)",
-      [nombre, tipo, cantidad_disponible, descripcion]
-    );
+  static async obtenerPorId(id) {
+    const [rows] = await db.query('SELECT * FROM materiales WHERE id = ?', [id]);
+    return rows[0];
   }
 
-  static async actualizar(id, { nombre, tipo, cantidad_disponible, descripcion }) {
-    await db.query(
-      "UPDATE materiales SET nombre = ?, tipo = ?, cantidad_disponible = ?, descripcion = ? WHERE id = ?",
+  static async crear(material) {
+    const { nombre, tipo, cantidad_disponible, descripcion } = material;
+    const [result] = await db.query(
+      'INSERT INTO materiales (nombre, tipo, cantidad_disponible, descripcion) VALUES (?, ?, ?, ?)',
+      [nombre, tipo, cantidad_disponible, descripcion]
+    );
+    return result.insertId;
+  }
+
+  static async actualizar(id, material) {
+    const { nombre, tipo, cantidad_disponible, descripcion } = material;
+    const [result] = await db.query(
+      'UPDATE materiales SET nombre = ?, tipo = ?, cantidad_disponible = ?, descripcion = ? WHERE id = ?',
       [nombre, tipo, cantidad_disponible, descripcion, id]
     );
+    return result.affectedRows;
   }
 
   static async eliminar(id) {
-    await db.query("DELETE FROM materiales WHERE id = ?", [id]);
+    const [result] = await db.query('DELETE FROM materiales WHERE id = ?', [id]);
+    return result.affectedRows;
   }
 }
 

@@ -1,19 +1,11 @@
-// src/pages/AdminPage.js
-import React from "react";
-import { useNavigate } from "react-router-dom";
+import { Link } from "react-router-dom";
 
 function AdminPage() {
-  const navigate = useNavigate();
-
-  const cerrarSesion = () => {
-    localStorage.removeItem("usuario");
-    navigate("/");
-  };
-
   return (
     <div>
-      <h1>Bienvenido Administrador</h1>
-      <button onClick={cerrarSesion}>Cerrar sesión</button>
+      <h1>Panel Admin</h1>
+      <Link to="/admin/solicitudPrestamo">Gestionar Materiales</Link>
+      {/* otros enlaces */}
     </div>
   );
 }
