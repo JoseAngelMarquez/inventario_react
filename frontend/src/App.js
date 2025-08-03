@@ -14,6 +14,17 @@ function App() {
       <Routes>
         <Route path="/" element={<Login />} />
 
+        {/* Ruta común para inicio, accesible por ambos roles */}
+        <Route
+          path="/inicio"
+          element={
+            <ProtectedRoute rolPermitido={["admin", "prestamista"]}>
+              <Inicio />
+            </ProtectedRoute>
+          }
+        />
+
+        {/* Rutas exclusivas para admin con Layout */}
         <Route
           path="/admin"
           element={
@@ -22,12 +33,12 @@ function App() {
             </ProtectedRoute>
           }
         >
-          <Route index element={<Inicio />} />
           <Route path="usuarios" element={<Usuarios />} />
           <Route path="prestamos" element={<Prestamos />} />
           <Route path="materiales" element={<Materiales />} />
         </Route>
 
+        {/* Rutas exclusivas para prestamista */}
         <Route
           path="/prestamista"
           element={
