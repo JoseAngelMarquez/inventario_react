@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import { loginUsuario } from "../services/usuarioService";
-import InputText from "../components/InputText";
+import InputText from "../components/InputText"; // <-- Importa el componente
 
 function Login() {
   const [usuario, setUsuario] = useState("");
@@ -13,8 +13,9 @@ function Login() {
 
     try {
       const datos = await loginUsuario({ usuario, contrasena });
-      alert(`Bienvenido ${datos.usuario} (${datos.rol})`);
-      // Aquí puedes redirigir o guardar datos en localStorage
+      const { usuario: user, mensaje } = datos;
+      alert(`Bienvenido ${user.usuario} (${user.rol})`);
+      // Aquí podrías redirigir o guardar en localStorage
     } catch (err) {
       setError(err.message);
     }
