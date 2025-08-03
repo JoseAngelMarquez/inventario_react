@@ -1,11 +1,14 @@
+// src/pages/Login.js
 import React, { useState } from "react";
+import { useNavigate } from "react-router-dom";
+import InputText from "../components/InputText";
 import { loginUsuario } from "../services/usuarioService";
-import InputText from "../components/InputText"; // <-- Importa el componente
 
 function Login() {
   const [usuario, setUsuario] = useState("");
   const [contrasena, setContrasena] = useState("");
   const [error, setError] = useState("");
+  const navigate = useNavigate();
 
   const handleLogin = async (e) => {
     e.preventDefault();
@@ -13,9 +16,19 @@ function Login() {
 
     try {
       const datos = await loginUsuario({ usuario, contrasena });
-      const { usuario: user, mensaje } = datos;
+      const { usuario: user } = datos;
+
       alert(`Bienvenido ${user.usuario} (${user.rol})`);
-      // Aquí podrías redirigir o guardar en localStorage
+
+      localStorage.setItem("usuario", JSON.stringify(user));
+
+      if (user.rol === "admin") {
+        navigate("/admin");
+      } else if (user.rol === "prestamista") {
+        navigate("/prestamista");
+      } else {
+        setError("Rol no reconocido");
+      }
     } catch (err) {
       setError(err.message);
     }

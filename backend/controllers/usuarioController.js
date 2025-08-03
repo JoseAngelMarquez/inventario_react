@@ -16,7 +16,7 @@ exports.login = (req, res) => {
 
     const usuarioEncontrado = resultados[0];
 
-    // Validación directa (sin hash)
+    // Validación directa
     if (usuarioEncontrado.contrasena === contrasena) {
       return res.json({ mensaje: 'Login exitoso', usuario: usuarioEncontrado });
     } else {
