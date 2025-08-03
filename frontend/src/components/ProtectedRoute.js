@@ -1,19 +1,22 @@
-// src/components/ProtectedRoute.js
-import React from "react";
+// components/ProtectedRoute.js
 import { Navigate } from "react-router-dom";
 
-function ProtectedRoute({ children, rolPermitido }) {
+const ProtectedRoute = ({ children, rolPermitido }) => {
   const usuario = JSON.parse(localStorage.getItem("usuario"));
 
   if (!usuario) {
     return <Navigate to="/" />;
   }
 
-  if (rolPermitido && usuario.rol !== rolPermitido) {
+  const permitido = Array.isArray(rolPermitido)
+    ? rolPermitido.includes(usuario.rol)
+    : usuario.rol === rolPermitido;
+
+  if (!permitido) {
     return <Navigate to="/" />;
   }
 
   return children;
-}
+};
 
 export default ProtectedRoute;
