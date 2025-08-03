@@ -1,0 +1,32 @@
+.layout {
+    display: flex;
+    height: 100vh;
+  }
+  
+  .sidebar {
+    width: 220px;
+    background-color: #222;
+    color: white;
+    padding: 1rem;
+  }
+  
+  .sidebar ul {
+    list-style: none;
+    padding: 0;
+  }
+  
+  .sidebar li {
+    margin: 1rem 0;
+  }
+  
+  .sidebar a {
+    color: white;
+    text-decoration: none;
+  }
+  
+  .content {
+    flex: 1;
+    padding: 2rem;
+    background-color: #f9f9f9;
+  }
+  

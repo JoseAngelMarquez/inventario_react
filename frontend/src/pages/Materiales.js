@@ -7,7 +7,6 @@ import {
   eliminarMaterial,
 } from "../services/materialService";
 import MaterialForm from "../components/MaterialForm";
-import Layout from "../components/Layout"; // 🔹 Importar Layout
 
 const Materiales = () => {
   const [materiales, setMateriales] = useState([]);
