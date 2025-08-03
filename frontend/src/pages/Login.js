@@ -1,27 +1,47 @@
-import React, { useEffect, useState } from 'react';
+import React, { useState } from "react";
+import { loginUsuario } from "../services/usuarioService";
+import InputText from "../components/InputText";
 
-const Usuarios = () => {
-  const [usuarios, setUsuarios] = useState([]);
+function Login() {
+  const [usuario, setUsuario] = useState("");
+  const [contrasena, setContrasena] = useState("");
+  const [error, setError] = useState("");
 
-  useEffect(() => {
-    fetch('http://localhost:3001/api/usuarios')
-      .then((res) => res.json())
-      .then((data) => setUsuarios(data))
-      .catch((error) => console.error('Error al cargar usuarios:', error));
-  }, []);
+  const handleLogin = async (e) => {
+    e.preventDefault();
+    setError("");
+
+    try {
+      const datos = await loginUsuario({ usuario, contrasena });
+      alert(`Bienvenido ${datos.usuario} (${datos.rol})`);
+      // Aquí puedes redirigir o guardar datos en localStorage
+    } catch (err) {
+      setError(err.message);
+    }
+  };
 
   return (
-    <div>
-      <h2>Lista de Usuarios</h2>
-      <ul>
-        {usuarios.map((usuario) => (
-          <li key={usuario.id}>
-            {usuario.usuario} - {usuario.rol}
-          </li>
-        ))}
-      </ul>
+    <div style={{ maxWidth: "400px", margin: "auto", marginTop: "100px" }}>
+      <h2>Iniciar Sesión</h2>
+      <form onSubmit={handleLogin}>
+        <InputText
+          label="Usuario"
+          value={usuario}
+          onChange={(e) => setUsuario(e.target.value)}
+          required
+        />
+        <InputText
+          label="Contraseña"
+          type="password"
+          value={contrasena}
+          onChange={(e) => setContrasena(e.target.value)}
+          required
+        />
+        <button type="submit">Ingresar</button>
+      </form>
+      {error && <p style={{ color: "red" }}>{error}</p>}
     </div>
   );
-};
+}
 
-export default Usuarios;
+export default Login;

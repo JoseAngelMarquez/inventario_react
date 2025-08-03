@@ -1,9 +1,7 @@
 const express = require('express');
 const cors = require('cors');
-require('dotenv').config();
-
 const app = express();
-const port = process.env.PORT || 3001;
+require('dotenv').config();
 
 // Middlewares
 app.use(cors());
@@ -13,7 +11,8 @@ app.use(express.json());
 const usuarioRoutes = require('./routes/usuarios');
 app.use('/api/usuarios', usuarioRoutes);
 
-// Servidor
-app.listen(port, () => {
-  console.log(`🚀 Servidor backend corriendo en http://localhost:${port}`);
+// Puerto
+const PORT = process.env.PORT || 3001;
+app.listen(PORT, () => {
+  console.log(`Servidor corriendo en puerto ${PORT}`);
 });
