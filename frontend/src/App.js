@@ -7,7 +7,6 @@ import Materiales from "./pages/Materiales";
 import ProtectedRoute from "./components/ProtectedRoute";
 import LayoutAdmin from "./components/LayoutAdmin";
 import LayoutPrestamista from "./components/LayoutPrestamista";
-import PrestamistaPage from "./pages/PrestamistaPage";
 
 function App() {
   return (
