@@ -1,4 +1,3 @@
-// src/components/LayoutPrestamista.jsx
 import React from "react";
 import { Link, Outlet } from "react-router-dom";
 
@@ -9,9 +8,9 @@ const LayoutPrestamista = () => {
         <h2>Prestamista</h2>
         <nav>
           <ul>
-            <li><Link to="/prestamista/inicio">Inicio</Link></li>
-            <li><Link to="/prestamista/prestamos">Mis Préstamos</Link></li>
-            {/* Agrega más enlaces si hay más páginas */}
+            <li><Link to="/prestamista">Inicio</Link></li>
+            <li><Link to="/prestamista/prestamos">Préstamos</Link></li>
+            <li><Link to="/prestamista/materiales">Materiales</Link></li>
           </ul>
         </nav>
       </aside>

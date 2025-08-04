@@ -1,31 +1,22 @@
 import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
 import Login from "./pages/Login";
-import PrestamistaPage from "./pages/PrestamistaPage";
-import Materiales from "./pages/Materiales";
+import Inicio from "./pages/Inicio";
 import Usuarios from "./pages/Usuarios";
 import Prestamos from "./pages/Prestamos";
-import Inicio from "./pages/Inicio";
+import Materiales from "./pages/Materiales";
 import ProtectedRoute from "./components/ProtectedRoute";
 import LayoutAdmin from "./components/LayoutAdmin";
 import LayoutPrestamista from "./components/LayoutPrestamista";
+import PrestamistaPage from "./pages/PrestamistaPage";
 
 function App() {
   return (
     <Router>
       <Routes>
+        {/* Login público */}
         <Route path="/" element={<Login />} />
 
-        {/* Ruta común para inicio, accesible por ambos roles */}
-        <Route
-          path="/inicio"
-          element={
-            <ProtectedRoute rolPermitido={["admin", "prestamista"]}>
-              <Inicio />
-            </ProtectedRoute>
-          }
-        />
-
-        {/* Rutas exclusivas para admin con Layout */}
+        {/* Layout y rutas para ADMIN */}
         <Route
           path="/admin"
           element={
@@ -34,12 +25,13 @@ function App() {
             </ProtectedRoute>
           }
         >
+          <Route index element={<Inicio />} />
           <Route path="usuarios" element={<Usuarios />} />
           <Route path="prestamos" element={<Prestamos />} />
           <Route path="materiales" element={<Materiales />} />
         </Route>
 
-        {/* Rutas exclusivas para prestamista */}
+        {/* Layout y rutas para PRESTAMISTA */}
         <Route
           path="/prestamista"
           element={
@@ -47,10 +39,13 @@ function App() {
               <LayoutPrestamista />
             </ProtectedRoute>
           }
-        />
+        >
+          <Route index element={<Inicio />} />
+          <Route path="prestamos" element={<Prestamos />} />
+          <Route path="Usuarios" element={<Usuarios />} />
+          <Route path="materiales" element={<Materiales />} />
 
-        <Route path="inicio" element={<PrestamistaPage />} />
-        <Route path="prestamos" element={<Prestamos />} />
+        </Route>
       </Routes>
     </Router>
   );
