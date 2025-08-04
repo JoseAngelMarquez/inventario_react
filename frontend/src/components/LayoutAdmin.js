@@ -17,7 +17,7 @@ const LayoutAdmin = () => {
         </nav>
       </aside>
       <main className="content">
-        <Outlet /> {/* Aquí se renderiza la página correspondiente */}
+        <Outlet />
       </main>
     </div>
   );

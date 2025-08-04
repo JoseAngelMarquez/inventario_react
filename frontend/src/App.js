@@ -7,6 +7,7 @@ import Prestamos from "./pages/Prestamos";
 import Inicio from "./pages/Inicio";
 import ProtectedRoute from "./components/ProtectedRoute";
 import LayoutAdmin from "./components/LayoutAdmin";
+import LayoutPrestamista from "./components/LayoutPrestamista";
 
 function App() {
   return (
@@ -43,10 +44,13 @@ function App() {
           path="/prestamista"
           element={
             <ProtectedRoute rolPermitido="prestamista">
-              <PrestamistaPage />
+              <LayoutPrestamista />
             </ProtectedRoute>
           }
         />
+
+        <Route path="inicio" element={<PrestamistaPage />} />
+        <Route path="prestamos" element={<Prestamos />} />
       </Routes>
     </Router>
   );
