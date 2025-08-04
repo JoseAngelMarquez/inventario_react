@@ -1,7 +1,7 @@
 import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
 import Login from "./pages/Login";
-import Inicio from "./pages/Inicio";
-import Usuarios from "./pages/Usuarios";
+import Inicio from "./pages/comunes/Inicio";
+import Usuarios from "./pages/admin/Usuarios";
 import Prestamos from "./pages/Prestamos";
 import Materiales from "./pages/comunes/Materiales";
 import ProtectedRoute from "./components/ProtectedRoute";
@@ -41,7 +41,6 @@ function App() {
         >
           <Route index element={<Inicio />} />
           <Route path="prestamos" element={<Prestamos />} />
-          <Route path="Usuarios" element={<Usuarios />} />
           <Route path="materiales" element={<Materiales />} />
 
         </Route>

@@ -1,7 +1,7 @@
 import React from "react";
-import { Link, Outlet, useNavigate} from "react-router-dom";
+import { Link, Outlet} from "react-router-dom";
 import CerrarSesion from "./CerrarSesión";
-import "./LayoutAdmin.css"; // Puedes definir estilos aquí
+import "./LayoutAdmin.css"; 
 
 const LayoutAdmin = () => {
  
