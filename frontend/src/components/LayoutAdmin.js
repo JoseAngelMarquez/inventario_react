@@ -1,8 +1,14 @@
 import React from "react";
-import { Link, Outlet } from "react-router-dom";
+import { Link, Outlet, useNavigate} from "react-router-dom";
 import "./LayoutAdmin.css"; // Puedes definir estilos aquí
 
 const LayoutAdmin = () => {
+  const navigate = useNavigate();
+
+  const cerrarSesion = () =>{
+    localStorage.removeItem("usuario");
+    navigate("/");
+  };
   return (
     <div className="layout">
       <aside className="sidebar">
@@ -13,6 +19,11 @@ const LayoutAdmin = () => {
             <li><Link to="/admin/usuarios">Agregar Usuarios</Link></li>
             <li><Link to="/admin/prestamos">Préstamos</Link></li>
             <li><Link to="/admin/materiales">Materiales</Link></li>
+            <li>
+              <button onClick={cerrarSesion} style={{ marginTop: "1rem" }}>
+                Cerrar sesión
+              </button>
+            </li>
           </ul>
         </nav>
       </aside>
