@@ -1,13 +1,8 @@
 import React from "react";
-import { Link, Outlet, useNavigate } from "react-router-dom";
-
+import { Link, Outlet } from "react-router-dom";
+import CerrarSesion from "./CerrarSesión";
 const LayoutPrestamista = () => {
-  const navigate = useNavigate();
-
-  const cerrarSesion = () =>{
-    localStorage.removeItem("usuario");
-    navigate("/");
-  };
+  
   return (
     <div className="layout">
       <aside className="sidebar">
@@ -17,11 +12,7 @@ const LayoutPrestamista = () => {
             <li><Link to="/prestamista">Inicio</Link></li>
             <li><Link to="/prestamista/prestamos">Préstamos</Link></li>
             <li><Link to="/prestamista/materiales">Materiales</Link></li>
-            <li>
-              <button onClick={cerrarSesion} style={{ marginTop: "1rem" }}>
-                Cerrar sesión
-              </button>
-            </li>
+            <li><CerrarSesion /></li>
           </ul>
         </nav>
       </aside>
