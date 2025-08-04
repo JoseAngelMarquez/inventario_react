@@ -3,7 +3,7 @@ import Login from "./pages/Login";
 import Inicio from "./pages/Inicio";
 import Usuarios from "./pages/Usuarios";
 import Prestamos from "./pages/Prestamos";
-import Materiales from "./pages/Materiales";
+import Materiales from "./pages/comunes/Materiales";
 import ProtectedRoute from "./components/ProtectedRoute";
 import LayoutAdmin from "./components/LayoutAdmin";
 import LayoutPrestamista from "./components/LayoutPrestamista";

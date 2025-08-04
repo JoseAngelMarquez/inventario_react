@@ -5,8 +5,8 @@ import {
   agregarMaterial,
   actualizarMaterial,
   eliminarMaterial,
-} from "../services/materialService";
-import MaterialForm from "../components/MaterialForm";
+} from "../../services/materialService";
+import MaterialForm from "../../components/MaterialForm";
 
 const Materiales = () => {
   const [materiales, setMateriales] = useState([]);
