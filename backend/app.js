@@ -12,6 +12,9 @@ app.use('/api/usuarios', usuarioRoutes);
 const materialesRoutes = require('./routes/materialRoutes'); // Ojo: que el nombre sea exacto
 app.use('/api/materiales', materialesRoutes);
 
+const prestamosRoutes = require('./routes/prestamosRoutes');
+app.use('/api/prestamos', prestamosRoutes);
+
 const PORT = process.env.PORT || 3001;
 app.listen(PORT, () => {
   console.log(`Servidor corriendo en puerto ${PORT}`);
