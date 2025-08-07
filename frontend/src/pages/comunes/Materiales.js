@@ -1,4 +1,3 @@
-// src/pages/Materiales.js
 import React, { useEffect, useState } from "react";
 import {
   obtenerMateriales,
@@ -7,14 +6,25 @@ import {
   eliminarMaterial,
 } from "../../services/materialService";
 import MaterialForm from "../../components/MaterialForm";
+import MaterialList from "../../components/MaterialList";
 
 const Materiales = () => {
   const [materiales, setMateriales] = useState([]);
   const [editando, setEditando] = useState(null);
+  const [cargando, setCargando] = useState(false);
+  const [error, setError] = useState(null);
 
   const cargarMateriales = async () => {
-    const res = await obtenerMateriales();
-    setMateriales(res.data);
+    setCargando(true);
+    setError(null);
+    try {
+      const res = await obtenerMateriales();
+      setMateriales(res.data);
+    } catch (e) {
+      setError("Error cargando materiales");
+    } finally {
+      setCargando(false);
+    }
   };
 
   useEffect(() => {
@@ -22,33 +32,50 @@ const Materiales = () => {
   }, []);
 
   const handleAddOrUpdate = async (material) => {
-    if (editando) {
-      await actualizarMaterial(editando.id, material);
-      setEditando(null);
-    } else {
-      await agregarMaterial(material);
+    try {
+      if (editando) {
+        await actualizarMaterial(editando.id, material);
+        setEditando(null);
+      } else {
+        await agregarMaterial(material);
+      }
+      cargarMateriales();
+    } catch (e) {
+      alert("Error guardando material");
     }
-    cargarMateriales();
   };
 
   const handleDelete = async (id) => {
-    await eliminarMaterial(id);
-    cargarMateriales();
+    if (window.confirm("¿Seguro que quieres eliminar este material?")) {
+      try {
+        await eliminarMaterial(id);
+        cargarMateriales();
+      } catch (e) {
+        alert("Error eliminando material");
+      }
+    }
   };
 
   return (
     <div>
       <h2>Gestión de Materiales</h2>
-      <MaterialForm onSubmit={handleAddOrUpdate} materialEditado={editando} cancelar={() => setEditando(null)} />
-      <ul>
-        {materiales.map((mat) => (
-          <li key={mat.id}>
-            {mat.nombre} - {mat.tipo} - Cantidad: {mat.cantidad_disponible}
-            <button onClick={() => setEditando(mat)}>Editar</button>
-            <button onClick={() => handleDelete(mat.id)}>Eliminar</button>
-          </li>
-        ))}
-      </ul>
+
+      <MaterialForm
+        onSubmit={handleAddOrUpdate}
+        materialEditado={editando}
+        cancelar={() => setEditando(null)}
+      />
+
+      {cargando && <p>Cargando materiales...</p>}
+      {error && <p style={{ color: "red" }}>{error}</p>}
+
+      {!cargando && !error && (
+        <MaterialList
+          materiales={materiales}
+          onEditar={setEditando}
+          onEliminar={handleDelete}
+        />
+      )}
     </div>
   );
 };
