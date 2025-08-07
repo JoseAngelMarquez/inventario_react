@@ -34,19 +34,23 @@ class Prestamos {
   }
 
   static async insertarPrestamo(conn, data) {
-    await conn.query(
+    const [result] = await conn.query(
       `INSERT INTO prestamos 
-      (id_material, cantidad, fecha_prestamo, estado, id_usuario, id_solicitante) 
-      VALUES (?, ?, NOW(), 'prestado', ?, ?)`,
+        (id_material, cantidad, fecha_prestamo, estado, id_usuario, id_solicitante) 
+       VALUES (?, ?, NOW(), 'prestado', ?, ?)`,
       [data.id_material, data.cantidad, data.id_usuario, data.id_solicitante]
     );
+    return result.insertId;
   }
+  
+  
 
   static async actualizarCantidadMaterial(conn, cantidad, id_material) {
-    await conn.query(
+    const [result] = await conn.query(
       'UPDATE materiales SET cantidad_disponible = cantidad_disponible - ? WHERE id = ?',
       [cantidad, id_material]
     );
+    return result.affectedRows;
   }
 }
 

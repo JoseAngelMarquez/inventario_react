@@ -12,13 +12,16 @@ exports.prestarMaterial = async (req, res) => {
       id_material, cantidad, id_usuario
     } = req.body;
 
-    // 1. Verificar material
+    // Verificar material
     const material = await PrestamosModel.verificarMaterial(conn, id_material);
-    if (!material) throw new Error('El material no existe');
-    if (material.cantidad_disponible < cantidad)
-      throw new Error('No hay suficiente cantidad disponible');
+    if (!material) {
+      return res.status(404).json({ error: 'El material no existe' });
+    }
+    if (material.cantidad_disponible < cantidad) {
+      return res.status(400).json({ error: 'No hay suficiente cantidad disponible' });
+    }
 
-    // 2. Verificar o registrar solicitante
+    // Verificar o registrar solicitante
     let solicitante = await PrestamosModel.buscarSolicitante(conn, nombre_completo, tipo);
     let id_solicitante;
     if (solicitante) {
@@ -30,18 +33,25 @@ exports.prestarMaterial = async (req, res) => {
       });
     }
 
-    // 3. Registrar préstamo
-    await PrestamosModel.insertarPrestamo(conn, {
+    // Registrar préstamo
+    const idPrestamo = await PrestamosModel.insertarPrestamo(conn, {
       id_material, cantidad, id_usuario, id_solicitante
     });
 
-    // 4. Actualizar inventario
-    await PrestamosModel.actualizarCantidadMaterial(conn, cantidad, id_material);
+    if (!idPrestamo) {
+      return res.status(500).json({ error: 'Error al registrar el préstamo' });
+    }
 
-    res.json({ mensaje: '✅ Préstamo registrado con éxito' });
+    // Actualizar inventario
+    const filasActualizadas = await PrestamosModel.actualizarCantidadMaterial(conn, cantidad, id_material);
+    if (filasActualizadas === 0) {
+      return res.status(500).json({ error: 'Error al actualizar la cantidad del material' });
+    }
+
+    res.json({ mensaje: 'Préstamo registrado con éxito', idPrestamo });
 
   } catch (error) {
-    res.status(400).json({ error: error.message });
+    res.status(500).json({ error: error.message });
   } finally {
     if (conn) conn.release();
   }
