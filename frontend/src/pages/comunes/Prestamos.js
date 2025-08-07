@@ -18,15 +18,16 @@ function FormPrestamo() {
         id_usuario: 1,
     });
 
-    useEffect(() => {
-        async function cargarMateriales() {
-            try {
-                const res = await obtenerMateriales();
-                setMateriales(res.data);
-            } catch (error) {
-                console.error('Error cargando materiales:', error);
-            }
+    const cargarMateriales = async () => {
+        try {
+            const res = await obtenerMateriales();
+            setMateriales(res.data);
+        } catch (error) {
+            console.error('Error cargando materiales:', error);
         }
+    };
+
+    useEffect(() => {
         cargarMateriales();
     }, []);
 
