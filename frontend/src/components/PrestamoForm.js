@@ -1,241 +1,161 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect } from 'react';
 
-const PrestamoForm = ({ materiales, onSubmit, cancelar }) => {
-  const tiposUnicos = [...new Set(materiales.map((m) => m.tipo))];
+function FormPrestamo() {
+  // Estado para los materiales (para el select)
+  const [materiales, setMateriales] = useState([]);
 
-  const [formData, setFormData] = useState({
-    tipoMaterial: "",
-    idMaterial: "",
-    cantidadDisponible: 0,
+  // Estado del formulario
+  const [form, setForm] = useState({
+    tipo: 'estudiante', // o trabajador
+    nombre_completo: '',
+    matricula: '',
+    carrera: '',
+    lugar_trabajo: '',
+    telefono: '',
+    correo: '',
+    id_material: '',
     cantidad: 1,
-    tipoSolicitante: "estudiante",
-    nombre: "",
-    matricula: "",
-    carrera: "",
-    lugarTrabajo: "",
-    telefono: "",
-    correo: "",
+    fecha_prestamo: new Date().toISOString().slice(0,16), // YYYY-MM-DDTHH:mm para input datetime-local
+    id_usuario: 1, // Ejemplo fijo, mejor si lo obtienes de sesión/autenticación
   });
 
-  const materialesFiltrados = formData.tipoMaterial
-    ? materiales.filter((m) => m.tipo === formData.tipoMaterial)
-    : [];
-
+  // Cargar materiales al montar el componente
   useEffect(() => {
-    const mat = materiales.find((m) => m.id === formData.idMaterial);
-    if (mat) {
-      setFormData((prev) => ({
-        ...prev,
-        cantidadDisponible: mat.cantidad_disponible,
-        cantidad: Math.min(prev.cantidad, mat.cantidad_disponible) || 1,
-      }));
-    } else {
-      setFormData((prev) => ({
-        ...prev,
-        cantidadDisponible: 0,
-        cantidad: 1,
-      }));
-    }
-  }, [formData.idMaterial, materiales]);
+    fetch('/api/materiales') // Asumiendo que tienes ese endpoint
+      .then(res => res.json())
+      .then(data => setMateriales(data))
+      .catch(err => console.error('Error al cargar materiales', err));
+  }, []);
 
-  const handleChange = (e) => {
+  // Manejar cambios en inputs
+  function handleChange(e) {
     const { name, value } = e.target;
+    setForm(prev => ({ ...prev, [name]: value }));
+  }
 
-    if (name === "cantidad") {
-      let val = parseInt(value, 10);
-      if (isNaN(val) || val < 1) val = 1;
-      if (val > formData.cantidadDisponible) val = formData.cantidadDisponible;
-      setFormData((prev) => ({ ...prev, cantidad: val }));
-      return;
-    }
-
-    if (name === "tipoMaterial") {
-      setFormData((prev) => ({
-        ...prev,
-        tipoMaterial: value,
-        idMaterial: "",
-        cantidadDisponible: 0,
-        cantidad: 1,
-      }));
-      return;
-    }
-
-    setFormData((prev) => ({ ...prev, [name]: value }));
-  };
-
-  const handleSubmit = (e) => {
+  // Enviar formulario
+  async function handleSubmit(e) {
     e.preventDefault();
+    try {
+      // Convierte la fecha para que no tenga segundos ni zona horaria (opcional según backend)
+      const payload = {
+        ...form,
+        fecha_prestamo: form.fecha_prestamo.replace('T', ' '), // "YYYY-MM-DD HH:mm"
+      };
 
-    if (!formData.idMaterial) {
-      alert("Selecciona un material");
-      return;
-    }
-    if (!formData.nombre || !formData.telefono || !formData.correo) {
-      alert("Completa los datos del solicitante");
-      return;
-    }
-    if (
-      formData.tipoSolicitante === "estudiante" &&
-      (!formData.matricula || !formData.carrera)
-    ) {
-      alert("Completa matrícula y carrera");
-      return;
-    }
-    if (formData.tipoSolicitante === "trabajador" && !formData.lugarTrabajo) {
-      alert("Completa lugar de trabajo");
-      return;
-    }
+      const res = await fetch('/api/prestamos', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(payload),
+      });
 
-    onSubmit(formData);
-  };
+      if (!res.ok) throw new Error('Error al crear préstamo');
+
+      const data = await res.json();
+      alert(`Préstamo creado con ID ${data.id}`);
+      // Aquí puedes limpiar el formulario o redirigir
+    } catch (err) {
+      alert(err.message);
+    }
+  }
 
   return (
     <form onSubmit={handleSubmit}>
-      <h3>Material</h3>
-
+      <h2>Datos del solicitante</h2>
       <label>
-        Tipo de material:
-        <select
-          name="tipoMaterial"
-          value={formData.tipoMaterial}
-          onChange={handleChange}
-          required
-        >
-          <option value="">-- Selecciona tipo --</option>
-          {tiposUnicos.map((tipo) => (
-            <option key={tipo} value={tipo}>
-              {tipo}
-            </option>
-          ))}
-        </select>
-      </label>
-
-      <label>
-        Material:
-        <select
-          name="idMaterial"
-          value={formData.idMaterial}
-          onChange={handleChange}
-          required
-          disabled={!formData.tipoMaterial}
-        >
-          <option value="">-- Selecciona material --</option>
-          {materialesFiltrados.map((mat) => (
-            <option key={mat.id} value={mat.id}>
-              {mat.nombre} (Disponible: {mat.cantidad_disponible})
-            </option>
-          ))}
-        </select>
-      </label>
-
-      <div>
-        <label>Cantidad a prestar:</label>
-        <input
-          type="number"
-          name="cantidad"
-          value={formData.cantidad}
-          onChange={handleChange}
-          min="1"
-          max={formData.cantidadDisponible || 1}
-          required
-        />
-      </div>
-
-      <h3>Datos del solicitante</h3>
-
-      <label>
-        Tipo de solicitante:
-        <select
-          name="tipoSolicitante"
-          value={formData.tipoSolicitante}
-          onChange={handleChange}
-        >
+        Tipo:
+        <select name="tipo" value={form.tipo} onChange={handleChange}>
           <option value="estudiante">Estudiante</option>
           <option value="trabajador">Trabajador</option>
         </select>
       </label>
 
-      <div>
-        <label>Nombre:</label>
+      <label>
+        Nombre completo:
         <input
           type="text"
-          name="nombre"
-          value={formData.nombre}
+          name="nombre_completo"
+          value={form.nombre_completo}
           onChange={handleChange}
           required
         />
-      </div>
+      </label>
 
-      {formData.tipoSolicitante === "estudiante" ? (
+      {form.tipo === 'estudiante' && (
         <>
-          <div>
-            <label>Matrícula:</label>
-            <input
-              type="text"
-              name="matricula"
-              value={formData.matricula}
-              onChange={handleChange}
-              required
-            />
-          </div>
-          <div>
-            <label>Carrera:</label>
-            <input
-              type="text"
-              name="carrera"
-              value={formData.carrera}
-              onChange={handleChange}
-              required
-            />
-          </div>
+          <label>
+            Matrícula:
+            <input type="text" name="matricula" value={form.matricula} onChange={handleChange} />
+          </label>
+          <label>
+            Carrera:
+            <input type="text" name="carrera" value={form.carrera} onChange={handleChange} />
+          </label>
         </>
-      ) : (
-        <div>
-          <label>Lugar de trabajo:</label>
-          <input
-            type="text"
-            name="lugarTrabajo"
-            value={formData.lugarTrabajo}
-            onChange={handleChange}
-            required
-          />
-        </div>
       )}
 
-      <div>
-        <label>Teléfono:</label>
+      {form.tipo === 'trabajador' && (
+        <label>
+          Lugar de trabajo:
+          <input type="text" name="lugar_trabajo" value={form.lugar_trabajo} onChange={handleChange} />
+        </label>
+      )}
+
+      <label>
+        Teléfono:
+        <input type="tel" name="telefono" value={form.telefono} onChange={handleChange} />
+      </label>
+
+      <label>
+        Correo:
+        <input type="email" name="correo" value={form.correo} onChange={handleChange} />
+      </label>
+
+      <h2>Datos del préstamo</h2>
+
+      <label>
+        Material:
+        <select
+          name="id_material"
+          value={form.id_material}
+          onChange={handleChange}
+          required
+        >
+          <option value="">-- Selecciona un material --</option>
+          {materiales.map(mat => (
+            <option key={mat.id} value={mat.id}>{mat.nombre}</option>
+          ))}
+        </select>
+      </label>
+
+      <label>
+        Cantidad:
         <input
-          type="tel"
-          name="telefono"
-          value={formData.telefono}
+          type="number"
+          name="cantidad"
+          value={form.cantidad}
+          min="1"
           onChange={handleChange}
           required
         />
-      </div>
+      </label>
 
-      <div>
-        <label>Correo:</label>
+      <label>
+        Fecha préstamo:
         <input
-          type="email"
-          name="correo"
-          value={formData.correo}
+          type="datetime-local"
+          name="fecha_prestamo"
+          value={form.fecha_prestamo}
           onChange={handleChange}
           required
         />
-      </div>
+      </label>
 
-      <button type="submit" style={{ marginTop: 10 }}>
-        Agregar préstamo
-      </button>
-      <button
-        type="button"
-        onClick={cancelar}
-        style={{ marginLeft: 10, marginTop: 10 }}
-      >
-        Cancelar
-      </button>
+      {/* id_usuario normalmente lo sacas del contexto o sesión */}
+
+      <button type="submit">Prestar</button>
     </form>
   );
-};
+}
 
-export default PrestamoForm;
+export default FormPrestamo;

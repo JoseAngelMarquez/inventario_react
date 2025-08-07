@@ -44,28 +44,47 @@ class Prestamos {
   }
 
   static async crear(conn, prestamo) {
-    const { id_solicitante, id_material, cantidad, fecha_prestamo, fecha_devolucion = null, id_usuario } = prestamo;
-
-    if (!id_usuario) throw new Error("El campo 'id_usuario' es obligatorio");
-    if (!id_solicitante) throw new Error("El campo 'id_solicitante' es obligatorio");
-    if (!id_material) throw new Error("El campo 'id_material' es obligatorio");
-    if (!cantidad || cantidad <= 0) throw new Error("La cantidad debe ser mayor a 0");
-    if (!fecha_prestamo) throw new Error("El campo 'fecha_prestamo' es obligatorio");
-
-    // Insertar préstamo
-    const [result] = await conn.query(`
-      INSERT INTO prestamos (id_solicitante, id_material, cantidad, fecha_prestamo, fecha_devolucion, id_usuario)
+    // Datos del solicitante (nuevo)
+    const {
+      tipo,
+      nombre_completo,
+      matricula = null,
+      carrera = null,
+      lugar_trabajo = null,
+      telefono = null,
+      correo = null,
+  
+      // Datos del préstamo
+      id_material,
+      cantidad,
+      fecha_prestamo,
+      fecha_devolucion = null,
+      id_usuario
+    } = prestamo;
+  
+    // Primero insertas el solicitante
+    const [resultSolicitante] = await conn.query(`
+      INSERT INTO solicitantes (tipo, nombre_completo, matricula, carrera, lugar_trabajo, telefono, correo)
+      VALUES (?, ?, ?, ?, ?, ?, ?)
+    `, [tipo, nombre_completo, matricula, carrera, lugar_trabajo, telefono, correo]);
+  
+    const id_solicitante = resultSolicitante.insertId;
+  
+    // Luego insertas el préstamo con el id_solicitante recién creado
+    const [resultPrestamo] = await conn.query(`
+      INSERT INTO prestamos (id_material, cantidad, fecha_prestamo, fecha_devolucion, id_usuario, id_solicitante)
       VALUES (?, ?, ?, ?, ?, ?)
-    `, [id_solicitante, id_material, cantidad, fecha_prestamo, fecha_devolucion, id_usuario]);
-
-    // Actualizar cantidad disponible del material
+    `, [id_material, cantidad, fecha_prestamo, fecha_devolucion, id_usuario, id_solicitante]);
+  
+    // Actualizas la cantidad disponible del material
     await conn.query(`
       UPDATE materiales SET cantidad_disponible = cantidad_disponible - ?
       WHERE id = ?
     `, [cantidad, id_material]);
-
-    return result.insertId;
+  
+    return resultPrestamo.insertId;
   }
+  
 
   static async actualizar(conn, id, prestamo) {
     const { id_solicitante, id_material, cantidad, fecha_prestamo, fecha_devolucion, estado, id_usuario } = prestamo;
