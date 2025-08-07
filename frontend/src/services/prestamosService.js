@@ -1,5 +1,6 @@
 import axios from "axios";
+import Material from "../../../backend/models/materialModel";
 
 const API_URL = "http://localhost:3001/api/prestamos";
 
-const obtenerPrestamos = () => axios.get(API_URL);
+export const prestarMaterial = (Material)
