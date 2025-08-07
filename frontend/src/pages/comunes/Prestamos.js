@@ -44,11 +44,22 @@ function FormPrestamo() {
       };
       const res = await agregarPrestamo(payload);
       alert(`Préstamo creado con ID ${res.data.id}`);
-      // Aquí limpia form si quieres
+  
+      // Aquí vuelves a cargar materiales actualizados
+      const resMateriales = await obtenerMateriales();
+      setMateriales(resMateriales.data);
+  
+      // También puedes limpiar el formulario si quieres
+      setForm(prev => ({
+        ...prev,
+        id_material: '',
+        cantidad: 1,
+      }));
     } catch (error) {
       alert('Error al crear préstamo: ' + (error.response?.data?.message || error.message));
     }
   }
+  
 
   return (
     <form onSubmit={handleSubmit}>
