@@ -1,12 +1,13 @@
 import React, { useEffect, useState } from "react";
+import MaterialForm from "../../components/materialForm";
+import MaterialList from "../../components/MaterialList";
 import {
   obtenerMateriales,
   agregarMaterial,
   actualizarMaterial,
   eliminarMaterial,
 } from "../../services/materialService";
-import MaterialForm from "../../components/MaterialForm";
-import MaterialList from "../../components/MaterialList";
+
 
 const Materiales = () => {
   const [materiales, setMateriales] = useState([]);
