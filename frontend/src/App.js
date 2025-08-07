@@ -2,12 +2,11 @@ import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
 import Login from "./pages/Login";
 import Inicio from "./pages/comunes/Inicio";
 import Usuarios from "./pages/admin/Usuarios";
-import Prestamos from "./pages/Prestamos";
 import Materiales from "./pages/comunes/Materiales";
 import ProtectedRoute from "./components/ProtectedRoute";
 import LayoutAdmin from "./components/LayoutAdmin";
 import LayoutPrestamista from "./components/LayoutPrestamista";
-
+import Prestamos from "./pages/comunes/Prestamos";
 function App() {
   return (
     <Router>

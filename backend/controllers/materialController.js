@@ -1,75 +1,70 @@
-const pool = require('../config/db');
-const Material = require('../models/materialModel');
+const pool = require('../config/db.config');
+const Prestamos = require('../model/Prestamos');
 
-exports.obtenerMateriales = async (req, res) => {
-  const conn = await pool.getConnection();
+exports.obtenerTodos = async (req, res) => {
+  let conn;
   try {
-    const materiales = await Material.obtenerTodos(conn);
-    res.json(materiales);
-  } catch (error) {
-    console.error('Error al obtener materiales:', error);
-    res.status(500).json({ message: 'Error al obtener materiales' });
+    conn = await pool.getConnection();
+    const prestamos = await Prestamos.obtenerTodosConDetalles(conn);
+    res.json(prestamos);
+  } catch (err) {
+    res.status(500).json({ error: 'Error al obtener préstamos' });
   } finally {
-    conn.release();
+    if (conn) conn.release();
   }
 };
 
-exports.obtenerMaterialPorId = async (req, res) => {
-  const conn = await pool.getConnection();
+exports.obtenerPorId = async (req, res) => {
+  let conn;
   try {
-    const id = req.params.id;
-    const material = await Material.obtenerPorId(conn, id);
-    if (!material) return res.status(404).json({ message: 'Material no encontrado' });
-    res.json(material);
-  } catch (error) {
-    console.error('Error al obtener material:', error);
-    res.status(500).json({ message: 'Error al obtener material' });
+    conn = await pool.getConnection();
+    const prestamo = await Prestamos.obtenerPorId(conn, req.params.id);
+    if (!prestamo) return res.status(404).json({ error: 'Préstamo no encontrado' });
+    res.json(prestamo);
+  } catch (err) {
+    res.status(500).json({ error: 'Error al obtener préstamo' });
   } finally {
-    conn.release();
+    if (conn) conn.release();
   }
 };
 
-exports.crearMaterial = async (req, res) => {
-  const conn = await pool.getConnection();
+exports.crear = async (req, res) => {
+  let conn;
   try {
-    const nuevoMaterial = req.body;
-    const id = await Material.crear(conn, nuevoMaterial);
-    res.status(201).json({ id, message: 'Material creado exitosamente' });
-  } catch (error) {
-    console.error('Error al crear material:', error);
-    res.status(500).json({ message: 'Error al crear material' });
+    conn = await pool.getConnection();
+    const id = await Prestamos.crear(conn, req.body);
+    res.status(201).json({ mensaje: 'Préstamo creado', id });
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ error: 'Error al crear préstamo' });
   } finally {
-    conn.release();
+    if (conn) conn.release();
   }
 };
 
-exports.actualizarMaterial = async (req, res) => {
-  const conn = await pool.getConnection();
+exports.actualizar = async (req, res) => {
+  let conn;
   try {
-    const id = req.params.id;
-    const materialActualizado = req.body;
-    const affectedRows = await Material.actualizar(conn, id, materialActualizado);
-    if (affectedRows === 0) return res.status(404).json({ message: 'Material no encontrado' });
-    res.json({ message: 'Material actualizado exitosamente' });
-  } catch (error) {
-    console.error('Error al actualizar material:', error);
-    res.status(500).json({ message: 'Error al actualizar material' });
+    conn = await pool.getConnection();
+    const actualizado = await Prestamos.actualizar(conn, req.params.id, req.body);
+    if (!actualizado) return res.status(404).json({ error: 'Préstamo no encontrado' });
+    res.json({ mensaje: 'Préstamo actualizado' });
+  } catch (err) {
+    res.status(500).json({ error: 'Error al actualizar préstamo' });
   } finally {
-    conn.release();
+    if (conn) conn.release();
   }
 };
 
-exports.eliminarMaterial = async (req, res) => {
-  const conn = await pool.getConnection();
+exports.eliminar = async (req, res) => {
+  let conn;
   try {
-    const id = req.params.id;
-    const affectedRows = await Material.eliminar(conn, id);
-    if (affectedRows === 0) return res.status(404).json({ message: 'Material no encontrado' });
-    res.json({ message: 'Material eliminado exitosamente' });
-  } catch (error) {
-    console.error('Error al eliminar material:', error);
-    res.status(500).json({ message: 'Error al eliminar material' });
+    conn = await pool.getConnection();
+    await Prestamos.eliminar(conn, req.params.id);
+    res.json({ mensaje: 'Préstamo eliminado' });
+  } catch (err) {
+    res.status(500).json({ error: 'Error al eliminar préstamo' });
   } finally {
-    conn.release();
+    if (conn) conn.release();
   }
 };

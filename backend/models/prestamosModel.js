@@ -1,56 +1,84 @@
 class Prestamos {
-  static async verificarMaterial(conn, id_material) {
-    const [rows] = await conn.query(
-      'SELECT cantidad_disponible FROM materiales WHERE id = ?',
-      [id_material]
-    );
+  static async obtenerTodosConDetalles(conn) {
+    const [rows] = await conn.query(`
+      SELECT 
+        p.id,
+        p.cantidad,
+        p.fecha_prestamo,
+        p.fecha_devolucion,
+        s.nombre_completo AS nombre_solicitante,
+        s.tipo AS tipo_solicitante,
+        m.nombre AS nombre_material,
+        m.descripcion AS descripcion_material
+      FROM prestamos p
+      JOIN solicitantes s ON p.id_solicitante = s.id
+      JOIN materiales m ON p.id_material = m.id
+      ORDER BY p.fecha_prestamo DESC
+    `);
+    return rows;
+  }
+
+  static async obtenerPorId(conn, id) {
+    const [rows] = await conn.query(`
+      SELECT 
+        p.id,
+        p.cantidad,
+        p.fecha_prestamo,
+        p.fecha_devolucion,
+        s.nombre_completo AS nombre_solicitante,
+        s.tipo AS tipo_solicitante,
+        m.nombre AS nombre_material,
+        m.descripcion AS descripcion_material
+      FROM prestamos p
+      JOIN solicitantes s ON p.id_solicitante = s.id
+      JOIN materiales m ON p.id_material = m.id
+      WHERE p.id = ?
+    `, [id]);
     return rows[0];
   }
 
-  static async buscarSolicitante(conn, nombre_completo, tipo) {
-    const [rows] = await conn.query(
-      'SELECT id FROM solicitantes WHERE nombre_completo = ? AND tipo = ?',
-      [nombre_completo, tipo]
-    );
-    return rows[0];
-  }
+  static async crear(conn, prestamo) {
+    const { id_solicitante, id_material, cantidad, fecha_prestamo, fecha_devolucion } = prestamo;
+    const [result] = await conn.query(`
+      INSERT INTO prestamos (id_solicitante, id_material, cantidad, fecha_prestamo, fecha_devolucion)
+      VALUES (?, ?, ?, ?, ?)
+    `, [id_solicitante, id_material, cantidad, fecha_prestamo, fecha_devolucion]);
 
-  static async insertarSolicitante(conn, data) {
-    const [result] = await conn.query(
-      `INSERT INTO solicitantes 
-      (tipo, nombre_completo, matricula, carrera, lugar_trabajo, telefono, correo) 
-      VALUES (?, ?, ?, ?, ?, ?, ?)`,
-      [
-        data.tipo,
-        data.nombre_completo,
-        data.matricula,
-        data.carrera,
-        data.lugar_trabajo,
-        data.telefono,
-        data.correo
-      ]
-    );
+    // Disminuir cantidad disponible en materiales
+    await conn.query(`
+      UPDATE materiales SET cantidad_disponible = cantidad_disponible - ?
+      WHERE id = ?
+    `, [cantidad, id_material]);
+
     return result.insertId;
   }
 
-  static async insertarPrestamo(conn, data) {
-    const [result] = await conn.query(
-      `INSERT INTO prestamos 
-        (id_material, cantidad, fecha_prestamo, estado, id_usuario, id_solicitante) 
-       VALUES (?, ?, NOW(), 'prestado', ?, ?)`,
-      [data.id_material, data.cantidad, data.id_usuario, data.id_solicitante]
-    );
-    return result.insertId;
-  }
-  
-  
+  static async actualizar(conn, id, prestamo) {
+    const { id_solicitante, id_material, cantidad, fecha_prestamo, fecha_devolucion } = prestamo;
+    const [result] = await conn.query(`
+      UPDATE prestamos 
+      SET id_solicitante = ?, id_material = ?, cantidad = ?, fecha_prestamo = ?, fecha_devolucion = ?
+      WHERE id = ?
+    `, [id_solicitante, id_material, cantidad, fecha_prestamo, fecha_devolucion, id]);
 
-  static async actualizarCantidadMaterial(conn, cantidad, id_material) {
-    const [result] = await conn.query(
-      'UPDATE materiales SET cantidad_disponible = cantidad_disponible - ? WHERE id = ?',
-      [cantidad, id_material]
-    );
     return result.affectedRows;
+  }
+
+  static async eliminar(conn, id) {
+    // Primero obtenemos el préstamo
+    const [rows] = await conn.query(`SELECT id_material, cantidad FROM prestamos WHERE id = ?`, [id]);
+    const prestamo = rows[0];
+
+    // Eliminamos el préstamo
+    await conn.query(`DELETE FROM prestamos WHERE id = ?`, [id]);
+
+    // Regresamos el material disponible
+    await conn.query(`
+      UPDATE materiales SET cantidad_disponible = cantidad_disponible + ?
+      WHERE id = ?
+    `, [prestamo.cantidad, prestamo.id_material]);
+
+    return true;
   }
 }
 
