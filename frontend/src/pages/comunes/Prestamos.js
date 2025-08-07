@@ -46,11 +46,11 @@ function FormPrestamo() {
             const res = await agregarPrestamo(payload);
             alert(`Préstamo creado con ID ${res.data.id}`);
 
-            // Aquí vuelves a cargar materiales actualizados
+            //Cargar materiales actualizados
             const resMateriales = await obtenerMateriales();
             setMateriales(resMateriales.data);
 
-            // También puedes limpiar el formulario si quieres
+            // Resetear el formulario
             setForm(prev => ({
                 ...prev,
                 id_material: '',
