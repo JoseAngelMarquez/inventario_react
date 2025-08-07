@@ -4,8 +4,8 @@ const controller = require('../controller/prestamosController');
 
 router.get('/', controller.obtenerTodos);
 router.get('/:id', controller.obtenerPorId);
-router.post('/prestamos', controller.crear);
-router.put('/api/prestamos/:id', controller.actualizar);
-router.delete('/api/prestamos/:id', controller.eliminar);
+router.post('/', controller.crear);
+router.put('/:id', controller.actualizar);
+router.delete('/:id', controller.eliminar);
 
 module.exports = router;
