@@ -1,64 +1,48 @@
-const { pool, PrestamosModel } = require('../models/prestamosModel');
+const PrestamosModel = require('../models/prestamosModel');
+const pool = require('../config/db');
 
 exports.prestarMaterial = async (req, res) => {
     const conn = await pool.getConnection();
     try {
-        const {
-            tipo,
-            nombre_completo,
-            matricula,
-            carrera,
-            lugar_trabajo,
-            telefono,
-            correo,
-            id_material,
-            cantidad,
-            id_usuario
-        } = req.body;
-
-        await conn.beginTransaction();
-
-        // 1. Verificar material
-        const material = await PrestamosModel.verificarMaterial(conn, id_material);
-        if (!material) throw new Error('El material no existe');
-        if (material.cantidad_disponible < cantidad)
-            throw new Error('No hay suficiente cantidad disponible');
-
-        // 2. Verificar o registrar solicitante
-        let solicitante = await PrestamosModel.buscarSolicitante(conn, nombre_completo, tipo);
-        let id_solicitante;
-        if (solicitante) {
-            id_solicitante = solicitante.id;
-        } else {
-            id_solicitante = await PrestamosModel.insertarSolicitante(conn, {
-                tipo,
-                nombre_completo,
-                matricula,
-                carrera,
-                lugar_trabajo,
-                telefono,
-                correo
-            });
-        }
-
-        // 3. Registrar préstamo
-        await PrestamosModel.insertarPrestamo(conn, {
-            id_material,
-            cantidad,
-            id_usuario,
-            id_solicitante
+      const {
+        tipo, nombre_completo, matricula, carrera,
+        lugar_trabajo, telefono, correo,
+        id_material, cantidad, id_usuario
+      } = req.body;
+  
+      // 1. Verificar material
+      const material = await PrestamosModel.verificarMaterial(conn, id_material);
+      if (!material) throw new Error('El material no existe');
+      if (material.cantidad_disponible < cantidad)
+        throw new Error('No hay suficiente cantidad disponible');
+  
+      // 2. Verificar o registrar solicitante
+      let solicitante = await PrestamosModel.buscarSolicitante(conn, nombre_completo, tipo);
+      let id_solicitante;
+      if (solicitante) {
+        id_solicitante = solicitante.id;
+      } else {
+        id_solicitante = await PrestamosModel.insertarSolicitante(conn, {
+          tipo, nombre_completo, matricula, carrera,
+          lugar_trabajo, telefono, correo
         });
-
-        // 4. Actualizar inventario
-        await PrestamosModel.actualizarCantidadMaterial(conn, cantidad, id_material);
-
-        await conn.commit();
-        res.json({ mensaje: '✅ Préstamo registrado con éxito' });
-
+      }
+  
+      // 3. Registrar préstamo
+      await PrestamosModel.insertarPrestamo(conn, {
+        id_material, cantidad, id_usuario, id_solicitante
+      });
+  
+      // 4. Actualizar inventario
+      await PrestamosModel.actualizarCantidadMaterial(conn, cantidad, id_material);
+  
+      res.json({ mensaje: '✅ Préstamo registrado con éxito' });
+  
     } catch (error) {
-        await conn.rollback();
-        res.status(400).json({ error: error.message });
+      res.status(400).json({ error: error.message });
     } finally {
-        conn.release();
+      conn.release();
     }
-};
+  };
+  
+
