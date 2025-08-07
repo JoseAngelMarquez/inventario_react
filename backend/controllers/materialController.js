@@ -1,70 +1,75 @@
-const pool = require('../config/db.config');
-const Prestamos = require('../model/Prestamos');
+const pool = require('../config/db');
+const Material = require('../models/materialModel');
 
-exports.obtenerTodos = async (req, res) => {
-  let conn;
+exports.obtenerMateriales = async (req, res) => {
+  const conn = await pool.getConnection();
   try {
-    conn = await pool.getConnection();
-    const prestamos = await Prestamos.obtenerTodosConDetalles(conn);
-    res.json(prestamos);
-  } catch (err) {
-    res.status(500).json({ error: 'Error al obtener préstamos' });
+    const materiales = await Material.obtenerTodos(conn);
+    res.json(materiales);
+  } catch (error) {
+    console.error('Error al obtener materiales:', error);
+    res.status(500).json({ message: 'Error al obtener materiales' });
   } finally {
-    if (conn) conn.release();
+    conn.release();
   }
 };
 
-exports.obtenerPorId = async (req, res) => {
-  let conn;
+exports.obtenerMaterialPorId = async (req, res) => {
+  const conn = await pool.getConnection();
   try {
-    conn = await pool.getConnection();
-    const prestamo = await Prestamos.obtenerPorId(conn, req.params.id);
-    if (!prestamo) return res.status(404).json({ error: 'Préstamo no encontrado' });
-    res.json(prestamo);
-  } catch (err) {
-    res.status(500).json({ error: 'Error al obtener préstamo' });
+    const id = req.params.id;
+    const material = await Material.obtenerPorId(conn, id);
+    if (!material) return res.status(404).json({ message: 'Material no encontrado' });
+    res.json(material);
+  } catch (error) {
+    console.error('Error al obtener material:', error);
+    res.status(500).json({ message: 'Error al obtener material' });
   } finally {
-    if (conn) conn.release();
+    conn.release();
   }
 };
 
-exports.crear = async (req, res) => {
-  let conn;
+exports.crearMaterial = async (req, res) => {
+  const conn = await pool.getConnection();
   try {
-    conn = await pool.getConnection();
-    const id = await Prestamos.crear(conn, req.body);
-    res.status(201).json({ mensaje: 'Préstamo creado', id });
-  } catch (err) {
-    console.error(err);
-    res.status(500).json({ error: 'Error al crear préstamo' });
+    const nuevoMaterial = req.body;
+    const id = await Material.crear(conn, nuevoMaterial);
+    res.status(201).json({ id, message: 'Material creado exitosamente' });
+  } catch (error) {
+    console.error('Error al crear material:', error);
+    res.status(500).json({ message: 'Error al crear material' });
   } finally {
-    if (conn) conn.release();
+    conn.release();
   }
 };
 
-exports.actualizar = async (req, res) => {
-  let conn;
+exports.actualizarMaterial = async (req, res) => {
+  const conn = await pool.getConnection();
   try {
-    conn = await pool.getConnection();
-    const actualizado = await Prestamos.actualizar(conn, req.params.id, req.body);
-    if (!actualizado) return res.status(404).json({ error: 'Préstamo no encontrado' });
-    res.json({ mensaje: 'Préstamo actualizado' });
-  } catch (err) {
-    res.status(500).json({ error: 'Error al actualizar préstamo' });
+    const id = req.params.id;
+    const materialActualizado = req.body;
+    const affectedRows = await Material.actualizar(conn, id, materialActualizado);
+    if (affectedRows === 0) return res.status(404).json({ message: 'Material no encontrado' });
+    res.json({ message: 'Material actualizado exitosamente' });
+  } catch (error) {
+    console.error('Error al actualizar material:', error);
+    res.status(500).json({ message: 'Error al actualizar material' });
   } finally {
-    if (conn) conn.release();
+    conn.release();
   }
 };
 
-exports.eliminar = async (req, res) => {
-  let conn;
+exports.eliminarMaterial = async (req, res) => {
+  const conn = await pool.getConnection();
   try {
-    conn = await pool.getConnection();
-    await Prestamos.eliminar(conn, req.params.id);
-    res.json({ mensaje: 'Préstamo eliminado' });
-  } catch (err) {
-    res.status(500).json({ error: 'Error al eliminar préstamo' });
+    const id = req.params.id;
+    const affectedRows = await Material.eliminar(conn, id);
+    if (affectedRows === 0) return res.status(404).json({ message: 'Material no encontrado' });
+    res.json({ message: 'Material eliminado exitosamente' });
+  } catch (error) {
+    console.error('Error al eliminar material:', error);
+    res.status(500).json({ message: 'Error al eliminar material' });
   } finally {
-    if (conn) conn.release();
+    conn.release();
   }
 };

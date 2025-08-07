@@ -1,57 +1,69 @@
 const pool = require('../config/db');
-const PrestamosModel = require('../models/prestamosModel');
+const Prestamos = require('../models/prestamosModel');
 
-exports.prestarMaterial = async (req, res) => {
+exports.obtenerTodos = async (req, res) => {
   let conn;
   try {
     conn = await pool.getConnection();
+    const prestamos = await Prestamos.obtenerTodosConDetalles(conn);
+    res.json(prestamos);
+  } catch (err) {
+    res.status(500).json({ error: 'Error al obtener préstamos' });
+  } finally {
+    if (conn) conn.release();
+  }
+};
 
-    const {
-      tipo, nombre_completo, matricula, carrera,
-      lugar_trabajo, telefono, correo,
-      id_material, cantidad, id_usuario
-    } = req.body;
+exports.obtenerPorId = async (req, res) => {
+  let conn;
+  try {
+    conn = await pool.getConnection();
+    const prestamo = await Prestamos.obtenerPorId(conn, req.params.id);
+    if (!prestamo) return res.status(404).json({ error: 'Préstamo no encontrado' });
+    res.json(prestamo);
+  } catch (err) {
+    res.status(500).json({ error: 'Error al obtener préstamo' });
+  } finally {
+    if (conn) conn.release();
+  }
+};
 
-    // Verificar material
-    const material = await PrestamosModel.verificarMaterial(conn, id_material);
-    if (!material) {
-      return res.status(404).json({ error: 'El material no existe' });
-    }
-    if (material.cantidad_disponible < cantidad) {
-      return res.status(400).json({ error: 'No hay suficiente cantidad disponible' });
-    }
+exports.crear = async (req, res) => {
+  let conn;
+  try {
+    conn = await pool.getConnection();
+    const id = await Prestamos.crear(conn, req.body);
+    res.status(201).json({ mensaje: 'Préstamo creado', id });
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ error: 'Error al crear préstamo' });
+  } finally {
+    if (conn) conn.release();
+  }
+};
 
-    // Verificar o registrar solicitante
-    let solicitante = await PrestamosModel.buscarSolicitante(conn, nombre_completo, tipo);
-    let id_solicitante;
-    if (solicitante) {
-      id_solicitante = solicitante.id;
-    } else {
-      id_solicitante = await PrestamosModel.insertarSolicitante(conn, {
-        tipo, nombre_completo, matricula, carrera,
-        lugar_trabajo, telefono, correo
-      });
-    }
+exports.actualizar = async (req, res) => {
+  let conn;
+  try {
+    conn = await pool.getConnection();
+    const actualizado = await Prestamos.actualizar(conn, req.params.id, req.body);
+    if (!actualizado) return res.status(404).json({ error: 'Préstamo no encontrado' });
+    res.json({ mensaje: 'Préstamo actualizado' });
+  } catch (err) {
+    res.status(500).json({ error: 'Error al actualizar préstamo' });
+  } finally {
+    if (conn) conn.release();
+  }
+};
 
-    // Registrar préstamo
-    const idPrestamo = await PrestamosModel.insertarPrestamo(conn, {
-      id_material, cantidad, id_usuario, id_solicitante
-    });
-
-    if (!idPrestamo) {
-      return res.status(500).json({ error: 'Error al registrar el préstamo' });
-    }
-
-    // Actualizar inventario
-    const filasActualizadas = await PrestamosModel.actualizarCantidadMaterial(conn, cantidad, id_material);
-    if (filasActualizadas === 0) {
-      return res.status(500).json({ error: 'Error al actualizar la cantidad del material' });
-    }
-
-    res.json({ mensaje: 'Préstamo registrado con éxito', idPrestamo });
-
-  } catch (error) {
-    res.status(500).json({ error: error.message });
+exports.eliminar = async (req, res) => {
+  let conn;
+  try {
+    conn = await pool.getConnection();
+    await Prestamos.eliminar(conn, req.params.id);
+    res.json({ mensaje: 'Préstamo eliminado' });
+  } catch (err) {
+    res.status(500).json({ error: 'Error al eliminar préstamo' });
   } finally {
     if (conn) conn.release();
   }
