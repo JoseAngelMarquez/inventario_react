@@ -62,7 +62,7 @@ class Prestamos {
       id_usuario
     } = prestamo;
   
-    // Primero insertas el solicitante
+    // Insertar el solicitante
     const [resultSolicitante] = await conn.query(`
       INSERT INTO solicitantes (tipo, nombre_completo, matricula, carrera, lugar_trabajo, telefono, correo)
       VALUES (?, ?, ?, ?, ?, ?, ?)
@@ -70,7 +70,7 @@ class Prestamos {
   
     const id_solicitante = resultSolicitante.insertId;
   
-    // Luego insertas el préstamo con el id_solicitante recién creado
+    // Insertar el préstamo con el id_solicitante recién creado
     const [resultPrestamo] = await conn.query(`
       INSERT INTO prestamos (id_material, cantidad, fecha_prestamo, fecha_devolucion, id_usuario, id_solicitante)
       VALUES (?, ?, ?, ?, ?, ?)
