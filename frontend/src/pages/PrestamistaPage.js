@@ -1,18 +1,11 @@
 import React from "react";
-import { useNavigate } from "react-router-dom";
+import CerrarSesion from "./CerrarSesion";
 
 function PrestamistaPage() {
-  const navigate = useNavigate();
-
-  const cerrarSesion = () => {
-    localStorage.removeItem("usuario");
-    navigate("/");
-  };
-
   return (
     <div>
       <h1>Bienvenido Prestamista</h1>
-      <button onClick={cerrarSesion}>Cerrar sesión</button>
+      <CerrarSesion />
     </div>
   );
 }
