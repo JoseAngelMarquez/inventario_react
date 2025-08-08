@@ -11,15 +11,19 @@ class Prestamos {
         s.tipo AS tipo_solicitante,
         m.nombre AS nombre_material,
         m.descripcion AS descripcion_material,
-        u.usuario AS usuario_prestamista
+        u_presto.usuario AS usuario_prestamista,
+        u_finalizo.usuario AS usuario_finalizador
       FROM prestamos p
       JOIN solicitantes s ON p.id_solicitante = s.id
       JOIN materiales m ON p.id_material = m.id
-      JOIN usuarios u ON p.id_usuario = u.id
+      JOIN usuarios u_presto ON p.id_usuario = u_presto.id
+      LEFT JOIN usuarios u_finalizo ON p.id_finalizado_por = u_finalizo.id
       ORDER BY p.fecha_prestamo DESC
     `);
     return rows;
   }
+  
+
 
   static async obtenerPorId(conn, id) {
     const [rows] = await conn.query(`
@@ -116,6 +120,44 @@ class Prestamos {
 
     return true;
   }
+  static async finalizarPrestamo(conn, idPrestamo, idUsuarioFinaliza) {
+    await conn.beginTransaction();
+    try {
+      const [prestamoRows] = await conn.query(
+        'SELECT id_material, cantidad, estado FROM prestamos WHERE id = ? FOR UPDATE',
+        [idPrestamo]
+      );
+      if (prestamoRows.length === 0) throw new Error('Préstamo no encontrado');
+  
+      if (prestamoRows[0].estado === 'finalizado')
+        throw new Error('El préstamo ya está finalizado');
+  
+      await conn.query(
+        `UPDATE prestamos 
+         SET estado = 'finalizado', 
+             id_finalizado_por = ?, 
+             fecha_devolucion = NOW() 
+         WHERE id = ?`,
+        [idUsuarioFinaliza, idPrestamo]
+      );
+  
+      await conn.query(
+        `UPDATE materiales 
+         SET cantidad_disponible = cantidad_disponible + ? 
+         WHERE id = ?`,
+        [prestamoRows[0].cantidad, prestamoRows[0].id_material]
+      );
+  
+      await conn.commit();
+  
+      return { message: 'Préstamo finalizado y materiales devueltos correctamente' };
+    } catch (error) {
+      await conn.rollback();
+      throw error;
+    }
+  }
+  
 }
+
 
 module.exports = Prestamos;

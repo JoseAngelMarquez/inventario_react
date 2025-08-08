@@ -72,4 +72,25 @@ exports.eliminar = async (req, res) => {
   } finally {
     if (conn) conn.release();
   }
+
 };
+
+exports.finalizar = async (req, res) => {
+  let conn;
+  try {
+    conn = await pool.getConnection();
+    const idPrestamo = req.params.id;
+
+    // Aquí obtén el id del usuario que finaliza. Por ahora lo fijo en 1 para pruebas:
+    const idUsuarioFinaliza = 1;
+
+    const resultado = await Prestamos.finalizarPrestamo(conn, idPrestamo, idUsuarioFinaliza);
+    res.json({ mensaje: resultado.message });
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ error: 'Error al finalizar préstamo', detalle: error.message });
+  } finally {
+    if (conn) conn.release();
+  }
+};
+

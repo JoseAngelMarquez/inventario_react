@@ -6,5 +6,5 @@ export const obtenerPrestamos = () => axios.get(API_URL_PRESTAMOS);
 
 export const agregarPrestamo = (prestamo) => axios.post(API_URL_PRESTAMOS, prestamo);
 
-export const finalizarPrestamo = (id) => axios.delete(`${API_URL_PRESTAMOS}/${id}`);
+export const finalizarPrestamo = (id) => axios.put(`http://localhost:3001/api/prestamos/${id}/finalizar`);
 
