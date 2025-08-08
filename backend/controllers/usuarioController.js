@@ -1,4 +1,5 @@
 const Usuario = require('../models/usuarioModel');
+const pool = require('../config/db');
 const bcrypt = require('bcrypt');
 
 exports.login = async (req, res) => {
@@ -8,8 +9,10 @@ exports.login = async (req, res) => {
     return res.status(400).json({ mensaje: 'Usuario y contraseña son obligatorios' });
   }
 
+  const conn = await pool.getConnection();
+
   try {
-    const resultados = await Usuario.buscarPorUsuario(usuario);
+    const resultados = await Usuario.buscarPorUsuario(conn, usuario);
 
     if (resultados.length === 0) {
       return res.status(401).json({ mensaje: 'Usuario no encontrado' });
@@ -17,7 +20,6 @@ exports.login = async (req, res) => {
 
     const usuarioEncontrado = resultados[0];
 
-    // Comparar la contraseña ingresada con la hasheada en la DB
     const match = await bcrypt.compare(contrasena, usuarioEncontrado.contrasena);
 
     if (match) {
@@ -28,8 +30,11 @@ exports.login = async (req, res) => {
   } catch (error) {
     console.error('Error en login:', error.message);
     return res.status(500).json({ mensaje: 'Error en el servidor' });
+  } finally {
+    conn.release();
   }
 };
+
 
 
 
@@ -46,23 +51,24 @@ exports.crearUsuario = async (req, res) => {
     return res.status(400).json({ mensaje: 'Rol inválido' });
   }
 
+  const conn = await pool.getConnection();
+
   try {
-    // Verificar si usuario ya existe
-    const existente = await Usuario.buscarPorUsuario(usuario);
+    const existente = await Usuario.buscarPorUsuario(conn, usuario);
     if (existente.length > 0) {
       return res.status(409).json({ mensaje: 'El usuario ya existe' });
     }
 
-    // Hashear la contraseña antes de guardarla
-    const saltRounds = 10; // Entre más alto, más seguro, pero más lento
+    const saltRounds = 10;
     const hashedPassword = await bcrypt.hash(contrasena, saltRounds);
 
-    // Guardar usuario con contraseña hasheada
-    const idNuevo = await Usuario.crear(usuario, hashedPassword, rol);
+    const idNuevo = await Usuario.crear(conn, usuario, hashedPassword, rol);
 
     return res.status(201).json({ mensaje: 'Usuario creado', id: idNuevo });
   } catch (error) {
     console.error('Error creando usuario:', error.message);
     return res.status(500).json({ mensaje: 'Error en el servidor' });
+  } finally {
+    conn.release();
   }
 };
