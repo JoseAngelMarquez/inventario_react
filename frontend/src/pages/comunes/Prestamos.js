@@ -1,9 +1,11 @@
 import React, { useState, useEffect } from 'react';
 import { obtenerMateriales } from '../../services/materialService';
-import { agregarPrestamo } from '../../services/prestamosService'; // usa tu service con axios
+import { agregarPrestamo, obtenerPrestamos } from '../../services/prestamosService'; // asegúrate que esta función exista
 
 function FormPrestamo() {
     const [materiales, setMateriales] = useState([]);
+    const [prestamos, setPrestamos] = useState([]);
+
     const [form, setForm] = useState({
         tipo: 'estudiante',
         nombre_completo: '',
@@ -27,8 +29,18 @@ function FormPrestamo() {
         }
     };
 
+    const cargarPrestamos = async () => {
+        try {
+            const res = await obtenerPrestamos();
+            setPrestamos(res.data);
+        } catch (error) {
+            console.error('Error cargando préstamos:', error);
+        }
+    };
+
     useEffect(() => {
         cargarMateriales();
+        cargarPrestamos();
     }, []);
 
     function handleChange(e) {
@@ -46,11 +58,10 @@ function FormPrestamo() {
             const res = await agregarPrestamo(payload);
             alert(`Préstamo creado con ID ${res.data.id}`);
 
-            //Cargar materiales actualizados
-            const resMateriales = await obtenerMateriales();
-            setMateriales(resMateriales.data);
+            await cargarMateriales();
+            await cargarPrestamos();
 
-            // Resetear el formulario
+            // Resetear parte del formulario
             setForm(prev => ({
                 ...prev,
                 id_material: '',
@@ -61,89 +72,132 @@ function FormPrestamo() {
         }
     }
 
-
     return (
-        <form onSubmit={handleSubmit}>
-            {/* campos solicitante (tipo, nombre, matricula, etc.) */}
-            <label>
-                Tipo:
-                <select name="tipo" value={form.tipo} onChange={handleChange}>
-                    <option value="estudiante">Estudiante</option>
-                    <option value="trabajador">Trabajador</option>
-                </select>
-            </label>
-
-            <label>
-                Nombre completo:
-                <input type="text" name="nombre_completo" value={form.nombre_completo} onChange={handleChange} required />
-            </label>
-
-            {form.tipo === 'estudiante' && (
-                <>
-                    <label>Matrícula:
-                        <input type="text" name="matricula" value={form.matricula} onChange={handleChange} />
-                    </label>
-                    <label>Carrera:
-                        <input type="text" name="carrera" value={form.carrera} onChange={handleChange} />
-                    </label>
-                </>
-            )}
-
-            {form.tipo === 'trabajador' && (
+        <>
+            <form onSubmit={handleSubmit}>
                 <label>
-                    Lugar de trabajo:
-                    <input type="text" name="lugar_trabajo" value={form.lugar_trabajo} onChange={handleChange} />
+                    Tipo:
+                    <select name="tipo" value={form.tipo} onChange={handleChange}>
+                        <option value="estudiante">Estudiante</option>
+                        <option value="trabajador">Trabajador</option>
+                    </select>
                 </label>
-            )}
 
-            <label>Teléfono:
-                <input type="tel" name="telefono" value={form.telefono} onChange={handleChange} />
-            </label>
+                <label>
+                    Nombre completo:
+                    <input type="text" name="nombre_completo" value={form.nombre_completo} onChange={handleChange} required />
+                </label>
 
-            <label>Correo:
-                <input type="email" name="correo" value={form.correo} onChange={handleChange} />
-            </label>
+                {form.tipo === 'estudiante' && (
+                    <>
+                        <label>
+                            Matrícula:
+                            <input type="text" name="matricula" value={form.matricula} onChange={handleChange} />
+                        </label>
+                        <label>
+                            Carrera:
+                            <input type="text" name="carrera" value={form.carrera} onChange={handleChange} />
+                        </label>
+                    </>
+                )}
 
-            <h3>Datos del préstamo</h3>
+                {form.tipo === 'trabajador' && (
+                    <label>
+                        Lugar de trabajo:
+                        <input type="text" name="lugar_trabajo" value={form.lugar_trabajo} onChange={handleChange} />
+                    </label>
+                )}
 
-            <label>Material:
-                <select name="id_material" value={form.id_material} onChange={handleChange} required>
-                    <option value="">-- Selecciona un material --</option>
-                    {materiales
-                        .filter(m => m.cantidad_disponible > 0)
-                        .map(m => (
-                            <option key={m.id} value={m.id}>
-                                {m.nombre} ({m.cantidad_disponible} disponibles)
-                            </option>
-                        ))}
+                <label>
+                    Teléfono:
+                    <input type="tel" name="telefono" value={form.telefono} onChange={handleChange} />
+                </label>
 
-                </select>
-            </label>
+                <label>
+                    Correo:
+                    <input type="email" name="correo" value={form.correo} onChange={handleChange} />
+                </label>
 
-            <label>Cantidad:
-                <input
-                    type="number"
-                    name="cantidad"
-                    value={form.cantidad}
-                    min={1}
-                    max={form.id_material ? materiales.find(m => m.id === +form.id_material)?.cantidad_disponible || 1 : 1}
-                    onChange={handleChange}
-                    required
-                />
-            </label>
+                <h3>Datos del préstamo</h3>
 
-            <label>Fecha préstamo:
-                <input
-                    type="datetime-local"
-                    name="fecha_prestamo"
-                    value={form.fecha_prestamo}
-                    onChange={handleChange}
-                    required
-                />
-            </label>
+                <label>
+                    Material:
+                    <select name="id_material" value={form.id_material} onChange={handleChange} required>
+                        <option value="">-- Selecciona un material --</option>
+                        {materiales
+                            .filter(m => m.cantidad_disponible > 0)
+                            .map(m => (
+                                <option key={m.id} value={m.id}>
+                                    {m.nombre} ({m.cantidad_disponible} disponibles)
+                                </option>
+                            ))}
+                    </select>
+                </label>
 
-            <button type="submit">Prestar</button>
-        </form>
+                <label>
+                    Cantidad:
+                    <input
+                        type="number"
+                        name="cantidad"
+                        value={form.cantidad}
+                        min={1}
+                        max={
+                            form.id_material
+                                ? materiales.find(m => m.id === +form.id_material)?.cantidad_disponible || 1
+                                : 1
+                        }
+                        onChange={handleChange}
+                        required
+                    />
+                </label>
+
+                <label>
+                    Fecha préstamo:
+                    <input
+                        type="datetime-local"
+                        name="fecha_prestamo"
+                        value={form.fecha_prestamo}
+                        onChange={handleChange}
+                        required
+                    />
+                </label>
+
+                <button type="submit">Prestar</button>
+            </form>
+
+            <hr />
+
+            <h2>Lista de Préstamos</h2>
+            {prestamos.length === 0 ? (
+  <p>No hay préstamos registrados.</p>
+) : (
+  <table border="1">
+    <thead>
+      <tr>
+        <th>ID</th>
+        <th>Nombre</th>
+        <th>Tipo</th>
+        <th>Material</th>
+        <th>Cantidad</th>
+        <th>Fecha préstamo</th>
+      </tr>
+    </thead>
+    <tbody>
+      {prestamos.map((prestamo) => (
+        <tr key={prestamo.id}>
+          <td>{prestamo.id}</td>
+          <td>{prestamo.nombre_solicitante}</td>
+          <td>{prestamo.tipo_solicitante}</td>
+          <td>{prestamo.nombre_material}</td>
+          <td>{prestamo.cantidad}</td>
+          <td>{new Date(prestamo.fecha_prestamo).toLocaleString()}</td>
+        </tr>
+      ))}
+    </tbody>
+  </table>
+)}
+
+        </>
     );
 }
 
