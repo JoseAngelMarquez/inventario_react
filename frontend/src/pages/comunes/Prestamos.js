@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { obtenerMateriales } from '../../services/materialService';
-import { agregarPrestamo, obtenerPrestamos } from '../../services/prestamosService'; // asegúrate que esta función exista
+import { agregarPrestamo, obtenerPrestamos, finalizarPrestamo } from '../../services/prestamosService'; // asegúrate que esta función exista
 
 function FormPrestamo() {
     const [materiales, setMateriales] = useState([]);
@@ -69,6 +69,17 @@ function FormPrestamo() {
             }));
         } catch (error) {
             alert('Error al crear préstamo: ' + (error.response?.data?.message || error.message));
+        }
+    }
+    async function handleFinalizar(id) {
+        if (!window.confirm('¿Seguro que quieres finalizar este préstamo?')) return;
+        try {
+            await finalizarPrestamo(id);
+            alert('Préstamo finalizado correctamente');
+            await cargarMateriales();
+            await cargarPrestamos();
+        } catch (error) {
+            alert('Error al finalizar préstamo: ' + (error.response?.data?.message || error.message));
         }
     }
 
@@ -191,6 +202,11 @@ function FormPrestamo() {
           <td>{prestamo.nombre_material}</td>
           <td>{prestamo.cantidad}</td>
           <td>{new Date(prestamo.fecha_prestamo).toLocaleString()}</td>
+        <td>{prestamo.estado !== 'finalizado' ? (
+              <button onClick={() => handleFinalizar(prestamo.id)}>Finalizar</button>
+            ) : (
+              'Finalizado'
+            )}</td>
         </tr>
       ))}
     </tbody>
