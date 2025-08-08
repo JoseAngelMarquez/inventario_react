@@ -7,6 +7,8 @@ import ProtectedRoute from "./components/ProtectedRoute";
 import LayoutAdmin from "./Layout/LayoutAdmin";
 import LayoutPrestamista from "./Layout/LayoutPrestamista";
 import Prestamos from "./pages/comunes/Prestamos";
+import "./styles/App.css"; 
+
 function App() {
   return (
     <Router>
