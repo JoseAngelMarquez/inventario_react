@@ -4,8 +4,8 @@ import Inicio from "./pages/comunes/Inicio";
 import Usuarios from "./pages/admin/Usuarios";
 import Materiales from "./pages/comunes/Materiales";
 import ProtectedRoute from "./components/ProtectedRoute";
-import LayoutAdmin from "./components/LayoutAdmin";
-import LayoutPrestamista from "./components/LayoutPrestamista";
+import LayoutAdmin from "./Layout/LayoutAdmin";
+import LayoutPrestamista from "./Layout/LayoutPrestamista";
 import Prestamos from "./pages/comunes/Prestamos";
 function App() {
   return (

@@ -1,6 +1,6 @@
 import React from "react";
 import { Link, Outlet } from "react-router-dom";
-import CerrarSesion from "./CerrarSesión";
+import CerrarSesion from "../components/CerrarSesion";
 const LayoutPrestamista = () => {
   
   return (
