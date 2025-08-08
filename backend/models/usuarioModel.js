@@ -9,6 +9,7 @@ class Usuario {
       throw error;
     }
   }
+  
   static async crear(usuario, contrasena, rol) {
     try {
       const [result] = await pool.query(
