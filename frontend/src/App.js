@@ -1,5 +1,5 @@
 import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
-import Login from "./pages/Login";
+import Login from "./pages/auth/Login";
 import Inicio from "./pages/comunes/Inicio";
 import Usuarios from "./pages/admin/Usuarios";
 import Materiales from "./pages/comunes/Materiales";
