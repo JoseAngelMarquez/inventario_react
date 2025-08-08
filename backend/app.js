@@ -9,7 +9,7 @@ app.use(express.json());
 const usuarioRoutes = require('./routes/usuarios');
 app.use('/api/usuarios', usuarioRoutes);
 
-const materialesRoutes = require('./routes/materialRoutes'); // Ojo: que el nombre sea exacto
+const materialesRoutes = require('./routes/materialRoutes'); 
 app.use('/api/materiales', materialesRoutes);
 
 const prestamosRoutes = require('./routes/prestamosRoutes');

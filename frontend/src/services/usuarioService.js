@@ -8,7 +8,9 @@ export const login = async (usuario, contrasena) => {
   return response.data;
 };
 
-export const crearUsuario = (usuario, contrasena, rol) => {
-  return axios.post(API_URL, { usuario, contrasena, rol })
-    .then(response => response.data);
+
+export const crearUsuario = async (usuario, contrasena, rol) => {
+  const response = await axios.post(`${API_URL}/crear`, { usuario, contrasena, rol });
+  return response.data;
 };
+
