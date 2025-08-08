@@ -59,7 +59,7 @@ exports.actualizar = async (req, res) => {
   }
 };
 
-exports.eliminar = async (req, res) => {
+/* exports.eliminar = async (req, res) => {
   let conn;
   try {
     conn = await pool.getConnection();
@@ -73,7 +73,7 @@ exports.eliminar = async (req, res) => {
     if (conn) conn.release();
   }
 
-};
+}; */
 
 exports.finalizar = async (req, res) => {
   let conn;

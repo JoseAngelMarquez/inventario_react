@@ -22,7 +22,7 @@ class Prestamos {
     `);
     return rows;
   }
-  
+
 
 
   static async obtenerPorId(conn, id) {
@@ -57,7 +57,7 @@ class Prestamos {
       lugar_trabajo = null,
       telefono = null,
       correo = null,
-  
+
       // Datos del préstamo
       id_material,
       cantidad,
@@ -65,30 +65,30 @@ class Prestamos {
       fecha_devolucion = null,
       id_usuario
     } = prestamo;
-  
+
     // Insertar el solicitante
     const [resultSolicitante] = await conn.query(`
       INSERT INTO solicitantes (tipo, nombre_completo, matricula, carrera, lugar_trabajo, telefono, correo)
       VALUES (?, ?, ?, ?, ?, ?, ?)
     `, [tipo, nombre_completo, matricula, carrera, lugar_trabajo, telefono, correo]);
-  
+
     const id_solicitante = resultSolicitante.insertId;
-  
+
     // Insertar el préstamo con el id_solicitante recién creado
     const [resultPrestamo] = await conn.query(`
       INSERT INTO prestamos (id_material, cantidad, fecha_prestamo, fecha_devolucion, id_usuario, id_solicitante)
       VALUES (?, ?, ?, ?, ?, ?)
     `, [id_material, cantidad, fecha_prestamo, fecha_devolucion, id_usuario, id_solicitante]);
-  
+
     // Actualizas la cantidad disponible del material
     await conn.query(`
       UPDATE materiales SET cantidad_disponible = cantidad_disponible - ?
       WHERE id = ?
     `, [cantidad, id_material]);
-  
+
     return resultPrestamo.insertId;
   }
-  
+
 
   static async actualizar(conn, id, prestamo) {
     const { id_solicitante, id_material, cantidad, fecha_prestamo, fecha_devolucion, estado, id_usuario } = prestamo;
@@ -103,7 +103,8 @@ class Prestamos {
     return result.affectedRows;
   }
 
-  static async eliminar(conn, id) {
+  
+  /* static async eliminar(conn, id) {
     // Obtener info del préstamo antes de eliminar para devolver cantidad
     const [rows] = await conn.query(`SELECT id_material, cantidad FROM prestamos WHERE id = ?`, [id]);
     const prestamo = rows[0];
@@ -119,7 +120,8 @@ class Prestamos {
     `, [prestamo.cantidad, prestamo.id_material]);
 
     return true;
-  }
+  } */
+
   static async finalizarPrestamo(conn, idPrestamo, idUsuarioFinaliza) {
     await conn.beginTransaction();
     try {
@@ -128,10 +130,10 @@ class Prestamos {
         [idPrestamo]
       );
       if (prestamoRows.length === 0) throw new Error('Préstamo no encontrado');
-  
+
       if (prestamoRows[0].estado === 'finalizado')
         throw new Error('El préstamo ya está finalizado');
-  
+
       await conn.query(
         `UPDATE prestamos 
          SET estado = 'finalizado', 
@@ -140,23 +142,23 @@ class Prestamos {
          WHERE id = ?`,
         [idUsuarioFinaliza, idPrestamo]
       );
-  
+
       await conn.query(
         `UPDATE materiales 
          SET cantidad_disponible = cantidad_disponible + ? 
          WHERE id = ?`,
         [prestamoRows[0].cantidad, prestamoRows[0].id_material]
       );
-  
+
       await conn.commit();
-  
+
       return { message: 'Préstamo finalizado y materiales devueltos correctamente' };
     } catch (error) {
       await conn.rollback();
       throw error;
     }
   }
-  
+
 }
 
 
