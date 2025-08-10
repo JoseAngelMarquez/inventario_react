@@ -15,6 +15,10 @@ app.use('/api/materiales', materialesRoutes);
 const prestamosRoutes = require('./routes/prestamosRoutes');
 app.use('/api/prestamos', prestamosRoutes);
 
+const inventarioRoutes = require("./routes/inventarioRoutes");
+app.use("/api/inventario", inventarioRoutes);
+
+
 const PORT = process.env.PORT || 3001;
 app.listen(PORT, () => {
   console.log(`Servidor corriendo en puerto ${PORT}`);
