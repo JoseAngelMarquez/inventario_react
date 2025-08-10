@@ -7,6 +7,7 @@ const Inicio = () => {
   const [totales, setTotales] = useState(null);
   const [error, setError] = useState(null);
   const [loading, setLoading] = useState(true);
+  const [busqueda, setBusqueda] = useState("");
 
   useEffect(() => {
     const cargarDatos = async () => {
@@ -31,6 +32,13 @@ const Inicio = () => {
   if (loading) return <p>Cargando datos...</p>;
   if (error) return <p>{error}</p>;
 
+   // Filtrar materiales por texto ingresado
+   const materialesFiltrados = materiales.filter((mat) =>
+    mat.nombre.toLowerCase().includes(busqueda.toLowerCase()) ||
+    mat.tipo.toLowerCase().includes(busqueda.toLowerCase()) ||
+    mat.descripcion.toLowerCase().includes(busqueda.toLowerCase())
+  );
+  
   return (
     <div>
       <h2>Panel de Materiales</h2>
@@ -50,6 +58,24 @@ const Inicio = () => {
       </div>
 
       <h3>Lista de Materiales</h3>
+       {/* Input de búsqueda */}
+       <div style={{ marginTop: "1rem" }}>
+        <input
+          type="text"
+          placeholder="Buscar material..."
+          value={busqueda}
+          onChange={(e) => setBusqueda(e.target.value)}
+          style={{
+            padding: "8px",
+            width: "250px",
+            border: "1px solid #ccc",
+            borderRadius: "4px"
+          }}
+        />
+      </div>
+
+      {/* Lista filtrada */}
+      <h3 style={{ marginTop: "1rem" }}>Lista de Materiales</h3>
       <table border="1" cellPadding="5" style={{ marginTop: "1rem", width: "100%" }}>
         <thead>
           <tr>
@@ -60,8 +86,8 @@ const Inicio = () => {
           </tr>
         </thead>
         <tbody>
-          {materiales && materiales.length > 0 ? (
-            materiales.map((mat) => (
+          {materialesFiltrados.length > 0 ? (
+            materialesFiltrados.map((mat) => (
               <tr key={mat.id}>
                 <td>{mat.nombre}</td>
                 <td>{mat.tipo}</td>
@@ -71,7 +97,7 @@ const Inicio = () => {
             ))
           ) : (
             <tr>
-              <td colSpan="4">No hay materiales para mostrar.</td>
+              <td colSpan="4">No hay materiales que coincidan con la búsqueda.</td>
             </tr>
           )}
         </tbody>
