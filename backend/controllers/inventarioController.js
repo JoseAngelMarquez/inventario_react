@@ -1,27 +1,15 @@
-class Inventario {
-    static async obtenerTotales(conn) {
-      // Total de materiales
-      const [total] = await conn.query("SELECT COUNT(*) AS total FROM materiales");
-  
-      // Materiales disponibles
-      const [disponibles] = await conn.query(
-        "SELECT COUNT(*) AS disponibles FROM materiales WHERE cantidad_disponible > 0"
-      );
-  
-      // Materiales prestados (con base en préstamos activos)
-      const [prestados] = await conn.query(
-        `SELECT COUNT(*) AS prestados 
-         FROM prestamos 
-         WHERE estado = 'prestado'`
-      );
-  
-      return {
-        totalMateriales: total[0].total,
-        materialesDisponibles: disponibles[0].disponibles,
-        materialesPrestados: prestados[0].prestados
-      };
-    }
+const Inventario = require("../models/inventarioModel");
+const pool = require("../config/db"); // tu conexión
+
+exports.obtenerTotalesMateriales = async (req, res) => {
+  const conn = await pool.getConnection();
+  try {
+    const totales = await Inventario.obtenerTotales(conn);
+    res.json(totales);
+  } catch (err) {
+    console.error("Error obteniendo totales:", err);
+    res.status(500).json({ error: "Error en el servidor" });
+  } finally {
+    conn.release();
   }
-  
-  module.exports = Inventario;
-  
+};
