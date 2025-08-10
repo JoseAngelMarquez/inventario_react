@@ -3,7 +3,7 @@ const pool = require('../config/db');
 
 async function insertarUsuario() {
   const usuario = 'test';
-  const contrasena = '1232';
+  const contrasena = '1234';
   const rol = 'prestamista';
 
   try {

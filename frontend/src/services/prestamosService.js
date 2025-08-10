@@ -1,6 +1,6 @@
 import axios from 'axios';
 
-const API_URL_PRESTAMOS = process.env.REACT_APP_API_URL+'prestamos';
+const API_URL_PRESTAMOS = 'http://localhost:3001/api/prestamos';
 export const obtenerPrestamos = () => axios.get(API_URL_PRESTAMOS);
 
 export const agregarPrestamo = (prestamo) => axios.post(API_URL_PRESTAMOS, prestamo);

@@ -1,24 +1,35 @@
 import React, { useEffect, useState } from "react";
 import { obtenerMateriales } from "../../services/materialService";
+import { obtenerTotales } from "../../services/inventarioService";
 
 const Inicio = () => {
   const [materiales, setMateriales] = useState(null);
+  const [totales, setTotales] = useState(null);
   const [error, setError] = useState(null);
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    const cargarMateriales = async () => {
+    const cargarDatos = async () => {
       try {
-        const data = await obtenerMateriales();
-        setMateriales(data);
+        const [resMateriales, resTotales] = await Promise.all([
+          obtenerMateriales(),
+          obtenerTotales()
+        ]);
+        setMateriales(resMateriales.data);
+        setTotales(resTotales.data);
+        setError(null);
       } catch (err) {
-        setError("Error cargando materiales");
+        console.error("Error cargando datos:", err);
+        setError("Error cargando datos");
+      } finally {
+        setLoading(false);
       }
     };
-    cargarMateriales();
+    cargarDatos();
   }, []);
 
+  if (loading) return <p>Cargando datos...</p>;
   if (error) return <p>{error}</p>;
-  if (!materiales) return <p>Cargando materiales...</p>;
 
   return (
     <div>
@@ -26,19 +37,45 @@ const Inicio = () => {
       <div style={{ display: "flex", gap: "1rem" }}>
         <div style={{ padding: "1rem", border: "1px solid #ccc" }}>
           <h3>Materiales Totales</h3>
-          <p>{materiales.totalMateriales}</p>
+          <p>{totales?.totalMateriales ?? "N/A"}</p>
         </div>
         <div style={{ padding: "1rem", border: "1px solid #ccc" }}>
           <h3>Materiales Disponibles</h3>
-          <p>{materiales.materialesDisponibles}</p>
+          <p>{totales?.materialesDisponibles ?? "N/A"}</p>
         </div>
         <div style={{ padding: "1rem", border: "1px solid #ccc" }}>
           <h3>Materiales Prestados</h3>
-          <p>{materiales.materialesPrestados}</p>
+          <p>{totales?.materialesPrestados ?? "N/A"}</p>
         </div>
       </div>
 
-      {/* Aquí podrías mostrar tabla con datos de préstamos */}
+      <h3>Lista de Materiales</h3>
+      <table border="1" cellPadding="5" style={{ marginTop: "1rem", width: "100%" }}>
+        <thead>
+          <tr>
+            <th>Nombre</th>
+            <th>Tipo</th>
+            <th>Cantidad Disponible</th>
+            <th>Descripción</th>
+          </tr>
+        </thead>
+        <tbody>
+          {materiales && materiales.length > 0 ? (
+            materiales.map((mat) => (
+              <tr key={mat.id}>
+                <td>{mat.nombre}</td>
+                <td>{mat.tipo}</td>
+                <td>{mat.cantidad_disponible}</td>
+                <td>{mat.descripcion}</td>
+              </tr>
+            ))
+          ) : (
+            <tr>
+              <td colSpan="4">No hay materiales para mostrar.</td>
+            </tr>
+          )}
+        </tbody>
+      </table>
     </div>
   );
 };

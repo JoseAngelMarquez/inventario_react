@@ -1,75 +1,84 @@
 import React, { useEffect, useState } from "react";
-import { obtenerMateriales } from "../../services/materialService";
+import MaterialForm from "../../components/materialForm";
+import MaterialList from "../../components/MaterialList";
+import {
+  obtenerMateriales,
+  agregarMaterial,
+  actualizarMaterial,
+  eliminarMaterial,
+} from "../../services/materialService";
 
-const Inicio = () => {
+
+const Materiales = () => {
   const [materiales, setMateriales] = useState([]);
+  const [editando, setEditando] = useState(null);
+  const [cargando, setCargando] = useState(false);
   const [error, setError] = useState(null);
-  const [cargando, setCargando] = useState(true);
+
+  const cargarMateriales = async () => {
+    setCargando(true);
+    setError(null);
+    try {
+      const res = await obtenerMateriales();
+      setMateriales(res.data);
+    } catch (e) {
+      setError("Error cargando materiales");
+    } finally {
+      setCargando(false);
+    }
+  };
 
   useEffect(() => {
-    const cargarMateriales = async () => {
-      try {
-        const res = await obtenerMateriales(); // ← devuelve objeto axios
-        console.log("Materiales recibidos:", res.data); // debug
-        setMateriales(res.data); // ← aquí usamos solo el array
-      } catch (err) {
-        console.error(err);
-        setError("Error cargando materiales");
-      } finally {
-        setCargando(false);
-      }
-    };
     cargarMateriales();
   }, []);
 
-  if (cargando) return <p>Cargando materiales...</p>;
-  if (error) return <p>{error}</p>;
+  const handleAddOrUpdate = async (material) => {
+    try {
+      if (editando) {
+        await actualizarMaterial(editando.id, material);
+        setEditando(null);
+      } else {
+        await agregarMaterial(material);
+      }
+      cargarMateriales();
+    } catch (e) {
+      alert("Error guardando material");
+    }
+  };
 
-  // Calcular totales
-  const totalMateriales = materiales.length;
-  const materialesDisponibles = materiales.filter(m => m.cantidad_disponible > 0).length;
-  const materialesPrestados = totalMateriales - materialesDisponibles;
+  const handleDelete = async (id) => {
+    if (window.confirm("¿Seguro que quieres eliminar este material?")) {
+      try {
+        await eliminarMaterial(id);
+        cargarMateriales();
+      } catch (e) {
+        alert("Error eliminando material");
+      }
+    }
+  };
 
   return (
     <div>
-      <h2>Panel de Materiales</h2>
-      <div style={{ display: "flex", gap: "1rem" }}>
-        <div style={{ padding: "1rem", border: "1px solid #ccc" }}>
-          <h3>Materiales Totales</h3>
-          <p>{totalMateriales}</p>
-        </div>
-        <div style={{ padding: "1rem", border: "1px solid #ccc" }}>
-          <h3>Materiales Disponibles</h3>
-          <p>{materialesDisponibles}</p>
-        </div>
-        <div style={{ padding: "1rem", border: "1px solid #ccc" }}>
-          <h3>Materiales Prestados</h3>
-          <p>{materialesPrestados}</p>
-        </div>
-      </div>
+      <h2>Gestión de Materiales</h2>
 
-      {/* Lista de materiales */}
-      <h3 style={{ marginTop: "2rem" }}>Lista de Materiales</h3>
-      <table border="1" cellPadding="5">
-        <thead>
-          <tr>
-            <th>ID</th>
-            <th>Nombre</th>
-            <th>Cantidad Disponible</th>
-          </tr>
-        </thead>
-        <tbody>
-          {materiales.map(m => (
-            <tr key={m.id}>
-              <td>{m.id}</td>
-              <td>{m.nombre}</td>
-              <td>{m.cantidad_disponible}</td>
-            </tr>
-          ))}
-        </tbody>
-      </table>
+      <MaterialForm
+        onSubmit={handleAddOrUpdate}
+        materialEditado={editando}
+        cancelar={() => setEditando(null)}
+      />
+
+      {cargando && <p>Cargando materiales...</p>}
+      {error && <p style={{ color: "red" }}>{error}</p>}
+
+      {!cargando && !error && (
+        <MaterialList
+          materiales={materiales}
+          onEditar={setEditando}
+          onEliminar={handleDelete}
+        />
+      )}
     </div>
   );
 };
 
-export default Inicio;
+export default Materiales;
