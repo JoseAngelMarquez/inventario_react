@@ -1,5 +1,14 @@
 const pool = require('../config/db');
 const Prestamos = require('../models/prestamosModel');
+const nodemailer = require('nodemailer');
+
+const transporter = nodemailer.createTransport({
+  service: 'gmail',
+  auth: {
+    user: 'joseangelmarquezespina060503@gmail.com',
+    pass: 'iikd vkkn ksib rsib',
+  },
+});
 
 exports.obtenerTodos = async (req, res) => {
   let conn;
@@ -35,14 +44,41 @@ exports.crear = async (req, res) => {
   try {
     conn = await pool.getConnection();
     const id = await Prestamos.crear(conn, req.body);
+
+    // Respondes inmediatamente al cliente
     res.status(201).json({ mensaje: 'Préstamo creado', id });
+
+    // Extraemos datos para el correo (puedes hacerlo antes o después de responder)
+    const { correo, nombre_completo, id_material, cantidad, fecha_prestamo } = req.body;
+
+    // Configura el email
+    const mailOptions = {
+      from: 'tucorreo@gmail.com',
+      to: correo,
+      subject: 'Confirmación de préstamo',
+      text: `
+        Hola ${nombre_completo},
+
+        Tu préstamo del material con ID ${id_material} (cantidad: ${cantidad}) fue registrado correctamente el día ${fecha_prestamo}.
+
+        Gracias.
+      `,
+    };
+
+    // Enviar el correo de forma asíncrona, no bloquea la respuesta
+    transporter.sendMail(mailOptions).catch(err => {
+      console.error('Error enviando correo:', err);
+    });
+
   } catch (error) {
     console.error(error);
+    // Si falla la creación, devuelves error
     res.status(500).json({ error: 'Error al crear préstamo', detalle: error.message });
   } finally {
     if (conn) conn.release();
   }
 };
+
 
 exports.actualizar = async (req, res) => {
   let conn;

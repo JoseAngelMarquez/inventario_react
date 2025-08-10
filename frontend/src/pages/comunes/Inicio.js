@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { obtenerMateriales } from "../../services/materialService";
 import { obtenerTotales } from "../../services/inventarioService";
-import InputText from '../../components/UI/InputText';
+import InputText from  "../../components/UI/InputText";
 
 const Inicio = () => {
   const [materiales, setMateriales] = useState(null);
