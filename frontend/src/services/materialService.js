@@ -1,7 +1,7 @@
 // src/services/materialService.js
 import axios from 'axios';
 
-const API_URL = 'http://localhost:3001/api/materiales';
+const API_URL = process.env.REACT_APP_API_URL+'/materiales';
 
 export const obtenerMateriales = () => axios.get(API_URL);
 
