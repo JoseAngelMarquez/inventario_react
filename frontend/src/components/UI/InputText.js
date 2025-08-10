@@ -14,7 +14,7 @@ function InputText({ label, type = "text", value, onChange, required = false }) 
           padding: "0.5rem",
           border: "1px solid #ccc",
           borderRadius: "4px",
-          fontSize: "1rem",
+          fontSize: "0.5rem",
         }}
       />
     </div>

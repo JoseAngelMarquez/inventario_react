@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { obtenerMateriales } from "../../services/materialService";
 import { obtenerTotales } from "../../services/inventarioService";
+import InputText from '../../components/UI/InputText';
 
 const Inicio = () => {
   const [materiales, setMateriales] = useState(null);
@@ -32,13 +33,13 @@ const Inicio = () => {
   if (loading) return <p>Cargando datos...</p>;
   if (error) return <p>{error}</p>;
 
-   // Filtrar materiales por texto ingresado
-   const materialesFiltrados = materiales.filter((mat) =>
+  // Filtrar materiales por texto ingresado
+  const materialesFiltrados = materiales.filter((mat) =>
     mat.nombre.toLowerCase().includes(busqueda.toLowerCase()) ||
     mat.tipo.toLowerCase().includes(busqueda.toLowerCase()) ||
     mat.descripcion.toLowerCase().includes(busqueda.toLowerCase())
   );
-  
+
   return (
     <div>
       <h2>Panel de Materiales</h2>
@@ -58,20 +59,14 @@ const Inicio = () => {
       </div>
 
       <h3>Lista de Materiales</h3>
-       {/* Input de búsqueda */}
-       <div style={{ marginTop: "1rem" }}>
-        <input
-          type="text"
-          placeholder="Buscar material..."
+      {/* Input de búsqueda */}
+      <div style={{ marginTop: "1rem" }}>
+        <InputText
+          label="Buscar material"
           value={busqueda}
           onChange={(e) => setBusqueda(e.target.value)}
-          style={{
-            padding: "8px",
-            width: "250px",
-            border: "1px solid #ccc",
-            borderRadius: "4px"
-          }}
         />
+
       </div>
 
       {/* Lista filtrada */}
