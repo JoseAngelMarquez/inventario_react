@@ -17,8 +17,7 @@
   align-items: center;
   padding: 0 1rem;
   box-sizing: border-box;
-  /* altura fija que definimos en grid-template-rows */
-  height: 100%;  /* para que tome toda la fila 1 */
+  height: 100%; 
 }
 
 .div2 {
@@ -38,4 +37,37 @@
   box-sizing: border-box;
 
 }
+
+.div2 ul {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.div2 ul li {
+  margin: 0.5rem 0;
+}
+
+.div2 ul li a {
+  display: block;
+  color: white;
+  text-decoration: none;
+  padding: 0.5rem 1rem;
+  border-radius: 4px;
+  transition: background-color 0.3s ease;
+  font-weight: 500;
+}
+
+.div2 ul li a:hover,
+.div2 ul li a:focus {
+  background-color: #555;
+  outline: none;
+}
+
+.div2 ul li a.active {
+  background-color: #007bff;
+  color: white;
+}
+
+
 
