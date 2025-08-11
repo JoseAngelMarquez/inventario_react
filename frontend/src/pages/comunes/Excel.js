@@ -13,7 +13,7 @@ export default function PrestamosReporte() {
   }, []);
 
   const exportarExcel = () => {
-    const datosParaExcel = prestamos.map(({ id, solicitante, prestamista, finalizador, cantidad, fecha_prestamo, tipo_material }) => ({
+    const datosParaExcel = prestamos.map(({ id, solicitante, prestamista, finalizador, cantidad, fecha_prestamo, tipo_material, nombre_material }) => ({
       ID: id,
       Solicitante: solicitante,
       Prestamista: prestamista,
@@ -21,6 +21,7 @@ export default function PrestamosReporte() {
       Cantidad: cantidad,
       FechaPrestamo: fecha_prestamo,
       TipoMaterial: tipo_material,
+      Nombre : nombre_material || 'Sin nombre',
     }));
 
     const hoja = XLSX.utils.json_to_sheet(datosParaExcel);
@@ -46,6 +47,7 @@ export default function PrestamosReporte() {
             <th>Cantidad</th>
             <th>Fecha Préstamo</th>
             <th>Tipo Material</th>
+            <th>Nombre Material</th>
           </tr>
         </thead>
         <tbody>
@@ -67,6 +69,7 @@ export default function PrestamosReporte() {
                 })}
               </td>
               <td>{p.tipo_material}</td>
+              <td>{p.nombre_material}</td>
             </tr>
           ))}
         </tbody>

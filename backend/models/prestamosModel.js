@@ -167,7 +167,9 @@ class Prestamos {
         u_finalizo.usuario AS finalizador,
         p.cantidad,
         p.fecha_prestamo,
-        m.tipo AS tipo_material
+        p.fecha_devolucion,
+        m.tipo AS tipo_material,
+        m.nombre AS nombre_material
       FROM prestamos p
       JOIN solicitantes s ON p.id_solicitante = s.id
       JOIN usuarios u_presto ON p.id_usuario = u_presto.id
@@ -177,6 +179,7 @@ class Prestamos {
     `);
     return rows;
   }
+  
 
 }
 
