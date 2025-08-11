@@ -37,31 +37,40 @@ export default function PrestamosReporte() {
       <h1>Reporte de Préstamos</h1>
       <button onClick={exportarExcel}>Exportar a Excel</button>
       <table border="1">
-  <thead>
-    <tr>
-      <th>ID</th>
-      <th>Solicitante</th>
-      <th>Prestamista</th>
-      <th>Finalizador</th>
-      <th>Cantidad</th>
-      <th>Fecha Préstamo</th>
-      <th>Tipo Material</th>
-    </tr>
-  </thead>
-  <tbody>
-    {prestamos.map(p => (
-      <tr key={p.id}>
-        <td>{p.id}</td>
-        <td>{p.solicitante}</td>
-        <td>{p.prestamista}</td>
-        <td>{p.finalizador || 'No finalizado'}</td>
-        <td>{p.cantidad}</td>
-        <td>{new Date(p.fecha_prestamo).toLocaleDateString()}</td>
-        <td>{p.tipo_material}</td>
-      </tr>
-    ))}
-  </tbody>
-</table>
+        <thead>
+          <tr>
+            <th>ID</th>
+            <th>Solicitante</th>
+            <th>Prestamista</th>
+            <th>Finalizador</th>
+            <th>Cantidad</th>
+            <th>Fecha Préstamo</th>
+            <th>Tipo Material</th>
+          </tr>
+        </thead>
+        <tbody>
+          {prestamos.map(p => (
+            <tr key={p.id}>
+              <td>{p.id}</td>
+              <td>{p.solicitante}</td>
+              <td>{p.prestamista}</td>
+              <td>{p.finalizador || 'No finalizado'}</td>
+              <td>{p.cantidad}</td>
+              <td>
+                {new Date(p.fecha_prestamo).toLocaleString("es-MX", {
+                  timeZone: "America/Mexico_City",
+                  year: "numeric",
+                  month: "2-digit",
+                  day: "2-digit",
+                  hour: "2-digit",
+                  minute: "2-digit"
+                })}
+              </td>
+              <td>{p.tipo_material}</td>
+            </tr>
+          ))}
+        </tbody>
+      </table>
 
     </div>
   );
