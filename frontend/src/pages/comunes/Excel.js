@@ -13,15 +13,15 @@ export default function PrestamosReporte() {
   }, []);
 
   const exportarExcel = () => {
-    const datosParaExcel = prestamos.map(({ id, solicitante, prestamista, finalizador, cantidad, fecha_prestamo, tipo_material, nombre_material }) => ({
-      ID: id,
+    const datosParaExcel = prestamos.map(({ solicitante, prestamista, finalizador, cantidad, fecha_prestamo, fecha_devolucion, tipo_material, nombre_material }) => ({
       Solicitante: solicitante,
       Prestamista: prestamista,
       Finalizador: finalizador || 'No finalizado',
       Cantidad: cantidad,
       FechaPrestamo: fecha_prestamo,
       TipoMaterial: tipo_material,
-      Nombre : nombre_material || 'Sin nombre',
+      Nombre: nombre_material || 'Sin nombre',
+      Devolucion: fecha_devolucion,
     }));
 
     const hoja = XLSX.utils.json_to_sheet(datosParaExcel);
@@ -40,12 +40,13 @@ export default function PrestamosReporte() {
       <table border="1">
         <thead>
           <tr>
-            <th>ID</th>
             <th>Solicitante</th>
             <th>Prestamista</th>
             <th>Finalizador</th>
             <th>Cantidad</th>
             <th>Fecha Préstamo</th>
+            <th>Fecha Devolución</th>
+
             <th>Tipo Material</th>
             <th>Nombre Material</th>
           </tr>
@@ -53,7 +54,6 @@ export default function PrestamosReporte() {
         <tbody>
           {prestamos.map(p => (
             <tr key={p.id}>
-              <td>{p.id}</td>
               <td>{p.solicitante}</td>
               <td>{p.prestamista}</td>
               <td>{p.finalizador || 'No finalizado'}</td>
@@ -68,8 +68,19 @@ export default function PrestamosReporte() {
                   minute: "2-digit"
                 })}
               </td>
+              <td>
+                {new Date(p.fecha_devolucion).toLocaleString("es-MX", {
+                  timeZone: "America/Mexico_City",
+                  year: "numeric",
+                  month: "2-digit",
+                  day: "2-digit",
+                  hour: "2-digit",
+                  minute: "2-digit"
+                })}
+              </td>
               <td>{p.tipo_material}</td>
               <td>{p.nombre_material}</td>
+              
             </tr>
           ))}
         </tbody>

@@ -127,7 +127,7 @@ exports.finalizar = async (req, res) => {
     conn = await pool.getConnection();
     const idPrestamo = req.params.id;
 
-    // Aquí obtén el id del usuario que finaliza. Por ahora lo fijo en 1 para pruebas:
+    
     const idUsuarioFinaliza = 1;
 
     const resultado = await Prestamos.finalizarPrestamo(conn, idPrestamo, idUsuarioFinaliza);
@@ -154,14 +154,16 @@ exports.exportarExcel = async (req, res) => {
     const worksheet = workbook.addWorksheet('Préstamos');
 
     worksheet.columns = [
-      { header: 'ID', key: 'id', width: 10 },
-      { header: 'Solicitante', key: 'nombre_solicitante', width: 30 },
-      { header: 'Material', key: 'nombre_material', width: 30 },
-      { header: 'Cantidad', key: 'cantidad', width: 10 },
-      { header: 'Fecha Préstamo', key: 'fecha_prestamo', width: 20 },
-      { header: 'Fecha Devolución', key: 'fecha_devolucion', width: 20 },
-      { header: 'Estado', key: 'estado', width: 15 }
+      { header: 'Solicitante', key: 'Solicitante', width: 30 },
+      { header: 'Prestamista', key: 'Prestamista', width: 30 },
+      { header: 'Finalizador', key: 'Finalizador', width: 30 },
+      { header: 'Cantidad', key: 'Cantidad', width: 10 },
+      { header: 'Fecha Préstamo', key: 'FechaPrestamo', width: 20, style: { numFmt: 'dd/mm/yyyy hh:mm' } },
+      { header: 'Tipo Material', key: 'TipoMaterial', width: 20 },
+      { header: 'Nombre', key: 'Nombre', width: 30 },
+      { header: 'Devolución', key: 'Devolucion', width: 20, style: { numFmt: 'dd/mm/yyyy hh:mm' } },
     ];
+    
 
     prestamos.forEach(prestamo => {
       worksheet.addRow(prestamo);
