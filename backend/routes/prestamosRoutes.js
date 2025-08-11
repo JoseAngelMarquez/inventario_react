@@ -10,6 +10,7 @@ router.put('/:id', controller.actualizar);
 //router.delete('/:id', controller.eliminar);
 router.put('/:id/finalizar', controller.finalizar);
 router.get('/exportar/excel', controller.exportarExcel);
+router.get('/reporte/completo', controller.reporteCompleto);
 
 
 module.exports = router;

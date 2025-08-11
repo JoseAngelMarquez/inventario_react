@@ -103,7 +103,7 @@ class Prestamos {
     return result.affectedRows;
   }
 
-  
+
   /* static async eliminar(conn, id) {
     // Obtener info del préstamo antes de eliminar para devolver cantidad
     const [rows] = await conn.query(`SELECT id_material, cantidad FROM prestamos WHERE id = ?`, [id]);
@@ -157,6 +157,25 @@ class Prestamos {
       await conn.rollback();
       throw error;
     }
+  }
+  static async obtenerReporteCompleto(conn) {
+    const [rows] = await conn.query(`
+      SELECT 
+        p.id,
+        s.nombre_completo AS solicitante,
+        u_presto.usuario AS prestamista,
+        u_finalizo.usuario AS finalizador,
+        p.cantidad,
+        p.fecha_prestamo,
+        m.tipo AS tipo_material
+      FROM prestamos p
+      JOIN solicitantes s ON p.id_solicitante = s.id
+      JOIN usuarios u_presto ON p.id_usuario = u_presto.id
+      LEFT JOIN usuarios u_finalizo ON p.id_finalizado_por = u_finalizo.id
+      JOIN materiales m ON p.id_material = m.id
+      ORDER BY p.fecha_prestamo DESC
+    `);
+    return rows;
   }
 
 }

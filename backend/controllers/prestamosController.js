@@ -179,5 +179,20 @@ exports.exportarExcel = async (req, res) => {
   } finally {
     if (conn) conn.release();
   }
+
+};
+
+exports.reporteCompleto = async (req, res) => {
+  let conn;
+  try {
+    conn = await pool.getConnection();
+    const reporte = await Prestamos.obtenerReporteCompleto(conn);
+    res.json(reporte);
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ error: 'Error al obtener reporte completo' });
+  } finally {
+    if (conn) conn.release();
+  }
 };
 
