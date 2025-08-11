@@ -13,7 +13,7 @@ const styles = {
         backgroundColor: "#333",
         padding: "15px",
         height: "50px",
-        width: "100%", // aquí estaba el error, antes tenías "with"
+        width: "100%", 
         display: "flex",
         alignItems: "center"
     },
