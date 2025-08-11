@@ -72,3 +72,22 @@ exports.crearUsuario = async (req, res) => {
     conn.release();
   }
 };
+
+// En el controlador usuariosController.js
+exports.obtenerUsuarioActual = async (req, res) => {
+  try {
+    const userId = req.userId; 
+    const conn = await pool.getConnection();
+    const usuario = await Usuario.obtenerPorId(conn, userId);
+    conn.release();
+
+    if (!usuario) {
+      return res.status(404).json({ error: 'Usuario no encontrado' });
+    }
+
+    res.json(usuario);
+  } catch (error) {
+    res.status(500).json({ error: 'Error interno del servidor' });
+  }
+};
+

@@ -1,22 +1,24 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
+import { obtenerUsuarioActual } from "../services/usuarioService";
 
 const NavBar = () => {
-    return (
-        <div style={styles.navBar}>
-            <h2 style={{ color: "#fff" }}>NavBar</h2>
-        </div>
-    );
-};
+  const [userName, setUserName] = useState("Cargando...");
 
-const styles = {
-    navBar: {
-        backgroundColor: "#333",
-        padding: "15px",
-        height: "50px",
-        width: "100%", 
-        display: "flex",
-        alignItems: "center"
-    },
+  useEffect(() => {
+    obtenerUsuarioActual()
+      .then(data => {
+        setUserName(data.nombre || "Usuario");
+      })
+      .catch(() => {
+        setUserName("Usuario");
+      });
+  }, []);
+
+  return (
+    <div style={{ backgroundColor: "#333", color: "#fff", padding: "10px" }}>
+      <h2>Bienvenido, {userName}</h2>
+    </div>
+  );
 };
 
 export default NavBar;

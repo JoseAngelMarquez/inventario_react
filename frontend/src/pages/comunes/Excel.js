@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import * as XLSX from 'xlsx';
 import { saveAs } from 'file-saver';
-import { obtenerReporteCompleto } from "../../services/prestamosService";  // solo esta que usas
+import { obtenerReporteCompleto } from "../../services/prestamosService";
 
 export default function PrestamosReporte() {
   const [prestamos, setPrestamos] = useState([]);
@@ -12,31 +12,53 @@ export default function PrestamosReporte() {
       .catch(err => console.error(err));
   }, []);
 
-  const exportarExcel = () => {
-    const datosParaExcel = prestamos.map(({ solicitante, prestamista, finalizador, cantidad, fecha_prestamo, fecha_devolucion, tipo_material, nombre_material }) => ({
-      Solicitante: solicitante,
-      Prestamista: prestamista,
-      Finalizador: finalizador || 'No finalizado',
-      Cantidad: cantidad,
-      FechaPrestamo: fecha_prestamo,
-      TipoMaterial: tipo_material,
-      Nombre: nombre_material || 'Sin nombre',
-      Devolucion: fecha_devolucion,
-    }));
+  const exportarExcelPorFecha = () => {
+    // Obtener fechas únicas (solo fecha, sin hora)
+    const fechasUnicas = [...new Set(prestamos.map(p => {
+      const fecha = new Date(p.fecha_prestamo);
+      return fecha.toISOString().split('T')[0];
+    }))];
 
-    const hoja = XLSX.utils.json_to_sheet(datosParaExcel);
     const libro = XLSX.utils.book_new();
-    XLSX.utils.book_append_sheet(libro, hoja, "Préstamos");
 
+    fechasUnicas.forEach(fecha => {
+      // Filtrar préstamos de esa fecha
+      const datosFiltrados = prestamos.filter(p => {
+        const fechaPrestamo = new Date(p.fecha_prestamo).toISOString().split('T')[0];
+        return fechaPrestamo === fecha;
+      });
+
+      // Mapear datos para Excel
+      const datosParaExcel = datosFiltrados.map(({ solicitante, prestamista, finalizador, cantidad, fecha_prestamo, fecha_devolucion, tipo_material, nombre_material }) => ({
+        Solicitante: solicitante,
+        Prestamista: prestamista,
+        Finalizador: finalizador || 'No finalizado',
+        Cantidad: cantidad,
+        FechaPrestamo: fecha_prestamo,
+        TipoMaterial: tipo_material,
+        Nombre: nombre_material || 'Sin nombre',
+        Devolucion: fecha_devolucion,
+      }));
+
+      // Crear hoja con los datos filtrados
+      const hoja = XLSX.utils.json_to_sheet(datosParaExcel);
+
+      // Agregar hoja al libro con nombre de la fecha
+      XLSX.utils.book_append_sheet(libro, hoja, fecha);
+    });
+
+    // Generar archivo Excel
     const excelBuffer = XLSX.write(libro, { bookType: 'xlsx', type: 'array' });
     const archivo = new Blob([excelBuffer], { type: 'application/octet-stream' });
-    saveAs(archivo, 'prestamos.xlsx');
+    saveAs(archivo, 'prestamos_por_fecha.xlsx');
   };
 
   return (
     <div>
       <h1>Reporte de Préstamos</h1>
-      <button onClick={exportarExcel}>Exportar a Excel</button>
+      
+      <button onClick={exportarExcelPorFecha} style={{ marginBottom: '20px' }}>Exportar Excel</button>
+
       <table border="1">
         <thead>
           <tr>
@@ -57,34 +79,28 @@ export default function PrestamosReporte() {
               <td>{p.prestamista}</td>
               <td>{p.finalizador || 'No finalizado'}</td>
               <td>{p.cantidad}</td>
-              <td>
-                {new Date(p.fecha_prestamo).toLocaleString("es-MX", {
-                  timeZone: "America/Mexico_City",
-                  year: "numeric",
-                  month: "2-digit",
-                  day: "2-digit",
-                  hour: "2-digit",
-                  minute: "2-digit"
-                })}
-              </td>
-              <td>
-                {new Date(p.fecha_devolucion).toLocaleString("es-MX", {
-                  timeZone: "America/Mexico_City",
-                  year: "numeric",
-                  month: "2-digit",
-                  day: "2-digit",
-                  hour: "2-digit",
-                  minute: "2-digit"
-                })}
-              </td>
+              <td>{new Date(p.fecha_prestamo).toLocaleString("es-MX", {
+                timeZone: "America/Mexico_City",
+                year: "numeric",
+                month: "2-digit",
+                day: "2-digit",
+                hour: "2-digit",
+                minute: "2-digit"
+              })}</td>
+              <td>{p.fecha_devolucion && new Date(p.fecha_devolucion).toLocaleString("es-MX", {
+                timeZone: "America/Mexico_City",
+                year: "numeric",
+                month: "2-digit",
+                day: "2-digit",
+                hour: "2-digit",
+                minute: "2-digit"
+              })}</td>
               <td>{p.tipo_material}</td>
               <td>{p.nombre_material}</td>
-              
             </tr>
           ))}
         </tbody>
       </table>
-
     </div>
   );
 }

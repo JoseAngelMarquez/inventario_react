@@ -14,3 +14,8 @@ export const crearUsuario = async (usuario, contrasena, rol) => {
   return response.data;
 };
 
+//función para obtener perfil del usuario logueado
+export const obtenerUsuarioActual = async () => {
+  const response = await axios.get(`${API_URL}/me`);
+  return response.data;
+};

@@ -1,9 +1,6 @@
 .parent {
   display: grid;
   grid-template-columns: repeat(5, 1fr);  /* 5 columnas iguales */
-  /* Ajustamos filas:
-     fila 1: altura fija para header (div1)
-     filas 2 a 5: se reparten el espacio restante de forma igual */
   grid-template-rows: 100px 1fr 1fr 1fr 1fr;
   grid-gap: 0;
   height: 100vh;

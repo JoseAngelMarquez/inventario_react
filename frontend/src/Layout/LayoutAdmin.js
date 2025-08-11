@@ -8,7 +8,7 @@ const LayoutAdmin = () => {
   return (
     <div className="parent">
       <header className="div1">
-
+    <NavBar />
       </header>
       <aside className="div2">
         <h2>Admin</h2>
