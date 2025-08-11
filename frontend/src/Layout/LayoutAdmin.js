@@ -15,6 +15,7 @@ const LayoutAdmin = () => {
             <li><Link to="/admin/usuarios">Agregar Usuarios</Link></li>
             <li><Link to="/admin/prestamos">Préstamos</Link></li>
             <li><Link to="/admin/materiales">Materiales</Link></li>
+            <li><Link to="/admin/Excel">Exportar Excel</Link></li>
             <li><CerrarSesion /></li>
           </ul>
         </nav>

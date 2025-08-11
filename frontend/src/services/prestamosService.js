@@ -7,3 +7,8 @@ export const agregarPrestamo = (prestamo) => axios.post(API_URL_PRESTAMOS, prest
 
 export const finalizarPrestamo = (id) => axios.put(`${API_URL_PRESTAMOS}/${id}/finalizar`);
 
+export const descargarExcelPrestamos = () => {
+    return axios.get(process.env.REACT_APP_API_URL + '/prestamos/exportar/excel', {
+      responseType: 'blob', // Muy importante para archivos binarios
+    });
+  };

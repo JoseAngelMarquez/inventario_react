@@ -1,6 +1,8 @@
 const pool = require('../config/db');
 const Prestamos = require('../models/prestamosModel');
 const nodemailer = require('nodemailer');
+const validator = require('validator');
+
 
 const transporter = nodemailer.createTransport({
   service: 'gmail',
@@ -43,41 +45,49 @@ exports.crear = async (req, res) => {
   let conn;
   try {
     conn = await pool.getConnection();
+
+    const {
+      correo, nombre_completo, id_material, cantidad, fecha_prestamo
+    } = req.body;
+
     const id = await Prestamos.crear(conn, req.body);
 
-    // Respondes inmediatamente al cliente
+    // Obtén nombre del material para el correo
+    const [rows] = await conn.query('SELECT nombre FROM materiales WHERE id = ?', [id_material]);
+    const nombre_material = rows.length > 0 ? rows[0].nombre : 'Material desconocido';
+
+    // Envías respuesta al cliente
     res.status(201).json({ mensaje: 'Préstamo creado', id });
 
-    // Extraemos datos para el correo (puedes hacerlo antes o después de responder)
-    const { correo, nombre_completo, id_material, cantidad, fecha_prestamo } = req.body;
-
-    // Configura el email
+    // Prepara y envía correo de forma asíncrona (no bloquea respuesta)
     const mailOptions = {
-      from: 'tucorreo@gmail.com',
+      from: 'joseangelmarquezespina060503@gmail.com',
       to: correo,
       subject: 'Confirmación de préstamo',
       text: `
         Hola ${nombre_completo},
 
-        Tu préstamo del material con ID ${id_material} (cantidad: ${cantidad}) fue registrado correctamente el día ${fecha_prestamo}.
+        Tu préstamo del material ${nombre_material} (cantidad: ${cantidad}) fue registrado correctamente el día ${fecha_prestamo}.
 
         Gracias.
       `,
     };
 
-    // Enviar el correo de forma asíncrona, no bloquea la respuesta
     transporter.sendMail(mailOptions).catch(err => {
       console.error('Error enviando correo:', err);
     });
 
   } catch (error) {
     console.error(error);
-    // Si falla la creación, devuelves error
-    res.status(500).json({ error: 'Error al crear préstamo', detalle: error.message });
+    // Aquí verifica que la respuesta NO haya sido enviada antes
+    if (!res.headersSent) {
+      res.status(500).json({ error: 'Error al crear préstamo', detalle: error.message });
+    }
   } finally {
     if (conn) conn.release();
   }
 };
+
 
 
 exports.actualizar = async (req, res) => {
@@ -125,6 +135,47 @@ exports.finalizar = async (req, res) => {
   } catch (error) {
     console.error(error);
     res.status(500).json({ error: 'Error al finalizar préstamo', detalle: error.message });
+  } finally {
+    if (conn) conn.release();
+  }
+
+};
+
+exports.exportarExcel = async (req, res) => {
+  let conn;
+  try {
+    conn = await pool.getConnection();
+
+    const prestamos = await Prestamos.obtenerTodosConDetalles(conn);
+
+    console.log('Prestamos para Excel:', prestamos); // Verifica datos
+
+    const workbook = new excelJS.Workbook();
+    const worksheet = workbook.addWorksheet('Préstamos');
+
+    worksheet.columns = [
+      { header: 'ID', key: 'id', width: 10 },
+      { header: 'Solicitante', key: 'nombre_solicitante', width: 30 },
+      { header: 'Material', key: 'nombre_material', width: 30 },
+      { header: 'Cantidad', key: 'cantidad', width: 10 },
+      { header: 'Fecha Préstamo', key: 'fecha_prestamo', width: 20 },
+      { header: 'Fecha Devolución', key: 'fecha_devolucion', width: 20 },
+      { header: 'Estado', key: 'estado', width: 15 }
+    ];
+
+    prestamos.forEach(prestamo => {
+      worksheet.addRow(prestamo);
+    });
+
+    res.setHeader('Content-Type', 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
+    res.setHeader('Content-Disposition', 'attachment; filename=prestamos.xlsx');
+
+    await workbook.xlsx.write(res);
+    res.status(200).end();
+
+  } catch (error) {
+    console.error('Error exportando Excel:', error);
+    res.status(500).send({ message: 'Error generando Excel', error: error.message });
   } finally {
     if (conn) conn.release();
   }

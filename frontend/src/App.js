@@ -8,6 +8,7 @@ import LayoutAdmin from "./Layout/LayoutAdmin";
 import LayoutPrestamista from "./Layout/LayoutPrestamista";
 import Prestamos from "./pages/comunes/Prestamos";
 import "./styles/App.css"; 
+import Excel from "./pages/comunes/Excel";
 
 function App() {
   return (
@@ -29,6 +30,7 @@ function App() {
           <Route path="usuarios" element={<Usuarios />} />
           <Route path="prestamos" element={<Prestamos />} />
           <Route path="materiales" element={<Materiales />} />
+          <Route path="Excel" element={<Excel />} />
         </Route>
 
         {/* Layout y rutas para PRESTAMISTA */}
