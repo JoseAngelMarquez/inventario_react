@@ -1,9 +1,12 @@
 .layout {
-    display: flex;
-    height: 100vh;
-  }
+  display: flex;
+  flex-direction: column; /* Navbar arriba, resto abajo */
+  height: 100vh;
+}
   
   .sidebar {
+    display: flex;
+    height: 100vh;
     width: 220px;
     background-color: #222;
     color: white;
@@ -29,4 +32,6 @@
     padding: 2rem;
     background-color: #f9f9f9;
   }
+
+
   

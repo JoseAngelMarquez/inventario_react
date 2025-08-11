@@ -46,7 +46,6 @@ export default function PrestamosReporte() {
             <th>Cantidad</th>
             <th>Fecha Préstamo</th>
             <th>Fecha Devolución</th>
-
             <th>Tipo Material</th>
             <th>Nombre Material</th>
           </tr>

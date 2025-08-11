@@ -2,13 +2,21 @@ import React from "react";
 import { Link, Outlet} from "react-router-dom";
 import CerrarSesion from "../components/UI/BtnCerrar";
 import "../styles/LayoutAdmin.css"; 
+import NavBar from "../components/navBar"; 
+
 
 const LayoutAdmin = () => {
  
   return (
+    
     <div className="layout">
+       <NavBar />
       <aside className="sidebar">
+     
+
         <h2>Admin</h2>
+
+
         <nav>
           <ul>
             <li><Link to="/admin">Inicio</Link></li>
