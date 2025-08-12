@@ -1,8 +1,8 @@
 import React, { useEffect, useState } from "react";
 import { obtenerMateriales } from "../../services/materialService";
 import { obtenerTotales } from "../../services/inventarioService";
-import InputText from "../../components/UI/InputText";
 import "../../styles/Inicio.css";
+import { CiSearch } from "react-icons/ci";
 
 const Inicio = () => {
   const [materiales, setMateriales] = useState(null);
@@ -63,10 +63,13 @@ const Inicio = () => {
       <h3>Lista de Materiales</h3>
 
       <div className="search-container">
+      <CiSearch className="search-icon"/>
+
         <input className="search-input"
+        
           label="Buscar material"
           value={busqueda}
-          onChange={(e) => setBusqueda(e.target.value)}
+          onChange={(e) => setBusqueda(e.target.value)} 
         />
       </div>
 
