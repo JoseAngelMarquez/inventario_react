@@ -1,7 +1,8 @@
 import React, { useEffect, useState } from "react";
 import { obtenerMateriales } from "../../services/materialService";
 import { obtenerTotales } from "../../services/inventarioService";
-import InputText from  "../../components/UI/InputText";
+import InputText from "../../components/UI/InputText";
+import "../../styles/Inicio.css";
 
 const Inicio = () => {
   const [materiales, setMateriales] = useState(null);
@@ -43,35 +44,33 @@ const Inicio = () => {
   return (
     <div>
       <h2>Panel de Materiales</h2>
-      <div style={{ display: "flex", gap: "1rem" }}>
-        <div style={{ padding: "1rem", border: "1px solid #ccc" }}>
+
+      <div className="panel-container">
+        <div className="panel-box">
           <h3>Materiales Totales</h3>
           <p>{totales?.totalMateriales ?? "N/A"}</p>
         </div>
-        <div style={{ padding: "1rem", border: "1px solid #ccc" }}>
+        <div className="panel-box">
           <h3>Materiales Disponibles</h3>
           <p>{totales?.materialesDisponibles ?? "N/A"}</p>
         </div>
-        <div style={{ padding: "1rem", border: "1px solid #ccc" }}>
+        <div className="panel-box">
           <h3>Materiales Prestados</h3>
           <p>{totales?.materialesPrestados ?? "N/A"}</p>
         </div>
       </div>
 
       <h3>Lista de Materiales</h3>
-      {/* Input de búsqueda */}
-      <div style={{ marginTop: "1rem" }}>
+
+      <div className="search-container">
         <InputText
           label="Buscar material"
           value={busqueda}
           onChange={(e) => setBusqueda(e.target.value)}
         />
-
       </div>
 
-      {/* Lista filtrada */}
-      <h3 style={{ marginTop: "1rem" }}>Lista de Materiales</h3>
-      <table border="1" cellPadding="5" style={{ marginTop: "1rem", width: "100%" }}>
+      <table className="table-materiales">
         <thead>
           <tr>
             <th>Nombre</th>
@@ -98,6 +97,7 @@ const Inicio = () => {
         </tbody>
       </table>
     </div>
+
   );
 };
 
