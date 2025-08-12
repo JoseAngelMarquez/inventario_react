@@ -63,7 +63,7 @@ const Inicio = () => {
       <h3>Lista de Materiales</h3>
 
       <div className="search-container">
-        <InputText
+        <input className="search-input"
           label="Buscar material"
           value={busqueda}
           onChange={(e) => setBusqueda(e.target.value)}
