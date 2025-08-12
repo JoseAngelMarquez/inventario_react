@@ -37,6 +37,7 @@
   padding: 1rem;
   overflow-y: auto;
   box-sizing: border-box;
+  width: 100%;
 }
 
 .div2 ul {
@@ -66,10 +67,7 @@
 }
 
 
-
-
-
-@media  (max-width: 768px) {
+@media  (min-width: 600px) {
   .div2 {
     grid-area: 2 / 1 / 6 / 2;
     /* filas 2-5, columna 1 */
@@ -78,4 +76,5 @@
     box-sizing: border-box;
     min-width: 200px;
   }
+  
 }
