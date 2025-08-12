@@ -15,7 +15,7 @@ const NavBar = () => {
   }, []);
 
   return (
-    <div style={{ backgroundColor: "#333", color: "#fff", padding: "10px" }}>
+    <div style={{ color: "#fff", padding: "10px" }}>
       <h2>Bienvenido, {userName}</h2>
     </div>
   );
