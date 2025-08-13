@@ -78,13 +78,20 @@ const Inicio = () => {
         placeholder="Contraseña"
         value={contrasena}
         onChange={(e) => setContrasena(e.target.value)}
+        className="input2"
       />
+      <div>
       <select value={rol} onChange={(e) => setRol(e.target.value)}>
         <option value="prestamista">Prestamista</option>
         <option value="admin">Admin</option>
+        
       </select>
+      <button className="btn-crear" onClick={handleCrearUsuario}>Crear Usuario</button>
+
+      </div>
       
-      <button onClick={handleCrearUsuario}>Crear Usuario</button>
+      
+      
 
       <table>
         <thead>

@@ -26,7 +26,7 @@
   }
   
   .table-materiales th {
-    background-color: #f0f0f0;
+    background-color: #8F3D38;
   }
   
   .search-container {
@@ -51,3 +51,16 @@
     transform: translateY(-50%);
     font-size: 20px;
   }
+ 
+
+table th, table td {
+    padding: 15px 15px;
+    text-align: left;
+    border-bottom: 1px solid #ddd;
+    
+}
+
+th{
+    background-color: #8F3D38;
+    color: white;
+}

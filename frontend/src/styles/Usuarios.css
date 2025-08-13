@@ -1,5 +1,5 @@
 table{
-    margin-top: 40px;
+    margin-top: 10px;
     width: 100%;
     border-collapse: collapse;
     background-color: #ffffff;
@@ -21,7 +21,7 @@ th{
 }
 
 input{
-    width: 50%;
+    width: 30%;
     padding: 10px;
     border: 1px solid #ddd;
     border-radius: 4px;
@@ -29,8 +29,6 @@ input{
 }
 
 button{
-    margin-top: 10px;
-    margin-left: 10px;
     background-color: #8F3D38;
     color: white;
     border: none;
@@ -48,5 +46,20 @@ select{
 }
 button:hover{
     background-color: #7a2f2b;
+}
+
+.btn-crear{
+    margin-left: 1rem;
+}
+
+.input2{
+    margin-left: 3rem; 
+    margin-right: 3rem;
+}
+
+
+
+option{
+    background-color: #f0f0f0;
 }
 
