@@ -15,7 +15,7 @@ class Usuario {
 
   static async obtenerUsuarios(conn) {
     const [rows] = await conn.query('SELECT * FROM usuarios');
-    return rows.map(row => ({usuario: row.usuario, rol: row.rol}));
+    return rows.map(row => ({id:row.id, usuario: row.usuario, rol: row.rol}));
 
   }
 }
