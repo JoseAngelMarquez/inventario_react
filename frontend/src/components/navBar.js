@@ -1,11 +1,11 @@
 import React, { useEffect, useState } from "react";
-import { obtenerUsuarioActual } from "../services/usuarioService";
+import { obtenerUsuarios } from "../services/usuarioService";
 
 const NavBar = () => {
   const [userName, setUserName] = useState("Cargando...");
 
   useEffect(() => {
-    obtenerUsuarioActual()
+    obtenerUsuarios()
       .then(data => {
         setUserName(data.nombre || "Usuario");
       })

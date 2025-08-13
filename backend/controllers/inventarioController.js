@@ -10,6 +10,6 @@ exports.obtenerTotalesMateriales = async (req, res) => {
     console.error("Error obteniendo totales:", err);
     res.status(500).json({ error: "Error en el servidor" });
   } finally {
-    conn.release();
+    if (conn) conn.release(); 
   }
 };

@@ -10,7 +10,7 @@ exports.obtenerMateriales = async (req, res) => {
     console.error('Error al obtener materiales:', error);
     res.status(500).json({ message: 'Error al obtener materiales' });
   } finally {
-    conn.release();
+    if (conn) conn.release(); 
   }
 };
 
@@ -25,7 +25,7 @@ exports.obtenerMaterialPorId = async (req, res) => {
     console.error('Error al obtener material:', error);
     res.status(500).json({ message: 'Error al obtener material' });
   } finally {
-    conn.release();
+    if (conn) conn.release(); 
   }
 };
 
@@ -39,7 +39,7 @@ exports.crearMaterial = async (req, res) => {
     console.error('Error al crear material:', error);
     res.status(500).json({ message: 'Error al crear material' });
   } finally {
-    conn.release();
+    if (conn) conn.release(); 
   }
 };
 
@@ -55,7 +55,7 @@ exports.actualizarMaterial = async (req, res) => {
     console.error('Error al actualizar material:', error);
     res.status(500).json({ message: 'Error al actualizar material' });
   } finally {
-    conn.release();
+    if (conn) conn.release(); 
   }
 };
 
@@ -70,6 +70,6 @@ exports.eliminarMaterial = async (req, res) => {
     console.error('Error al eliminar material:', error);
     res.status(500).json({ message: 'Error al eliminar material' });
   } finally {
-    conn.release();
+    if (conn) conn.release(); 
   }
 };

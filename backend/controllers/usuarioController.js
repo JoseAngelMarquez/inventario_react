@@ -1,6 +1,7 @@
 const Usuario = require('../models/usuarioModel');
 const pool = require('../config/db');
 const bcrypt = require('bcrypt');
+const { param } = require('../routes/usuarios');
 
 exports.login = async (req, res) => {
   const { usuario, contrasena } = req.body;
@@ -31,7 +32,7 @@ exports.login = async (req, res) => {
     console.error('Error en login:', error.message);
     return res.status(500).json({ mensaje: 'Error en el servidor' });
   } finally {
-    conn.release();
+    if (conn) conn.release(); 
   }
 };
 
@@ -69,25 +70,22 @@ exports.crearUsuario = async (req, res) => {
     console.error('Error creando usuario:', error.message);
     return res.status(500).json({ mensaje: 'Error en el servidor' });
   } finally {
-    conn.release();
+    if (conn) conn.release(); 
   }
 };
 
-// En el controlador usuariosController.js
-exports.obtenerUsuarioActual = async (req, res) => {
-  try {
-    const userId = req.userId; 
-    const conn = await pool.getConnection();
-    const usuario = await Usuario.obtenerPorId(conn, userId);
-    conn.release();
 
-    if (!usuario) {
-      return res.status(404).json({ error: 'Usuario no encontrado' });
-    }
-
-    res.json(usuario);
-  } catch (error) {
-    res.status(500).json({ error: 'Error interno del servidor' });
+exports.obtenerUsuarios = async (req, res) => {
+  const conn = await pool.getConnection();
+  try{
+    const usuarios = await Usuario.obtenerUsuarios(conn);
+    res.json(usuarios);
+  }catch(error){
+    console.error('Error al obtener usuarios:', error);
+    res.status(500).json({ mensaje: 'Error al obtener usuarios' });
+  } finally {
+    if (conn) conn.release(); 
   }
-};
+}
+
 
