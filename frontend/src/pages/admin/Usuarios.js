@@ -1,5 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { crearUsuario, obtenerUsuarios } from "../../services/usuarioService";
+import "../../styles/Usuarios.css";
+
 const Inicio = () => {
   const [usuario, setUsuario] = useState("");
   const [contrasena, setContrasena] = useState("");
@@ -7,20 +9,25 @@ const Inicio = () => {
   const [error, setError] = useState(null);
   const [mensaje, setMensaje] = useState(null);
   const [usuarios, setUsuarios] = useState([]);
-  
+
+  // Paginación
+  const [pagina, setPagina] = useState(1);
+  const filasPorPagina = 7;
+  const totalPaginas = Math.ceil(usuarios.length / filasPorPagina);
+
   useEffect(() => {
     const fetchUsuarios = async () => {
-    try {
-      const lista = await obtenerUsuarios();
-      setUsuarios(lista);
-      console.log("Usuarios obtenidos:", lista);   
-    } catch (error) {
-      setError("Error al obtener usuarios");
-    }
-
+      try {
+        const lista = await obtenerUsuarios();
+        setUsuarios(lista);
+        console.log("Usuarios obtenidos:", lista);
+      } catch (error) {
+        setError("Error al obtener usuarios");
+      }
     };
     fetchUsuarios();
-  },[]);
+  }, []);
+
   const handleCrearUsuario = async () => {
     setError(null);
     setMensaje(null);
@@ -35,12 +42,27 @@ const Inicio = () => {
       setMensaje(`Usuario creado con ID: ${data.id}`);
       setUsuario("");
       setContrasena("");
+
+      // Refrescar la lista de usuarios
+      const lista = await obtenerUsuarios();
+      setUsuarios(lista);
+      setPagina(1); // Opcional: volver a la primera página
     } catch (err) {
       setError(err.response?.data?.mensaje || "Error creando usuario");
     }
   };
 
-  
+  const cambiarPagina = (nuevaPagina) => {
+    if (nuevaPagina < 1) nuevaPagina = 1;
+    if (nuevaPagina > totalPaginas) nuevaPagina = totalPaginas;
+    setPagina(nuevaPagina);
+  };
+
+  // Filas que se mostrarán en la página actual
+  const filasMostradas = usuarios.slice(
+    (pagina - 1) * filasPorPagina,
+    pagina * filasPorPagina
+  );
 
   return (
     <div>
@@ -62,16 +84,16 @@ const Inicio = () => {
         <option value="admin">Admin</option>
       </select>
       <button onClick={handleCrearUsuario}>Crear Usuario</button>
+
       <table>
         <thead>
-          
           <tr>
             <th>Usuario</th>
             <th>Rol</th>
           </tr>
         </thead>
         <tbody>
-          {usuarios.map((user) => (
+          {filasMostradas.map((user) => (
             <tr key={user.id}>
               <td>{user.usuario}</td>
               <td>{user.rol}</td>
@@ -79,6 +101,19 @@ const Inicio = () => {
           ))}
         </tbody>
       </table>
+
+      <div style={{ marginTop: "10px" }}>
+        <button onClick={() => cambiarPagina(pagina - 1)} disabled={pagina === 1}>
+          Anterior
+        </button>
+        <span style={{ margin: "0 10px" }}>
+          Página {pagina} de {totalPaginas}
+        </span>
+        <button onClick={() => cambiarPagina(pagina + 1)} disabled={pagina === totalPaginas}>
+          Siguiente
+        </button>
+      </div>
+
       {error && <p style={{ color: "red" }}>{error}</p>}
       {mensaje && <p style={{ color: "green" }}>{mensaje}</p>}
     </div>
