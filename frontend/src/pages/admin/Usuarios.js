@@ -12,7 +12,7 @@ const Inicio = () => {
 
   // Paginación
   const [pagina, setPagina] = useState(1);
-  const filasPorPagina = 7;
+  const filasPorPagina = 5;
   const totalPaginas = Math.ceil(usuarios.length / filasPorPagina);
 
   useEffect(() => {
@@ -83,6 +83,7 @@ const Inicio = () => {
         <option value="prestamista">Prestamista</option>
         <option value="admin">Admin</option>
       </select>
+      
       <button onClick={handleCrearUsuario}>Crear Usuario</button>
 
       <table>
