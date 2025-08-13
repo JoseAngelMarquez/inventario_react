@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { obtenerMateriales } from '../../services/materialService';
 import { agregarPrestamo, obtenerPrestamos, finalizarPrestamo } from '../../services/prestamosService';
-
+import "../../styles/Prestamos.css"; 
 function FormPrestamo() {
     const [materiales, setMateriales] = useState([]);
     const [prestamos, setPrestamos] = useState([]);
@@ -186,7 +186,6 @@ function FormPrestamo() {
         <table border="1">
           <thead>
             <tr>
-              <th>ID</th>
               <th>Nombre</th>
               <th>Tipo</th>
               <th>Material</th>
@@ -201,7 +200,6 @@ function FormPrestamo() {
           <tbody>
             {prestamos.map((prestamo) => (
               <tr key={prestamo.id}>
-                <td>{prestamo.id}</td>
                 <td>{prestamo.nombre_solicitante}</td>
                 <td>{prestamo.tipo_solicitante}</td>
                 <td>{prestamo.nombre_material}</td>
