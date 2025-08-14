@@ -1,14 +1,14 @@
 const pool = require('../config/db');
 const Prestamos = require('../models/prestamosModel');
 const nodemailer = require('nodemailer');
-const validator = require('validator');
+require('dotenv').config();
 
 
 const transporter = nodemailer.createTransport({
   service: 'gmail',
   auth: {
-    user: 'joseangelmarquezespina060503@gmail.com',
-    pass: 'iikd vkkn ksib rsib',
+    user: process.env.GMAIL_USER,
+    pass: process.env.GMAIL_PASS,
   },
 });
 
@@ -61,7 +61,7 @@ exports.crear = async (req, res) => {
 
     // Prepara y envía correo de forma asíncrona (no bloquea respuesta)
     const mailOptions = {
-      from: 'joseangelmarquezespina060503@gmail.com',
+      from: process.env.EMAIL_FROM,
       to: correo,
       subject: 'Confirmación de préstamo',
       text: `
