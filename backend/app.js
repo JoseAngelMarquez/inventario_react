@@ -19,7 +19,7 @@ app.use(session({
   resave: false,
   saveUninitialized: false,
   cookie: {
-    secure: false, // true si usas HTTPS
+    secure: false, 
     httpOnly: true,
     maxAge: parseInt(process.env.SESSION_MAX_AGE)
   }
