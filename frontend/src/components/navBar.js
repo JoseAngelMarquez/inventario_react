@@ -1,17 +1,17 @@
 import React, { useEffect, useState } from "react";
-import { obtenerUsuarios } from "../services/usuarioService";
 
 const NavBar = () => {
   const [userName, setUserName] = useState("Cargando...");
 
   useEffect(() => {
-    obtenerUsuarios()
-      .then(data => {
-        setUserName(data.nombre || "Usuario");
-      })
-      .catch(() => {
-        setUserName("Usuario");
-      });
+    // Leer usuario logueado desde localStorage
+    const usuarioLogueado = JSON.parse(localStorage.getItem("usuario"));
+    
+    if (usuarioLogueado && usuarioLogueado.usuario) {
+      setUserName(usuarioLogueado.usuario);
+    } else {
+      setUserName("Usuario");
+    }
   }, []);
 
   return (
