@@ -40,46 +40,53 @@ exports.obtenerPorId = async (req, res) => {
     if (conn) conn.release();
   }
 };
-
 exports.crear = async (req, res) => {
+  console.log('Sesión actual:', req.session.usuario);
+
   let conn;
   try {
+    if (!req.session.usuario) {
+      return res.status(401).json({ mensaje: 'No autorizado, inicia sesión' });
+    }
+
     conn = await pool.getConnection();
 
     const {
-      correo, nombre_completo, id_material, cantidad, fecha_prestamo
+      tipo, nombre_completo, matricula, carrera, lugar_trabajo,
+      telefono, correo, id_material, cantidad, fecha_prestamo
     } = req.body;
 
-    const id = await Prestamos.crear(conn, req.body);
+    const [solicitanteResult] = await conn.query(
+      `INSERT INTO solicitantes (tipo, nombre_completo, matricula, carrera, lugar_trabajo, telefono, correo)
+       VALUES (?, ?, ?, ?, ?, ?, ?)`,
+      [tipo, nombre_completo, matricula || null, carrera || null, lugar_trabajo || null, telefono || null, correo]
+    );
+    const id_solicitante = solicitanteResult.insertId;
 
-    // Obtén nombre del material para el correo
+    const id_usuario = req.session.usuario.id;
+    const [prestamoResult] = await conn.query(
+      `INSERT INTO prestamos (id_material, cantidad, fecha_prestamo, id_usuario, id_solicitante)
+       VALUES (?, ?, ?, ?, ?)`,
+      [id_material, cantidad, fecha_prestamo, id_usuario, id_solicitante]
+    );
+
+    const idPrestamo = prestamoResult.insertId;
+
     const [rows] = await conn.query('SELECT nombre FROM materiales WHERE id = ?', [id_material]);
     const nombre_material = rows.length > 0 ? rows[0].nombre : 'Material desconocido';
 
-    // Envías respuesta al cliente
-    res.status(201).json({ mensaje: 'Préstamo creado', id });
+    res.status(201).json({ mensaje: 'Préstamo creado', id: idPrestamo });
 
-    // Prepara y envía correo de forma asíncrona (no bloquea respuesta)
     const mailOptions = {
       from: process.env.EMAIL_FROM,
       to: correo,
       subject: 'Confirmación de préstamo',
-      text: `
-        Hola ${nombre_completo},
-
-        Tu préstamo del material ${nombre_material} (cantidad: ${cantidad}) fue registrado correctamente el día ${fecha_prestamo}.
-
-        Gracias.
-      `,
+      text: `Hola ${nombre_completo},\n\nTu préstamo del material ${nombre_material} (cantidad: ${cantidad}) fue registrado correctamente el día ${fecha_prestamo}.\n\nGracias.`
     };
-
-    transporter.sendMail(mailOptions).catch(err => {
-      console.error('Error enviando correo:', err);
-    });
+    transporter.sendMail(mailOptions).catch(err => console.error('Error enviando correo:', err));
 
   } catch (error) {
     console.error(error);
-    // Aquí verifica que la respuesta NO haya sido enviada antes
     if (!res.headersSent) {
       res.status(500).json({ error: 'Error al crear préstamo', detalle: error.message });
     }
@@ -87,6 +94,9 @@ exports.crear = async (req, res) => {
     if (conn) conn.release();
   }
 };
+
+
+
 
 
 

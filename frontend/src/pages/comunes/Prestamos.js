@@ -4,9 +4,6 @@ import { agregarPrestamo, obtenerPrestamos, finalizarPrestamo } from '../../serv
 import "../../styles/Prestamos.css";
 
 function FormPrestamo() {
-    // Obtener usuario logueado desde localStorage
-    const usuarioLogueado = JSON.parse(localStorage.getItem("usuario")) || { id: null };
-
     const [materiales, setMateriales] = useState([]);
     const [prestamos, setPrestamos] = useState([]);
 
@@ -21,7 +18,6 @@ function FormPrestamo() {
         id_material: '',
         cantidad: 1,
         fecha_prestamo: new Date().toISOString().slice(0, 16),
-        id_usuario: usuarioLogueado.id, // ahora toma el usuario logueado
     });
 
     const cargarMateriales = async () => {
@@ -47,11 +43,6 @@ function FormPrestamo() {
         cargarPrestamos();
     }, []);
 
-    // Si el usuario cambia (logout/login), actualizamos el id_usuario
-    useEffect(() => {
-        setForm(prev => ({ ...prev, id_usuario: usuarioLogueado.id }));
-    }, [usuarioLogueado.id]);
-
     function handleChange(e) {
         const { name, value } = e.target;
         setForm(prev => ({ ...prev, [name]: value }));
@@ -60,11 +51,6 @@ function FormPrestamo() {
     async function handleSubmit(e) {
         e.preventDefault();
         try {
-            if (!form.id_usuario) {
-                alert("Error: no se detectó usuario logueado.");
-                return;
-            }
-
             const payload = {
                 ...form,
                 fecha_prestamo: form.fecha_prestamo.replace('T', ' '),
@@ -73,6 +59,7 @@ function FormPrestamo() {
             const res = await agregarPrestamo(payload);
             alert(`Préstamo creado con ID ${res.data.id}`);
 
+            // Recargar datos
             await cargarMateriales();
             await cargarPrestamos();
 
@@ -82,7 +69,7 @@ function FormPrestamo() {
                 cantidad: 1,
             }));
         } catch (error) {
-            alert('Error al crear préstamo: ' + (error.response?.data?.message || error.message));
+            alert('Error al crear préstamo: ' + (error.response?.data?.detalle || error.message));
         }
     }
 
@@ -95,7 +82,7 @@ function FormPrestamo() {
             await cargarPrestamos();
             await cargarMateriales();
         } catch (error) {
-            alert('Error al finalizar préstamo: ' + (error.response?.data?.message || error.message));
+            alert('Error al finalizar préstamo: ' + (error.response?.data?.detalle || error.message));
         }
     }
 
@@ -168,11 +155,7 @@ function FormPrestamo() {
                         name="cantidad"
                         value={form.cantidad}
                         min={1}
-                        max={
-                            form.id_material
-                                ? materiales.find(m => m.id === +form.id_material)?.cantidad_disponible || 1
-                                : 1
-                        }
+                        max={form.id_material ? materiales.find(m => m.id === +form.id_material)?.cantidad_disponible || 1 : 1}
                         onChange={handleChange}
                         required
                     />
