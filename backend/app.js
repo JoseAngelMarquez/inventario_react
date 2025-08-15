@@ -5,40 +5,33 @@ require('dotenv').config();
 
 const app = express();
 
-// Configuración de CORS para frontend en otro puerto (por ejemplo localhost:3000)
+// CORS
 app.use(cors({
-  origin: 'http://localhost:3000', // Cambia esto por el dominio de tu frontend
-  credentials: true // Permite enviar cookies con la sesión
+  origin: process.env.FRONTEND_URL,
+  credentials: true
 }));
 
 app.use(express.json());
 
 // Configuración de sesión
 app.use(session({
-  secret: process.env.SESSION_SECRET || 'mi_secreto_seguro',
+  secret: process.env.SESSION_SECRET,
   resave: false,
   saveUninitialized: false,
   cookie: {
     secure: false, // true si usas HTTPS
     httpOnly: true,
-    maxAge: 1000 * 60 * 60 // 1 hora
+    maxAge: parseInt(process.env.SESSION_MAX_AGE)
   }
 }));
 
 // Rutas
-const usuarioRoutes = require('./routes/usuarios');
-app.use('/api/usuarios', usuarioRoutes);
+app.use('/api/usuarios', require('./routes/usuarios'));
+app.use('/api/materiales', require('./routes/materialRoutes'));
+app.use('/api/prestamos', require('./routes/prestamosRoutes'));
+app.use('/api/inventario', require('./routes/inventarioRoutes'));
 
-const materialesRoutes = require('./routes/materialRoutes'); 
-app.use('/api/materiales', materialesRoutes);
-
-const prestamosRoutes = require('./routes/prestamosRoutes');
-app.use('/api/prestamos', prestamosRoutes);
-
-const inventarioRoutes = require("./routes/inventarioRoutes");
-app.use("/api/inventario", inventarioRoutes);
-
-// Puerto del servidor
+// Inicio del servidor
 const PORT = process.env.PORT || 3001;
 app.listen(PORT, () => {
   console.log(`Servidor corriendo en puerto ${PORT}`);
