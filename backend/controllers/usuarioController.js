@@ -20,11 +20,17 @@ exports.login = async (req, res) => {
     }
 
     const usuarioEncontrado = resultados[0];
-
     const match = await bcrypt.compare(contrasena, usuarioEncontrado.contrasena);
 
     if (match) {
-      return res.json({ mensaje: 'Login exitoso', usuario: usuarioEncontrado });
+      // Guardar datos en la sesión
+      req.session.usuario = {
+        id: usuarioEncontrado.id,
+        usuario: usuarioEncontrado.usuario,
+        rol: usuarioEncontrado.rol
+      };
+
+      return res.json({ mensaje: 'Login exitoso', usuario: req.session.usuario });
     } else {
       return res.status(401).json({ mensaje: 'Contraseña incorrecta' });
     }
@@ -32,9 +38,10 @@ exports.login = async (req, res) => {
     console.error('Error en login:', error.message);
     return res.status(500).json({ mensaje: 'Error en el servidor' });
   } finally {
-    if (conn) conn.release(); 
+    if (conn) conn.release();
   }
 };
+
 
 
 

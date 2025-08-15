@@ -122,14 +122,17 @@ exports.actualizar = async (req, res) => {
 }; */
 
 exports.finalizar = async (req, res) => {
+  console.log('Sesión actual:', req.session.usuario); // debug
+  if (!req.session.usuario) {
+    return res.status(401).json({ mensaje: 'No autorizado, inicia sesión' });
+  }
+
+  const idUsuarioFinaliza = req.session.usuario.id;
+  const idPrestamo = req.params.id;
+
   let conn;
   try {
     conn = await pool.getConnection();
-    const idPrestamo = req.params.id;
-
-    
-    const idUsuarioFinaliza = 1;
-
     const resultado = await Prestamos.finalizarPrestamo(conn, idPrestamo, idUsuarioFinaliza);
     res.json({ mensaje: resultado.message });
   } catch (error) {
@@ -138,8 +141,9 @@ exports.finalizar = async (req, res) => {
   } finally {
     if (conn) conn.release();
   }
-
 };
+
+
 
 exports.exportarExcel = async (req, res) => {
   let conn;
