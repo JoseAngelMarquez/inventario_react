@@ -1,3 +1,4 @@
+// src/pages/PrestamosReporte.js
 import React, { useEffect, useState } from 'react';
 import * as XLSX from 'xlsx';
 import { saveAs } from 'file-saver';
@@ -12,8 +13,20 @@ export default function PrestamosReporte() {
       .catch(err => console.error(err));
   }, []);
 
+  // Función para formatear fecha a hora de México
+  const formatoMexico = (fecha) => {
+    return new Intl.DateTimeFormat("es-MX", {
+      timeZone: "America/Mexico_City",
+      year: "numeric",
+      month: "2-digit",
+      day: "2-digit",
+      hour: "2-digit",
+      minute: "2-digit",
+      second: "2-digit"
+    }).format(new Date(fecha));
+  };
+
   const exportarExcelPorFecha = () => {
-    // Obtener fechas únicas (solo fecha, sin hora)
     const fechasUnicas = [...new Set(prestamos.map(p => {
       const fecha = new Date(p.fecha_prestamo);
       return fecha.toISOString().split('T')[0];
@@ -22,32 +35,26 @@ export default function PrestamosReporte() {
     const libro = XLSX.utils.book_new();
 
     fechasUnicas.forEach(fecha => {
-      // Filtrar préstamos de esa fecha
       const datosFiltrados = prestamos.filter(p => {
         const fechaPrestamo = new Date(p.fecha_prestamo).toISOString().split('T')[0];
         return fechaPrestamo === fecha;
       });
 
-      // Mapear datos para Excel
       const datosParaExcel = datosFiltrados.map(({ solicitante, prestamista, finalizador, cantidad, fecha_prestamo, fecha_devolucion, tipo_material, nombre_material }) => ({
         Solicitante: solicitante,
         Prestamista: prestamista,
         Finalizador: finalizador || 'No finalizado',
         Cantidad: cantidad,
-        FechaPrestamo: fecha_prestamo,
+        FechaPrestamo: formatoMexico(fecha_prestamo),
         TipoMaterial: tipo_material,
         Nombre: nombre_material || 'Sin nombre',
-        Devolucion: fecha_devolucion,
+        Devolucion: fecha_devolucion ? formatoMexico(fecha_devolucion) : 'No devuelto',
       }));
 
-      // Crear hoja con los datos filtrados
       const hoja = XLSX.utils.json_to_sheet(datosParaExcel);
-
-      // Agregar hoja al libro con nombre de la fecha
       XLSX.utils.book_append_sheet(libro, hoja, fecha);
     });
 
-    // Generar archivo Excel
     const excelBuffer = XLSX.write(libro, { bookType: 'xlsx', type: 'array' });
     const archivo = new Blob([excelBuffer], { type: 'application/octet-stream' });
     saveAs(archivo, 'prestamos_por_fecha.xlsx');
@@ -56,7 +63,6 @@ export default function PrestamosReporte() {
   return (
     <div>
       <h1>Reporte de Préstamos</h1>
-      
       <button onClick={exportarExcelPorFecha} style={{ marginBottom: '20px' }}>Exportar Excel</button>
 
       <table border="1">
@@ -79,22 +85,8 @@ export default function PrestamosReporte() {
               <td>{p.prestamista}</td>
               <td>{p.finalizador || 'No finalizado'}</td>
               <td>{p.cantidad}</td>
-              <td>{new Date(p.fecha_prestamo).toLocaleString("es-MX", {
-                timeZone: "America/Mexico_City",
-                year: "numeric",
-                month: "2-digit",
-                day: "2-digit",
-                hour: "2-digit",
-                minute: "2-digit"
-              })}</td>
-              <td>{p.fecha_devolucion && new Date(p.fecha_devolucion).toLocaleString("es-MX", {
-                timeZone: "America/Mexico_City",
-                year: "numeric",
-                month: "2-digit",
-                day: "2-digit",
-                hour: "2-digit",
-                minute: "2-digit"
-              })}</td>
+              <td>{formatoMexico(p.fecha_prestamo)}</td>
+              <td>{p.fecha_devolucion ? formatoMexico(p.fecha_devolucion) : 'No devuelto'}</td>
               <td>{p.tipo_material}</td>
               <td>{p.nombre_material}</td>
             </tr>
