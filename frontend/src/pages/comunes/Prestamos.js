@@ -6,7 +6,6 @@ import "../../styles/Prestamos.css";
 function FormPrestamo() {
     const [materiales, setMateriales] = useState([]);
     const [prestamos, setPrestamos] = useState([]);
-
     const [form, setForm] = useState({
         tipo: 'estudiante',
         nombre_completo: '',
@@ -20,6 +19,7 @@ function FormPrestamo() {
         fecha_prestamo: new Date().toISOString().slice(0, 16),
     });
 
+    // Cargar materiales
     const cargarMateriales = async () => {
         try {
             const res = await obtenerMateriales();
@@ -29,6 +29,7 @@ function FormPrestamo() {
         }
     };
 
+    // Cargar préstamos
     const cargarPrestamos = async () => {
         try {
             const res = await obtenerPrestamos();
@@ -43,11 +44,13 @@ function FormPrestamo() {
         cargarPrestamos();
     }, []);
 
+    // Manejo de cambios en el formulario
     function handleChange(e) {
         const { name, value } = e.target;
         setForm(prev => ({ ...prev, [name]: value }));
     }
 
+    // Crear préstamo
     async function handleSubmit(e) {
         e.preventDefault();
         try {
@@ -63,6 +66,7 @@ function FormPrestamo() {
             await cargarMateriales();
             await cargarPrestamos();
 
+            // Reset parcial del formulario
             setForm(prev => ({
                 ...prev,
                 id_material: '',
@@ -73,9 +77,9 @@ function FormPrestamo() {
         }
     }
 
+    // Finalizar préstamo
     async function handleFinalizar(id) {
         if (!window.confirm('¿Seguro que deseas finalizar este préstamo?')) return;
-
         try {
             await finalizarPrestamo(id);
             alert('Préstamo finalizado correctamente');
@@ -138,13 +142,11 @@ function FormPrestamo() {
                     Material:
                     <select name="id_material" value={form.id_material} onChange={handleChange} required>
                         <option value="">-- Selecciona un material --</option>
-                        {materiales
-                            .filter(m => m.cantidad_disponible > 0)
-                            .map(m => (
-                                <option key={m.id} value={m.id}>
-                                    {m.nombre} ({m.cantidad_disponible} disponibles)
-                                </option>
-                            ))}
+                        {materiales.filter(m => m.cantidad_disponible > 0).map(m => (
+                            <option key={m.id} value={m.id}>
+                                {m.nombre} ({m.cantidad_disponible} disponibles)
+                            </option>
+                        ))}
                     </select>
                 </label>
 
@@ -196,7 +198,7 @@ function FormPrestamo() {
                         </tr>
                     </thead>
                     <tbody>
-                        {prestamos.map((prestamo) => (
+                        {prestamos.map(prestamo => (
                             <tr key={prestamo.id}>
                                 <td>{prestamo.nombre_solicitante}</td>
                                 <td>{prestamo.tipo_solicitante}</td>

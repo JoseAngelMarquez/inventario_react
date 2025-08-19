@@ -43,19 +43,21 @@ exports.obtenerPorId = async (req, res) => {
 exports.crear = async (req, res) => {
   console.log('Sesión actual:', req.session.usuario);
 
+  if (!req.session.usuario) {
+    return res.status(401).json({ mensaje: 'No autorizado, inicia sesión' });
+  }
+
   let conn;
   try {
-    if (!req.session.usuario) {
-      return res.status(401).json({ mensaje: 'No autorizado, inicia sesión' });
-    }
-
     conn = await pool.getConnection();
+    await conn.beginTransaction();
 
     const {
       tipo, nombre_completo, matricula, carrera, lugar_trabajo,
       telefono, correo, id_material, cantidad, fecha_prestamo
     } = req.body;
 
+    // Insertar solicitante
     const [solicitanteResult] = await conn.query(
       `INSERT INTO solicitantes (tipo, nombre_completo, matricula, carrera, lugar_trabajo, telefono, correo)
        VALUES (?, ?, ?, ?, ?, ?, ?)`,
@@ -63,33 +65,49 @@ exports.crear = async (req, res) => {
     );
     const id_solicitante = solicitanteResult.insertId;
 
+    // Bloquear material y verificar stock
+    const [materialRows] = await conn.query(
+      'SELECT cantidad_disponible, nombre FROM materiales WHERE id = ? FOR UPDATE',
+      [id_material]
+    );
+    if (materialRows.length === 0) throw new Error('Material no encontrado');
+    if (materialRows[0].cantidad_disponible < cantidad) throw new Error('No hay suficiente stock disponible');
+
     const id_usuario = req.session.usuario.id;
+
+    // Insertar préstamo
     const [prestamoResult] = await conn.query(
-      `INSERT INTO prestamos (id_material, cantidad, fecha_prestamo, id_usuario, id_solicitante)
-       VALUES (?, ?, ?, ?, ?)`,
+      `INSERT INTO prestamos (id_material, cantidad, fecha_prestamo, id_usuario, id_solicitante, estado)
+       VALUES (?, ?, ?, ?, ?, 'prestado')`,
       [id_material, cantidad, fecha_prestamo, id_usuario, id_solicitante]
     );
-
+    
     const idPrestamo = prestamoResult.insertId;
 
-    const [rows] = await conn.query('SELECT nombre FROM materiales WHERE id = ?', [id_material]);
-    const nombre_material = rows.length > 0 ? rows[0].nombre : 'Material desconocido';
+    // Actualizar stock
+    await conn.query(
+      'UPDATE materiales SET cantidad_disponible = cantidad_disponible - ? WHERE id = ?',
+      [cantidad, id_material]
+    );
 
+    await conn.commit();
+
+    // Enviar respuesta
     res.status(201).json({ mensaje: 'Préstamo creado', id: idPrestamo });
 
+    // Enviar correo (fuera de la transacción)
     const mailOptions = {
       from: process.env.EMAIL_FROM,
       to: correo,
       subject: 'Confirmación de préstamo',
-      text: `Hola ${nombre_completo},\n\nTu préstamo del material ${nombre_material} (cantidad: ${cantidad}) fue registrado correctamente el día ${fecha_prestamo}.\n\nGracias.`
+      text: `Hola ${nombre_completo},\n\nTu préstamo del material ${materialRows[0].nombre} (cantidad: ${cantidad}) fue registrado correctamente el día ${fecha_prestamo}.\n\nGracias.`
     };
     transporter.sendMail(mailOptions).catch(err => console.error('Error enviando correo:', err));
 
   } catch (error) {
+    if (conn) await conn.rollback();
     console.error(error);
-    if (!res.headersSent) {
-      res.status(500).json({ error: 'Error al crear préstamo', detalle: error.message });
-    }
+    if (!res.headersSent) res.status(500).json({ error: 'Error al crear préstamo', detalle: error.message });
   } finally {
     if (conn) conn.release();
   }
@@ -97,39 +115,6 @@ exports.crear = async (req, res) => {
 
 
 
-
-
-
-exports.actualizar = async (req, res) => {
-  let conn;
-  try {
-    conn = await pool.getConnection();
-    const actualizado = await Prestamos.actualizar(conn, req.params.id, req.body);
-    if (!actualizado) return res.status(404).json({ error: 'Préstamo no encontrado' });
-    res.json({ mensaje: 'Préstamo actualizado' });
-  } catch (error) {
-    console.error(error);
-    res.status(500).json({ error: 'Error al actualizar préstamo' });
-  } finally {
-    if (conn) conn.release();
-  }
-};
-
-/* exports.eliminar = async (req, res) => {
-  let conn;
-  try {
-    conn = await pool.getConnection();
-    const eliminado = await Prestamos.eliminar(conn, req.params.id);
-    if (!eliminado) return res.status(404).json({ error: 'Préstamo no encontrado' });
-    res.json({ mensaje: 'Préstamo eliminado' });
-  } catch (error) {
-    console.error(error);
-    res.status(500).json({ error: 'Error al eliminar préstamo' });
-  } finally {
-    if (conn) conn.release();
-  }
-
-}; */
 
 exports.finalizar = async (req, res) => {
   console.log('Sesión actual:', req.session.usuario); // debug
@@ -152,6 +137,26 @@ exports.finalizar = async (req, res) => {
     if (conn) conn.release();
   }
 };
+
+
+
+exports.actualizar = async (req, res) => {
+  let conn;
+  try {
+    conn = await pool.getConnection();
+    const actualizado = await Prestamos.actualizar(conn, req.params.id, req.body);
+    if (!actualizado) return res.status(404).json({ error: 'Préstamo no encontrado' });
+    res.json({ mensaje: 'Préstamo actualizado' });
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ error: 'Error al actualizar préstamo' });
+  } finally {
+    if (conn) conn.release();
+  }
+};
+
+
+
 
 
 
