@@ -1,16 +1,8 @@
 const pool = require('../config/db');
 const Prestamos = require('../models/prestamosModel');
-const nodemailer = require('nodemailer');
+const { enviarCorreo } = require('../utils/email');
 require('dotenv').config();
-
-
-const transporter = nodemailer.createTransport({
-  service: 'gmail',
-  auth: {
-    user: process.env.GMAIL_USER,
-    pass: process.env.GMAIL_PASS,
-  },
-});
+const excelJS = require('exceljs');
 
 exports.obtenerTodos = async (req, res) => {
   let conn;
@@ -40,6 +32,7 @@ exports.obtenerPorId = async (req, res) => {
     if (conn) conn.release();
   }
 };
+
 exports.crear = async (req, res) => {
   console.log('Sesión actual:', req.session.usuario);
 
@@ -81,7 +74,6 @@ exports.crear = async (req, res) => {
        VALUES (?, ?, ?, ?, ?, 'prestado')`,
       [id_material, cantidad, fecha_prestamo, id_usuario, id_solicitante]
     );
-    
     const idPrestamo = prestamoResult.insertId;
 
     // Actualizar stock
@@ -96,14 +88,11 @@ exports.crear = async (req, res) => {
     res.status(201).json({ mensaje: 'Préstamo creado', id: idPrestamo });
 
     // Enviar correo (fuera de la transacción)
-    const mailOptions = {
-      from: process.env.EMAIL_FROM,
-      to: correo,
-      subject: 'Confirmación de préstamo',
-      text: `Hola ${nombre_completo},\n\nTu préstamo del material ${materialRows[0].nombre} (cantidad: ${cantidad}) fue registrado correctamente el día ${fecha_prestamo}.\n\nGracias.`
-    };
-    transporter.sendMail(mailOptions).catch(err => console.error('Error enviando correo:', err));
-
+    enviarCorreo(
+      correo,
+      'Confirmación de préstamo',
+      `Hola ${nombre_completo},\n\nTu préstamo del material "${materialRows[0].nombre}" (cantidad: ${cantidad}) fue registrado correctamente el día ${fecha_prestamo}.\n\nGracias.`
+    );
   } catch (error) {
     if (conn) await conn.rollback();
     console.error(error);
@@ -113,11 +102,8 @@ exports.crear = async (req, res) => {
   }
 };
 
-
-
-
 exports.finalizar = async (req, res) => {
-  console.log('Sesión actual:', req.session.usuario); // debug
+  console.log('Sesión actual:', req.session.usuario);
   if (!req.session.usuario) {
     return res.status(401).json({ mensaje: 'No autorizado, inicia sesión' });
   }
@@ -128,7 +114,31 @@ exports.finalizar = async (req, res) => {
   let conn;
   try {
     conn = await pool.getConnection();
+
+    // Finalizar el préstamo
     const resultado = await Prestamos.finalizarPrestamo(conn, idPrestamo, idUsuarioFinaliza);
+
+    // Obtener datos del préstamo y solicitante para el correo
+    const [prestamoRows] = await conn.query(
+      `SELECT p.id, p.cantidad, p.fecha_prestamo, s.nombre_completo, s.correo, m.nombre AS material_nombre
+       FROM prestamos p
+       JOIN solicitantes s ON p.id_solicitante = s.id
+       JOIN materiales m ON p.id_material = m.id
+       WHERE p.id = ?`,
+      [idPrestamo]
+    );
+
+    if (prestamoRows.length > 0) {
+      const prestamo = prestamoRows[0];
+      enviarCorreo(
+        prestamo.correo,
+        'Préstamo finalizado',
+        `Hola ${prestamo.nombre_completo},\n\nTu préstamo del material "${prestamo.material_nombre}" (cantidad: ${prestamo.cantidad}) realizado el ${prestamo.fecha_prestamo} ha sido finalizado.\n\nGracias.`
+      );
+    } else {
+      console.warn('No se encontró el préstamo para enviar correo.');
+    }
+
     res.json({ mensaje: resultado.message });
   } catch (error) {
     console.error(error);
@@ -137,8 +147,6 @@ exports.finalizar = async (req, res) => {
     if (conn) conn.release();
   }
 };
-
-
 
 exports.actualizar = async (req, res) => {
   let conn;
@@ -155,19 +163,11 @@ exports.actualizar = async (req, res) => {
   }
 };
 
-
-
-
-
-
 exports.exportarExcel = async (req, res) => {
   let conn;
   try {
     conn = await pool.getConnection();
-
     const prestamos = await Prestamos.obtenerTodosConDetalles(conn);
-
-    console.log('Prestamos para Excel:', prestamos); // Verifica datos
 
     const workbook = new excelJS.Workbook();
     const worksheet = workbook.addWorksheet('Préstamos');
@@ -182,7 +182,6 @@ exports.exportarExcel = async (req, res) => {
       { header: 'Nombre', key: 'Nombre', width: 30 },
       { header: 'Devolución', key: 'Devolucion', width: 20, style: { numFmt: 'dd/mm/yyyy hh:mm' } },
     ];
-    
 
     prestamos.forEach(prestamo => {
       worksheet.addRow(prestamo);
@@ -193,14 +192,12 @@ exports.exportarExcel = async (req, res) => {
 
     await workbook.xlsx.write(res);
     res.status(200).end();
-
   } catch (error) {
     console.error('Error exportando Excel:', error);
     res.status(500).send({ message: 'Error generando Excel', error: error.message });
   } finally {
     if (conn) conn.release();
   }
-
 };
 
 exports.reporteCompleto = async (req, res) => {
@@ -216,4 +213,3 @@ exports.reporteCompleto = async (req, res) => {
     if (conn) conn.release();
   }
 };
-
