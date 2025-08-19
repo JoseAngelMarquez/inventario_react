@@ -1,4 +1,5 @@
 class Prestamos {
+  // Obtener todos los préstamos con detalles de solicitante y material
   static async obtenerTodosConDetalles(conn) {
     const [rows] = await conn.query(`
       SELECT 
@@ -24,7 +25,7 @@ class Prestamos {
   }
 
 
-
+// Obtener préstamos por ID de solicitante
   static async obtenerPorId(conn, id) {
     const [rows] = await conn.query(`
       SELECT 
@@ -46,6 +47,12 @@ class Prestamos {
     `, [id]);
     return rows[0];
   }
+
+
+
+
+
+
   // Crear préstamo y actualizar stock
   static async crear(conn, prestamo) {
     const {
@@ -109,6 +116,13 @@ class Prestamos {
     }
   }
 
+
+
+
+
+
+
+
   // Finalizar préstamo y devolver stock
   static async finalizarPrestamo(conn, idPrestamo, idUsuarioFinaliza) {
     await conn.beginTransaction();
@@ -164,7 +178,7 @@ class Prestamos {
   }
 
 
-
+//Obtener reporte completo de préstamos
   static async obtenerReporteCompleto(conn) {
     const [rows] = await conn.query(`
       SELECT 
