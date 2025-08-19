@@ -112,38 +112,55 @@ class Prestamos {
   // Finalizar préstamo y devolver stock
   static async finalizarPrestamo(conn, idPrestamo, idUsuarioFinaliza) {
     await conn.beginTransaction();
-    try {
-      const [prestamoRows] = await conn.query(
-        'SELECT id_material, cantidad, estado FROM prestamos WHERE id = ? FOR UPDATE',
-        [idPrestamo]
-      );
-      if (prestamoRows.length === 0) throw new Error('Préstamo no encontrado');
-      if (prestamoRows[0].estado === 'finalizado')
-        throw new Error('El préstamo ya está finalizado');
+  try {
+    // Bloquea el préstamo para evitar condiciones de carrera
+    const [prestamoRows] = await conn.query(
+      'SELECT id_material, cantidad, estado FROM prestamos WHERE id = ? FOR UPDATE',
+      [idPrestamo]
+    );
+    if (prestamoRows.length === 0) throw new Error('Préstamo no encontrado');
+    if (prestamoRows[0].estado === 'finalizado')
+      throw new Error('El préstamo ya está finalizado');
 
-      // Actualizar préstamo a finalizado
-      await conn.query(`
-        UPDATE prestamos
-        SET estado = 'finalizado',
-            id_finalizado_por = ?,
-            fecha_devolucion = NOW()
-        WHERE id = ?
-      `, [idUsuarioFinaliza, idPrestamo]);
+    // Actualizar préstamo a finalizado
+    await conn.query(`
+      UPDATE prestamos
+      SET estado = 'finalizado',
+          id_finalizado_por = ?,   -- 🔹 usa el nombre real de tu columna
+          fecha_devolucion = NOW()
+      WHERE id = ?
+    `, [idUsuarioFinaliza, idPrestamo]);
 
-      // Devolver stock
-      await conn.query(`
-        UPDATE materiales
-        SET cantidad_disponible = cantidad_disponible + ?
-        WHERE id = ?
-      `, [prestamoRows[0].cantidad, prestamoRows[0].id_material]);
+    // Devolver stock
+    await conn.query(`
+      UPDATE materiales
+      SET cantidad_disponible = cantidad_disponible + ?
+      WHERE id = ?
+    `, [prestamoRows[0].cantidad, prestamoRows[0].id_material]);
 
-      await conn.commit();
-      return { message: 'Préstamo finalizado y stock actualizado correctamente' };
+    // Obtener los datos completos del préstamo y solicitante
+    const [prestamoData] = await conn.query(
+      `SELECT p.id, p.cantidad, p.fecha_prestamo, 
+              s.nombre_completo, s.correo, 
+              m.nombre AS material_nombre
+       FROM prestamos p
+       JOIN solicitantes s ON p.id_solicitante = s.id
+       JOIN materiales m ON p.id_material = m.id
+       WHERE p.id = ?`,
+      [idPrestamo]
+    );
 
-    } catch (error) {
-      await conn.rollback();
-      throw error;
-    }
+    await conn.commit();
+
+    return { 
+      message: 'Préstamo finalizado y stock actualizado correctamente',
+      prestamo: prestamoData.length ? prestamoData[0] : null
+    };
+
+  } catch (error) {
+    await conn.rollback();
+    throw error;
+  }
   }
 
 

@@ -77,31 +77,23 @@ exports.finalizar = async (req, res) => {
   try {
     conn = await pool.getConnection();
 
-    // Finalizar el préstamo
+    // Lógica de BD centralizada en el model
     const resultado = await Prestamos.finalizarPrestamo(conn, idPrestamo, idUsuarioFinaliza);
 
-    // Obtener datos del préstamo y solicitante para el correo
-    const [prestamoRows] = await conn.query(
-      `SELECT p.id, p.cantidad, p.fecha_prestamo, s.nombre_completo, s.correo, m.nombre AS material_nombre
-       FROM prestamos p
-       JOIN solicitantes s ON p.id_solicitante = s.id
-       JOIN materiales m ON p.id_material = m.id
-       WHERE p.id = ?`,
-      [idPrestamo]
-    );
-
-    if (prestamoRows.length > 0) {
-      const prestamo = prestamoRows[0];
+    // Si se obtuvo info del préstamo, enviar correo
+    if (resultado.prestamo) {
+      const p = resultado.prestamo;
       enviarCorreo(
-        prestamo.correo,
+        p.correo,
         'Préstamo finalizado',
-        `Hola ${prestamo.nombre_completo},\n\nTu préstamo del material "${prestamo.material_nombre}" (cantidad: ${prestamo.cantidad}) realizado el ${prestamo.fecha_prestamo} ha sido finalizado.\n\nGracias.`
+        `Hola ${p.nombre_completo},\n\nTu préstamo del material "${p.material_nombre}" (cantidad: ${p.cantidad}) realizado el ${p.fecha_prestamo} ha sido finalizado.\n\nGracias.`
       );
     } else {
       console.warn('No se encontró el préstamo para enviar correo.');
     }
 
     res.json({ mensaje: resultado.message });
+
   } catch (error) {
     console.error(error);
     res.status(500).json({ error: 'Error al finalizar préstamo', detalle: error.message });
@@ -109,6 +101,7 @@ exports.finalizar = async (req, res) => {
     if (conn) conn.release();
   }
 };
+
 
 exports.actualizar = async (req, res) => {
   let conn;
