@@ -34,69 +34,31 @@ exports.obtenerPorId = async (req, res) => {
 };
 
 exports.crear = async (req, res) => {
-  console.log('Sesión actual:', req.session.usuario);
-
   if (!req.session.usuario) {
     return res.status(401).json({ mensaje: 'No autorizado, inicia sesión' });
   }
 
   let conn;
   try {
-    conn = await pool.getConnection();
-    await conn.beginTransaction();
+    conn = await pool.getConnection(); 
+    const resultado = await Prestamos.crear(conn, {
+      ...req.body,
+      id_usuario: req.session.usuario.id
+    });
 
-    const {
-      tipo, nombre_completo, matricula, carrera, lugar_trabajo,
-      telefono, correo, id_material, cantidad, fecha_prestamo
-    } = req.body;
+    res.status(201).json({ mensaje: 'Préstamo creado', id: resultado.idPrestamo });
 
-    // Insertar solicitante
-    const [solicitanteResult] = await conn.query(
-      `INSERT INTO solicitantes (tipo, nombre_completo, matricula, carrera, lugar_trabajo, telefono, correo)
-       VALUES (?, ?, ?, ?, ?, ?, ?)`,
-      [tipo, nombre_completo, matricula || null, carrera || null, lugar_trabajo || null, telefono || null, correo]
-    );
-    const id_solicitante = solicitanteResult.insertId;
-
-    // Bloquear material y verificar stock
-    const [materialRows] = await conn.query(
-      'SELECT cantidad_disponible, nombre FROM materiales WHERE id = ? FOR UPDATE',
-      [id_material]
-    );
-    if (materialRows.length === 0) throw new Error('Material no encontrado');
-    if (materialRows[0].cantidad_disponible < cantidad) throw new Error('No hay suficiente stock disponible');
-
-    const id_usuario = req.session.usuario.id;
-
-    // Insertar préstamo
-    const [prestamoResult] = await conn.query(
-      `INSERT INTO prestamos (id_material, cantidad, fecha_prestamo, id_usuario, id_solicitante, estado)
-       VALUES (?, ?, ?, ?, ?, 'prestado')`,
-      [id_material, cantidad, fecha_prestamo, id_usuario, id_solicitante]
-    );
-    const idPrestamo = prestamoResult.insertId;
-
-    // Actualizar stock
-    await conn.query(
-      'UPDATE materiales SET cantidad_disponible = cantidad_disponible - ? WHERE id = ?',
-      [cantidad, id_material]
-    );
-
-    await conn.commit();
-
-    // Enviar respuesta
-    res.status(201).json({ mensaje: 'Préstamo creado', id: idPrestamo });
-
-    // Enviar correo (fuera de la transacción)
+    // Enviar correo fuera de la transacción
     enviarCorreo(
-      correo,
+      resultado.correoSolicitante,
       'Confirmación de préstamo',
-      `Hola ${nombre_completo},\n\nTu préstamo del material "${materialRows[0].nombre}" (cantidad: ${cantidad}) fue registrado correctamente el día ${fecha_prestamo}.\n\nGracias.`
+      `Hola ${resultado.nombreSolicitante},\n\nTu préstamo del material "${resultado.nombreMaterial}" (cantidad: ${resultado.cantidad}) fue registrado correctamente el día ${req.body.fecha_prestamo}.\n\nGracias.`
     );
+
   } catch (error) {
-    if (conn) await conn.rollback();
-    console.error(error);
-    if (!res.headersSent) res.status(500).json({ error: 'Error al crear préstamo', detalle: error.message });
+    console.error('Error al crear préstamo:', error);
+    if (!res.headersSent)
+      res.status(500).json({ error: 'Error al crear préstamo', detalle: error.message });
   } finally {
     if (conn) conn.release();
   }

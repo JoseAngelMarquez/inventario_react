@@ -70,12 +70,11 @@ class Prestamos {
         INSERT INTO solicitantes (tipo, nombre_completo, matricula, carrera, lugar_trabajo, telefono, correo)
         VALUES (?, ?, ?, ?, ?, ?, ?)
       `, [tipo, nombre_completo, matricula, carrera, lugar_trabajo, telefono, correo]);
-
       const id_solicitante = resultSolicitante.insertId;
 
-      // Verificar que haya stock suficiente
+      // Verificar stock y bloquear fila
       const [materialRows] = await conn.query(
-        'SELECT cantidad_disponible FROM materiales WHERE id = ? FOR UPDATE',
+        'SELECT cantidad_disponible, nombre FROM materiales WHERE id = ? FOR UPDATE',
         [id_material]
       );
       if (materialRows.length === 0) throw new Error('Material no encontrado');
@@ -85,18 +84,24 @@ class Prestamos {
       // Insertar préstamo
       const [resultPrestamo] = await conn.query(`
         INSERT INTO prestamos (id_material, cantidad, fecha_prestamo, fecha_devolucion, id_usuario, id_solicitante, estado)
-        VALUES (?, ?, ?, ?, ?, ?, 'activo')
+        VALUES (?, ?, ?, ?, ?, ?, 'prestado')
       `, [id_material, cantidad, fecha_prestamo, fecha_devolucion, id_usuario, id_solicitante]);
 
       // Actualizar stock
       await conn.query(`
-        UPDATE materiales 
-        SET cantidad_disponible = cantidad_disponible - ? 
+        UPDATE materiales
+        SET cantidad_disponible = cantidad_disponible - ?
         WHERE id = ?
       `, [cantidad, id_material]);
 
       await conn.commit();
-      return resultPrestamo.insertId;
+      return {
+        idPrestamo: resultPrestamo.insertId,
+        nombreMaterial: materialRows[0].nombre,
+        correoSolicitante: correo,
+        nombreSolicitante: nombre_completo,
+        cantidad
+      };
 
     } catch (error) {
       await conn.rollback();
