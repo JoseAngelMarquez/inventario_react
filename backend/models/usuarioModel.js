@@ -47,7 +47,18 @@ class Usuario {
     }
   }
   
-  
+  static async actualizar(conn, id, usuario, contrasena, rol) {
+      try {
+        const [result] = await conn.query(
+          'UPDATE usuarios SET usuario = ?, contrasena = ?, rol = ? WHERE id = ?',
+          [usuario, contrasena, rol, id]
+        );
+        return result.affectedRows;
+      } catch (error) {
+        console.error("Error al actualizar usuario:", error.message);
+      }
+      
+  }
   
 
 
