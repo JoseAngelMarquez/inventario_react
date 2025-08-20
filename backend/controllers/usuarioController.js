@@ -159,3 +159,31 @@ exports.obtenerPaginados = async (req, res) => {
     if (conn) conn.release();
   }
 };
+exports.obtenerPaginados = async (req, res) => {
+  let conn;
+  try {
+    conn = await pool.getConnection();
+
+    // Valores por defecto
+    const page = parseInt(req.query.page) || 1;
+    const limit = parseInt(req.query.limit) || 10;
+    const offset = (page - 1) * limit;
+
+    const usuarios = await Usuario.obtenerPaginados(conn, limit, offset);
+    const total = await Usuario.contarTotal(conn);
+
+    res.json({
+      page,
+      limit,
+      total,
+      totalPages: Math.ceil(total / limit),
+      data: usuarios
+    });
+
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ mensaje: 'Error al obtener usuarios paginados' });
+  } finally {
+    if (conn) conn.release();
+  }
+};
