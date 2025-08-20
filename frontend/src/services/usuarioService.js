@@ -31,3 +31,9 @@ export const eliminarUsuario = async (id) => {
   });
   return response.data;
 };
+
+export const actualizarUsuario = async (id, usuario, contrasena, rol) => {
+  const response = await axios.put(`${API_URL}/${id}`, { usuario, contrasena, rol }, {
+  });
+  return response.data;
+}

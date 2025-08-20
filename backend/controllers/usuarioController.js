@@ -2,6 +2,7 @@ const Usuario = require('../models/usuarioModel');
 const pool = require('../config/db');
 const bcrypt = require('bcrypt');
 const { param } = require('../routes/usuarios');
+const { json } = require('express');
 
 exports.login = async (req, res) => {
   const { usuario, contrasena } = req.body;
@@ -105,9 +106,23 @@ exports.eliminarUsuario = async (req, res) => {
    res.json({ mensaje: 'Usuario eliminado exitosamente' });
 
   } catch (error) {
-    res.status(500).json({ mensaje: 'Error al eliminar usuario' });
-  }
+    res.status(500).json({ mensaje: 'No se puede eliminar este usuario porque ya realizó acciones en el sistema. ' });
+  }finally {
+    if (conn) conn.release();
 
 }
+}
 
-
+exports.actualizarUsuario = async (req, res) => {
+  const conn = await pool.getConnection();
+  try {
+    const id = req.params.id;
+    const usuarioActualizado = req.body;
+    const affectedRows = await Usuario.actualizar(conn, id, usuarioActualizado.contrasena, usuarioActualizado.rol); 
+    res.json({ mensaje: 'Usuario actualizado exitosamente' });
+  } catch (error) {
+    res.status(500).json({ mensaje: 'Error al actualizar usuario' });
+  }finally {
+    if (conn) conn.release(); 
+  }
+}
