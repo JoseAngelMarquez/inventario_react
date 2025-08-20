@@ -59,9 +59,18 @@ class Usuario {
       }
       
   }
-  
 
+  static async obtenerPaginados(conn, limit, offset) {
+    const [rows] = await conn.query(
+      'SELECT * FROM usuarios ORDER BY id LIMIT ? OFFSET ?',
+      [limit, offset]
+    );
+    return rows;
+  }
 
-}
+  static async contarTotal(conn) {
+    const [rows] = await conn.query('SELECT COUNT(*) AS total FROM usuarios');
+    return rows[0].total;
+  }
  
 module.exports = Usuario;
