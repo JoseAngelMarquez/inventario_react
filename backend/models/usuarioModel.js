@@ -18,6 +18,18 @@ class Usuario {
     return rows.map(row => ({id:row.id, usuario: row.usuario, rol: row.rol}));
 
   }
+
+  static async eliminar(conn, id) {
+    try {
+      const [result] = await conn.query('DELETE FROM usuarios WHERE id = ?', [id]);
+      return result.affectedRows;
+    }catch (error) {
+      console.error('Error al eliminar usuario:', error);
+      throw error;
+    }
+  }
+
+
 }
  
 module.exports = Usuario;
