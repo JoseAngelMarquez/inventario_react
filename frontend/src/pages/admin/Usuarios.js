@@ -1,64 +1,83 @@
+// Inicio.jsx
 import React, { useEffect, useState } from "react";
-import { crearUsuario, obtenerUsuarios, eliminarUsuario } from "../../services/usuarioService";
+import { crearUsuario, obtenerUsuarios, eliminarUsuario, actualizarUsuario } from "../../services/usuarioService";
+import UsuarioList from "../../components/UsuarioList";
 import "../../styles/Usuarios.css";
 
 const Inicio = () => {
+  const [usuarios, setUsuarios] = useState([]);
+  const [usuarioSeleccionado, setUsuarioSeleccionado] = useState(null);
   const [usuario, setUsuario] = useState("");
   const [contrasena, setContrasena] = useState("");
   const [rol, setRol] = useState("prestamista");
-  const [error, setError] = useState(null);
   const [mensaje, setMensaje] = useState(null);
-  const [usuarios, setUsuarios] = useState([]);
 
   // Paginación
   const [pagina, setPagina] = useState(1);
   const filasPorPagina = 5;
-  const totalPaginas = Math.ceil(usuarios.length / filasPorPagina);
 
   useEffect(() => {
-    const fetchUsuarios = async () => {
-      try {
-        const lista = await obtenerUsuarios();
-        setUsuarios(lista);
-        console.log("Usuarios obtenidos:", lista);
-      } catch (error) {
-        setError("Error al obtener usuarios");
-      }
-    };
     fetchUsuarios();
   }, []);
 
-  const handleCrearUsuario = async () => {
-    setError(null);
-    setMensaje(null);
+  const fetchUsuarios = async () => {
+    try {
+      const lista = await obtenerUsuarios();
+      setUsuarios(lista);
+    } catch (err) {
+      console.error(err);
+    }
+  };
 
+  const handleSubmit = async () => {
     if (!usuario || !contrasena) {
-      setError("Usuario y contraseña son obligatorios");
+      setMensaje("Usuario y contraseña son obligatorios");
       return;
     }
 
     try {
-      const data = await crearUsuario(usuario, contrasena, rol);
-      setMensaje(`Usuario creado con ID: ${data.id}`);
+      if (usuarioSeleccionado) {
+        await actualizarUsuario(usuarioSeleccionado.id, usuario, contrasena, rol);
+        setMensaje("Usuario actualizado correctamente");
+      } else {
+        const data = await crearUsuario(usuario, contrasena, rol);
+        setMensaje(`Usuario creado con ID: ${data.id}`);
+      }
       setUsuario("");
       setContrasena("");
-
-      // Refrescar la lista de usuarios
-      const lista = await obtenerUsuarios();
-      setUsuarios(lista);
-      setPagina(1); // Opcional: volver a la primera página
+      setRol("prestamista");
+      setUsuarioSeleccionado(null);
+      fetchUsuarios();
+      setPagina(1);
     } catch (err) {
-      setError(err.response?.data?.mensaje || "Error creando usuario");
+      setMensaje("Error al procesar usuario");
+      console.error(err);
     }
   };
-  const handleDeleteUsuario = async (id) => {
+
+  const handleEditar = (user) => {
+    setUsuarioSeleccionado(user);
+    setUsuario(user.usuario);
+    setRol(user.rol);
+    setContrasena("");
+  };
+
+  const handleEliminar = async (id) => {
     if (!window.confirm("¿Estás seguro de eliminar este usuario?")) return;
     try {
       await eliminarUsuario(id);
-    } catch (error) {
-      alert("Error al eliminar usuario: " + error.message);
+      fetchUsuarios();
+    } catch (err) {
+      alert( "No se puede eliminar el usuario porque tiene registros asociados : " + err.message);
     }
-  }
+  };
+
+  // Paginación
+  const totalPaginas = Math.ceil(usuarios.length / filasPorPagina);
+  const filasMostradas = usuarios.slice(
+    (pagina - 1) * filasPorPagina,
+    pagina * filasPorPagina
+  );
 
   const cambiarPagina = (nuevaPagina) => {
     if (nuevaPagina < 1) nuevaPagina = 1;
@@ -66,15 +85,9 @@ const Inicio = () => {
     setPagina(nuevaPagina);
   };
 
-  // Filas que se mostrarán en la página actual
-  const filasMostradas = usuarios.slice(
-    (pagina - 1) * filasPorPagina,
-    pagina * filasPorPagina
-  );
-
   return (
     <div>
-      <h2>Crear usuario</h2>
+      <h2>{usuarioSeleccionado ? "Editar usuario" : "Crear usuario"}</h2>
       <input
         type="text"
         placeholder="Usuario"
@@ -86,45 +99,30 @@ const Inicio = () => {
         placeholder="Contraseña"
         value={contrasena}
         onChange={(e) => setContrasena(e.target.value)}
-        className="input2"
       />
-      <div>
       <select value={rol} onChange={(e) => setRol(e.target.value)}>
         <option value="prestamista">Prestamista</option>
         <option value="admin">Admin</option>
-        
       </select>
-      <button className="btn-crear" onClick={handleCrearUsuario}>Crear Usuario</button>
+      <button onClick={handleSubmit}>
+        {usuarioSeleccionado ? "Actualizar" : "Crear"}
+      </button>
+      {usuarioSeleccionado && (
+        <button onClick={() => {
+          setUsuarioSeleccionado(null);
+          setUsuario("");
+          setContrasena("");
+          setRol("prestamista");
+        }}>Cancelar</button>
+      )}
 
-      </div>
-      
-      
-      
+      {mensaje && <p style={{ color: "green" }}>{mensaje}</p>}
 
-      <table>
-        <thead>
-          <tr>
-            <th>Usuario</th>
-            <th>Rol</th>
-               <th>Acciones</th>
-          </tr>
-        </thead>
-        <tbody>
-          {filasMostradas.map((user) => (
-            <tr key={user.id}>
-              <td>{user.usuario}</td>
-              <td>{user.rol}</td>
-              <td>
-                <button
-                onClick={() => handleDeleteUsuario(user.id)}
-                >
-                  Eliminar
-                </button>
-              </td>
-            </tr>
-          ))}
-        </tbody>
-      </table>
+      <UsuarioList
+        usuarios={filasMostradas}
+        onEditar={handleEditar}
+        onEliminar={handleEliminar}
+      />
 
       <div style={{ marginTop: "10px" }}>
         <button onClick={() => cambiarPagina(pagina - 1)} disabled={pagina === 1}>
@@ -137,9 +135,6 @@ const Inicio = () => {
           Siguiente
         </button>
       </div>
-
-      {error && <p style={{ color: "red" }}>{error}</p>}
-      {mensaje && <p style={{ color: "green" }}>{mensaje}</p>}
     </div>
   );
 };
