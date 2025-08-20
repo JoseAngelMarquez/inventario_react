@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { crearUsuario, obtenerUsuarios } from "../../services/usuarioService";
+import { crearUsuario, obtenerUsuarios, eliminarUsuario } from "../../services/usuarioService";
 import "../../styles/Usuarios.css";
 
 const Inicio = () => {
@@ -51,6 +51,14 @@ const Inicio = () => {
       setError(err.response?.data?.mensaje || "Error creando usuario");
     }
   };
+  const handleDeleteUsuario = async (id) => {
+    if (!window.confirm("¿Estás seguro de eliminar este usuario?")) return;
+    try {
+      await eliminarUsuario(id);
+    } catch (error) {
+      alert("Error al eliminar usuario: " + error.message);
+    }
+  }
 
   const cambiarPagina = (nuevaPagina) => {
     if (nuevaPagina < 1) nuevaPagina = 1;
@@ -98,6 +106,7 @@ const Inicio = () => {
           <tr>
             <th>Usuario</th>
             <th>Rol</th>
+               <th>Acciones</th>
           </tr>
         </thead>
         <tbody>
@@ -105,6 +114,13 @@ const Inicio = () => {
             <tr key={user.id}>
               <td>{user.usuario}</td>
               <td>{user.rol}</td>
+              <td>
+                <button
+                onClick={() => handleDeleteUsuario(user.id)}
+                >
+                  Eliminar
+                </button>
+              </td>
             </tr>
           ))}
         </tbody>

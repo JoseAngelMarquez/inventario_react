@@ -21,19 +21,33 @@ class Usuario {
 
   static async eliminar(conn, id) {
     try {
-      // Verificar si el usuario tiene préstamos
-      const [prestamos] = await conn.query('SELECT COUNT(*) AS total FROM prestamos WHERE id_usuario = ?', [id]);
-      if (prestamos[0].total > 0) {
+      console.log("Intentando eliminar usuario id:", id);
+  
+      // Verificar préstamos activos
+      const [prestamos] = await conn.query(
+        'SELECT COUNT(*) AS total FROM prestamos WHERE id_usuario = ? AND estado = "prestado"',
+        [id]
+      );
+  
+      const totalPrestamos = Number(prestamos[0]?.total || 0);
+      console.log("Préstamos activos encontrados:", totalPrestamos);
+  
+      if (totalPrestamos > 0) {
         throw new Error("El usuario tiene préstamos activos, no puede ser eliminado");
       }
   
-      // Eliminar usuario si no tiene préstamos
+      // Eliminar usuario
       const [result] = await conn.query('DELETE FROM usuarios WHERE id = ?', [id]);
+      console.log("Resultado DELETE:", result);
       return result.affectedRows;
+  
     } catch (error) {
+      console.error("Error al eliminar usuario:", error.message);
       throw error;
     }
   }
+  
+  
   
 
 

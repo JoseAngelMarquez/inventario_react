@@ -24,3 +24,10 @@ export const obtenerUsuarios = async () => {
   });
   return response.data;
 };
+
+export const eliminarUsuario = async (id) => {
+  const response = await axios.delete(`${API_URL}/${id}`, {
+    withCredentials: true
+  });
+  return response.data;
+};
