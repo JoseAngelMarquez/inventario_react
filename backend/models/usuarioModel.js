@@ -21,13 +21,20 @@ class Usuario {
 
   static async eliminar(conn, id) {
     try {
+      // Verificar si el usuario tiene préstamos
+      const [prestamos] = await conn.query('SELECT COUNT(*) AS total FROM prestamos WHERE id_usuario = ?', [id]);
+      if (prestamos[0].total > 0) {
+        throw new Error("El usuario tiene préstamos activos, no puede ser eliminado");
+      }
+  
+      // Eliminar usuario si no tiene préstamos
       const [result] = await conn.query('DELETE FROM usuarios WHERE id = ?', [id]);
       return result.affectedRows;
-    }catch (error) {
-      console.error('Error al eliminar usuario:', error);
+    } catch (error) {
       throw error;
     }
   }
+  
 
 
 }
