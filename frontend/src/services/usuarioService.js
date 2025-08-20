@@ -25,12 +25,9 @@ export const obtenerUsuarios = async () => {
   return response.data;
 };
 
-export const eliminarUsuario = async (id) => {
-  const response = await axios.delete(`${API_URL}/${id}`, {
-    withCredentials: true
+export const eliminarUsuario = (id) => axios.delete(`${API_URL}/${id}`, {
   });
-  return response.data;
-};
+
 
 export const actualizarUsuario = async (id, usuario, contrasena, rol) => {
   const response = await axios.put(`${API_URL}/${id}`, { usuario, contrasena, rol }, {

@@ -23,6 +23,7 @@ exports.login = async (req, res) => {
     const usuarioEncontrado = resultados[0];
     const match = await bcrypt.compare(contrasena, usuarioEncontrado.contrasena);
 
+    //Se guarda en la cookie para posteriormente validar en cualquier controller que el usuario esté logueado
     if (match) {
       // Guardar datos en la sesión
       req.session.usuario = {
