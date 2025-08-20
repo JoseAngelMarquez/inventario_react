@@ -96,3 +96,18 @@ exports.obtenerUsuarios = async (req, res) => {
 }
 
 
+exports.eliminarUsuario = async (req, res) => {
+  const conn = await pool.getConnection();
+  try {
+    const id = req.params.id;
+    const eliminarUsuario = await Usuario.eliminar(conn,id);
+    if (eliminarUsuario === 0) return res.status(404).json({ mensaje: 'Usuario no encontrado' });
+   res.json({ mensaje: 'Usuario eliminado exitosamente' });
+
+  } catch (error) {
+    res.status(500).json({ mensaje: 'Error al eliminar usuario' });
+  }
+
+}
+
+
