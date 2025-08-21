@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { login } from '../../services/usuarioService';
-
+//import styles from'../../styles/login.css'; // Asegúrate de que la ruta sea correcta
 const Login = () => {
   const [usuario, setUsuario] = useState('');
   const [contrasena, setContrasena] = useState('');
@@ -40,7 +40,7 @@ const Login = () => {
   };
 
   return (
-    <form onSubmit={handleSubmit}>
+    <form className="div2" onSubmit={handleSubmit}>
       <input
         type="text"
         placeholder="Usuario"

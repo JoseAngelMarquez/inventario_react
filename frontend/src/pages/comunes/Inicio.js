@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { obtenerMateriales } from "../../services/materialService";
 import { obtenerTotales } from "../../services/inventarioService";
-import "../../styles/Inicio.css";
+import styles from "../../styles/Inicio.module.css";
 import { CiSearch } from "react-icons/ci";
 
 const Inicio = () => {
@@ -45,16 +45,16 @@ const Inicio = () => {
     <div>
       <h2>Panel de Materiales</h2>
 
-      <div className="panel-container">
-        <div className="panel-box">
+      <div className= {styles["boton-cerrar"]}>
+        <div className={styles["panel-box"]}>
           <h3>Materiales Totales</h3>
           <p>{totales?.totalMateriales ?? "N/A"}</p>
         </div>
-        <div className="panel-box">
+        <div className={styles["panel-box"]}>
           <h3>Materiales Disponibles</h3>
           <p>{totales?.materialesDisponibles ?? "N/A"}</p>
         </div>
-        <div className="panel-box">
+        <div className={styles["panel-box"]}>
           <h3>Materiales Prestados</h3>
           <p>{totales?.materialesPrestados ?? "N/A"}</p>
         </div>
@@ -62,10 +62,10 @@ const Inicio = () => {
 
       <h3>Lista de Materiales</h3>
 
-      <div className="search-container">
-      <CiSearch className="search-icon"/>
+      <div className={styles["search-container"]}>
+      <CiSearch className={styles["search-icon"]}/>
 
-        <input className="search-input"
+        <input className={styles["search-input"]}
         
           label="Buscar material"
           value={busqueda}
@@ -73,7 +73,7 @@ const Inicio = () => {
         />
       </div>
 
-      <table className="table-materiales">
+      <table className={styles["table-materiales"]}>
         <thead>
           <tr>
             <th>Nombre</th>

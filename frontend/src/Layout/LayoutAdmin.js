@@ -1,16 +1,16 @@
 import React from "react";
 import { Link, Outlet } from "react-router-dom";
 import CerrarSesion from "../components/UI/BtnCerrar";
-import "../styles/LayoutAdmin.css"; 
+import styles from "../styles/LayoutAdmin.module.css"; 
 import NavBar from "../components/navBar"; 
 
 const LayoutAdmin = () => {
   return (
-    <div className="parent">
-      <header className="div1">
+    <div className={styles.parent}>
+      <header className={styles.div1}>
     <NavBar />
       </header>
-      <aside className="div2">
+      <aside className={styles.div2}>
         <h2>Admin</h2>
         <nav>
           <ul>
@@ -23,7 +23,7 @@ const LayoutAdmin = () => {
           </ul>
         </nav>
       </aside>
-      <main className="div3">
+      <main className={styles.div3}>
         <Outlet />
       </main>
     </div>

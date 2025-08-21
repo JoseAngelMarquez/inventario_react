@@ -1,6 +1,6 @@
 import React from "react";
 import { useNavigate } from "react-router-dom";
-import "../../styles/BotonCerrar.css";
+import styles from "../../styles/BotonCerrar.module.css";
 const CerrarSesion = () => {
   const navigate = useNavigate();
 
@@ -10,7 +10,7 @@ const CerrarSesion = () => {
   };
 
   return (
-    <button onClick={cerrarSesion} className="boton">
+    <button className={styles.boton} onClick={cerrarSesion}>
       Cerrar sesión
     </button>
   );

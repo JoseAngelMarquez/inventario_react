@@ -20,7 +20,7 @@ const NavBar = () => {
       padding: "10px",
       display: "flex",
       alignItems: "center",
-      gap: "50vh", // espacio entre la imagen y el texto
+      gap: "50vh", 
     },
     logo: {
       height: "20vh",

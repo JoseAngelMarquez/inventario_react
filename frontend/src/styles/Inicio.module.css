@@ -1,0 +1,71 @@
+.panel-container {
+  display: flex;
+  gap: 0.5rem;           /* espacio entre paneles */
+  overflow-x: auto;       /* scroll horizontal si hay muchos */
+  padding: 0.5rem 0;      /* un poco de espacio arriba y abajo */
+  white-space: nowrap;    /* evita que los paneles bajen de línea */
+}
+
+.boton-cerrar {
+  display: flex;
+  flex-direction: row;  /* horizontal */
+  gap: 1rem;            /* espacio entre tarjetas */
+  margin-bottom: 1rem;
+  width: 100%;           /* ocupar todo el ancho disponible */
+}
+
+.panel-box {
+  flex: 1;               /* cada panel ocupa el mismo espacio */
+  min-width: 120px;      /* ancho mínimo para que no se achique demasiado */
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  background-color: #f9f9f9;
+  border: 1px solid #ccc;
+  border-radius: 8px;
+  padding: 0.5rem;
+  text-align: center;
+}
+
+
+
+.table-materiales {
+  margin-top: 0.5rem;
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.85rem;
+  text-align: center;
+}
+
+.table-materiales th,
+.table-materiales td {
+  border: 1px solid black;
+  padding: 3px;
+}
+
+.table-materiales th {
+  background-color: #8F3D38;
+  color: white;
+}
+
+.search-container {
+  margin-top: 0.5rem;
+  position: relative;
+  display: block;
+}
+
+.search-input {
+  padding: 0.2rem;
+  width: 100%;
+  box-sizing: border-box;
+  font-size: 0.85rem;
+}
+
+.search-icon {
+  position: absolute;
+  top: 50%;
+  left: 5px;
+  transform: translateY(-50%);
+  font-size: 16px;
+}
