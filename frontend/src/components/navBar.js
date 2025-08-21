@@ -20,7 +20,7 @@ const NavBar = () => {
       padding: "10px",
       display: "flex",
       alignItems: "center",
-      gap: "10px", // espacio entre la imagen y el texto
+      gap: "50vh", // espacio entre la imagen y el texto
     },
     logo: {
       height: "20vh",
@@ -31,7 +31,7 @@ const NavBar = () => {
   return (
     <div style={styles.navbar}>
       <img src={logo_uaeh} alt="Logo" style={styles.logo} />
-      <h2>Bienvenido, {userName}</h2>
+      <h2>Bienvenido {userName}</h2>
     </div>
   );
 };
