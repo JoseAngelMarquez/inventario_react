@@ -44,10 +44,6 @@ exports.login = async (req, res) => {
   }
 };
 
-
-
-
-
 // Nuevo método para crear usuarios, por ejemplo llamado por el admin
 exports.crearUsuario = async (req, res) => {
   const { usuario, contrasena, rol } = req.body;
@@ -83,7 +79,6 @@ exports.crearUsuario = async (req, res) => {
   }
 };
 
-
 exports.obtenerUsuarios = async (req, res) => {
   const conn = await pool.getConnection();
   try{
@@ -96,7 +91,6 @@ exports.obtenerUsuarios = async (req, res) => {
     if (conn) conn.release(); 
   }
 }
-
 
 exports.eliminarUsuario = async (req, res) => {
   const conn = await pool.getConnection();

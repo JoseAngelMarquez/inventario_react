@@ -36,7 +36,7 @@ const Inicio = () => {
       setMensaje("Usuario y contraseña son obligatorios");
       return;
     }
-  
+
     try {
       if (usuarioSeleccionado && usuarioSeleccionado.id) {
         console.log("Actualizando usuario ID:", usuarioSeleccionado.id);
@@ -56,8 +56,6 @@ const Inicio = () => {
       console.error(err);
     }
   };
-  
-  
 
   const handleEditar = (user) => {
     setUsuarioSeleccionado(user);
