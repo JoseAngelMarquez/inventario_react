@@ -48,21 +48,33 @@ class Usuario {
   }
   
   static async actualizar(conn, id, usuario, contrasena, rol) {
-      try {
-        const [result] = await conn.query(
-          'UPDATE usuarios SET usuario = ?, contrasena = ?, rol = ? WHERE id = ?',
-          [usuario, contrasena, rol, id]
-        );
-        return result.affectedRows;
-      } catch (error) {
-        console.error("Error al actualizar usuario:", error.message);
+    try {
+      // Validar que id sea un número
+      const idNum = Number(id);
+      if (isNaN(idNum)) {
+        throw new Error("ID inválido: debe ser un número");
       }
-      
+  
+      // Validar que usuario, contrasena y rol no estén vacíos
+      if (!usuario || !contrasena || !rol) {
+        throw new Error("Faltan datos para actualizar el usuario");
+      }
+  
+      const [result] = await conn.query(
+        'UPDATE usuarios SET usuario = ?, contrasena = ?, rol = ? WHERE id = ?',
+        [usuario, contrasena, rol, idNum]
+      );
+      return result.affectedRows;
+    } catch (error) {
+      console.error("Error al actualizar usuario:", error.message);
+      throw error; // Propagar el error para que el controller lo maneje
+    }
   }
+  
 
   static async obtenerPaginados(conn, limit, offset) {
     const [rows] = await conn.query(
-      'SELECT usuario, rol FROM usuarios ORDER BY id LIMIT ? OFFSET ?',
+      'SELECT id, usuario, rol FROM usuarios ORDER BY id LIMIT ? OFFSET ?',
       [limit, offset]
     );
     return rows; 

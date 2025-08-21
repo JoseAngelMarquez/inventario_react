@@ -118,15 +118,28 @@ exports.actualizarUsuario = async (req, res) => {
   const conn = await pool.getConnection();
   try {
     const id = req.params.id;
-    const usuarioActualizado = req.body;
-    const affectedRows = await Usuario.actualizar(conn, id, usuarioActualizado.contrasena, usuarioActualizado.rol); 
+    const { usuario, contrasena, rol } = req.body;
+
+    // Validar que los datos existan
+    if (!usuario || !contrasena || !rol) {
+      return res.status(400).json({ mensaje: "Faltan datos para actualizar el usuario" });
+    }
+
+    const affectedRows = await Usuario.actualizar(conn, id, usuario, contrasena, rol);
+
+    if (affectedRows === 0) {
+      return res.status(404).json({ mensaje: "Usuario no encontrado o sin cambios" });
+    }
+
     res.json({ mensaje: 'Usuario actualizado exitosamente' });
   } catch (error) {
-    res.status(500).json({ mensaje: 'Error al actualizar usuario' });
-  }finally {
+    console.error("Error al actualizar usuario:", error.message);
+    res.status(500).json({ mensaje: 'Error al actualizar usuario', error: error.message });
+  } finally {
     if (conn) conn.release(); 
   }
 }
+
 exports.obtenerPaginados = async (req, res) => {
   const conn = await pool.getConnection();
   try {

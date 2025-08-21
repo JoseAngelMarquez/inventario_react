@@ -36,9 +36,10 @@ const Inicio = () => {
       setMensaje("Usuario y contraseña son obligatorios");
       return;
     }
-
+  
     try {
-      if (usuarioSeleccionado) {
+      if (usuarioSeleccionado && usuarioSeleccionado.id) {
+        console.log("Actualizando usuario ID:", usuarioSeleccionado.id);
         await actualizarUsuario(usuarioSeleccionado.id, usuario, contrasena, rol);
         setMensaje("Usuario actualizado correctamente");
       } else {
@@ -51,10 +52,12 @@ const Inicio = () => {
       setUsuarioSeleccionado(null);
       fetchUsuarios(pagina);
     } catch (err) {
-      setMensaje("Error al procesar usuario");
+      setMensaje("Error al procesar usuario: " + (err.response?.data?.message || err.message));
       console.error(err);
     }
   };
+  
+  
 
   const handleEditar = (user) => {
     setUsuarioSeleccionado(user);
