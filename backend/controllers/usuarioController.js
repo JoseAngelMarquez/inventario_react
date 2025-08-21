@@ -127,61 +127,31 @@ exports.actualizarUsuario = async (req, res) => {
     if (conn) conn.release(); 
   }
 }
-
-const pool = require('../config/db');
-const Usuario = require('../models/usuarioModel');
-
 exports.obtenerPaginados = async (req, res) => {
-  let conn;
+  const conn = await pool.getConnection();
   try {
-    conn = await pool.getConnection();
+    const pagina = parseInt(req.query.pagina) || 1;
+    const limite = parseInt(req.query.limite) || 10;
+    const offset = (pagina - 1) * limite;
 
-    // Valores por defecto
-    const page = parseInt(req.query.page) || 1;
-    const limit = parseInt(req.query.limit) || 10;
-    const offset = (page - 1) * limit;
+    // Obtener usuarios paginados
+    const usuarios = await Usuario.obtenerPaginados(conn, limite, offset);
 
-    const usuarios = await Usuario.obtenerPaginados(conn, limit, offset);
+    // Mapear solo los campos que queremos enviar
+    const resultado = usuarios.map(u => ({ usuario: u.usuario, rol: u.rol, id: u.id }));
+
+    // Obtener el total de usuarios para el paginador
     const total = await Usuario.contarTotal(conn);
 
     res.json({
-      page,
-      limit,
+      usuarios: resultado,
       total,
-      totalPages: Math.ceil(total / limit),
-      data: usuarios
+      pagina,
+      limite,
+      totalPaginas: Math.ceil(total / limite)
     });
-
   } catch (error) {
-    console.error(error);
-    res.status(500).json({ mensaje: 'Error al obtener usuarios paginados' });
-  } finally {
-    if (conn) conn.release();
-  }
-};
-exports.obtenerPaginados = async (req, res) => {
-  let conn;
-  try {
-    conn = await pool.getConnection();
-
-    // Valores por defecto
-    const page = parseInt(req.query.page) || 1;
-    const limit = parseInt(req.query.limit) || 10;
-    const offset = (page - 1) * limit;
-
-    const usuarios = await Usuario.obtenerPaginados(conn, limit, offset);
-    const total = await Usuario.contarTotal(conn);
-
-    res.json({
-      page,
-      limit,
-      total,
-      totalPages: Math.ceil(total / limit),
-      data: usuarios
-    });
-
-  } catch (error) {
-    console.error(error);
+    console.error('Error al obtener usuarios paginados:', error);
     res.status(500).json({ mensaje: 'Error al obtener usuarios paginados' });
   } finally {
     if (conn) conn.release();

@@ -1,6 +1,6 @@
-// Inicio.jsx
+// src/pages/Usuarios/Inicio.jsx
 import React, { useEffect, useState } from "react";
-import { crearUsuario, obtenerUsuarios, eliminarUsuario, actualizarUsuario } from "../../services/usuarioService";
+import { crearUsuario, actualizarUsuario, eliminarUsuario, obtenerPaginados } from "../../services/usuarioService";
 import UsuarioList from "../../components/UsuarioList";
 import "../../styles/Usuarios.css";
 
@@ -14,16 +14,18 @@ const Inicio = () => {
 
   // Paginación
   const [pagina, setPagina] = useState(1);
+  const [totalPaginas, setTotalPaginas] = useState(1);
   const filasPorPagina = 5;
 
   useEffect(() => {
-    fetchUsuarios();
-  }, []);
+    fetchUsuarios(pagina);
+  }, [pagina]);
 
-  const fetchUsuarios = async () => {
+  const fetchUsuarios = async (paginaActual = 1) => {
     try {
-      const lista = await obtenerUsuarios();
-      setUsuarios(lista);
+      const data = await obtenerPaginados(paginaActual, filasPorPagina);
+      setUsuarios(data.usuarios); // suponiendo que tu API devuelve { usuarios, total }
+      setTotalPaginas(Math.ceil(data.total / filasPorPagina));
     } catch (err) {
       console.error(err);
     }
@@ -47,8 +49,7 @@ const Inicio = () => {
       setContrasena("");
       setRol("prestamista");
       setUsuarioSeleccionado(null);
-      fetchUsuarios();
-      setPagina(1);
+      fetchUsuarios(pagina);
     } catch (err) {
       setMensaje("Error al procesar usuario");
       console.error(err);
@@ -66,18 +67,11 @@ const Inicio = () => {
     if (!window.confirm("¿Estás seguro de eliminar este usuario?")) return;
     try {
       await eliminarUsuario(id);
-      fetchUsuarios();
+      fetchUsuarios(pagina);
     } catch (err) {
-      alert( "No se puede eliminar el usuario porque tiene registros asociados : " + err.message);
+      alert("No se puede eliminar el usuario porque tiene registros asociados: " + err.message);
     }
   };
-
-  // Paginación
-  const totalPaginas = Math.ceil(usuarios.length / filasPorPagina);
-  const filasMostradas = usuarios.slice(
-    (pagina - 1) * filasPorPagina,
-    pagina * filasPorPagina
-  );
 
   const cambiarPagina = (nuevaPagina) => {
     if (nuevaPagina < 1) nuevaPagina = 1;
@@ -119,7 +113,7 @@ const Inicio = () => {
       {mensaje && <p style={{ color: "green" }}>{mensaje}</p>}
 
       <UsuarioList
-        usuarios={filasMostradas}
+        usuarios={usuarios.map(u => ({ usuario: u.usuario, rol: u.rol, id: u.id }))}
         onEditar={handleEditar}
         onEliminar={handleEliminar}
       />
