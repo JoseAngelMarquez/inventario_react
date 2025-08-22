@@ -2,7 +2,9 @@ import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { login } from '../../services/usuarioService';
 import styles from '../../styles/login.module.css';
-import uaeh from '../../images/uaeh.png'; // Asegúrate de tener esta imagen en la ruta correcta
+import uaeh from '../../images/uaeh.png'; 
+import { FaUserCircle, FaLock } from "react-icons/fa";
+
 const Login = () => {
   const [usuario, setUsuario] = useState('');
   const [contrasena, setContrasena] = useState('');
@@ -37,20 +39,29 @@ const Login = () => {
       <div className={styles.right}>
         <form className={styles.formulario} onSubmit={handleSubmit}>
           <h2>Iniciar Sesión</h2>
-          <input
-            type="text"
-            placeholder="Usuario"
-            value={usuario}
-            onChange={(e) => setUsuario(e.target.value)}
-            required
-          />
-          <input
-            type="password"
-            placeholder="Contraseña"
-            value={contrasena}
-            onChange={(e) => setContrasena(e.target.value)}
-            required
-          />
+
+          <div className={styles.inputGroup}>
+            <FaUserCircle className={styles.icon} />
+            <input
+              type="text"
+              placeholder="Usuario"
+              value={usuario}
+              onChange={(e) => setUsuario(e.target.value)}
+              required
+            />
+          </div>
+
+          <div className={styles.inputGroup}>
+            <FaLock className={styles.icon} />
+            <input
+              type="password"
+              placeholder="Contraseña"
+              value={contrasena}
+              onChange={(e) => setContrasena(e.target.value)}
+              required
+            />
+          </div>
+
           <button type="submit" disabled={loading}>
             {loading ? "Ingresando..." : "Ingresar"}
           </button>
@@ -58,10 +69,7 @@ const Login = () => {
         </form>
       </div>
     </div>
- 
-  
   );
-  
 };
 
 export default Login;

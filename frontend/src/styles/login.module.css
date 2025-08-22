@@ -94,3 +94,20 @@
   img{
     max-width: 200px;
   }
+  .inputGroup {
+    display: flex;
+    align-items: center;
+    margin-bottom: 15px;
+  }
+  
+  .inputGroup input {
+    flex: 1;
+    padding: 8px 12px;
+    margin-left: 8px;
+  }
+  
+  .icon {
+    font-size: 20px;
+    color: #333;
+  }
+  
