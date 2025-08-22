@@ -1,8 +1,8 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { login } from '../../services/usuarioService';
-import fondo from  "../../images/fondo.png"; // Asegúrate de que la ruta sea correcta
-import styles from '../../styles/login.module.css'; // Asegúrate de que la ruta sea correcta
+import styles from '../../styles/login.module.css';
+
 const Login = () => {
   const [usuario, setUsuario] = useState('');
   const [contrasena, setContrasena] = useState('');
@@ -14,61 +14,54 @@ const Login = () => {
     e.preventDefault();
     setMensaje('');
     setLoading(true);
-
     try {
       const data = await login(usuario, contrasena);
-
-      // Guardar usuario en localStorage
       localStorage.setItem('usuario', JSON.stringify(data.usuario));
-
-      // Redireccionar según el rol
-      if (data.usuario.rol === 'admin') {
-        navigate('/admin');
-      } else if (data.usuario.rol === 'prestamista') {
-        navigate('/prestamista');
-      } else {
-        setMensaje('Rol no reconocido');
-      }
+      if (data.usuario.rol === 'admin') navigate('/admin');
+      else if (data.usuario.rol === 'prestamista') navigate('/prestamista');
+      else setMensaje('Rol no reconocido');
     } catch (error) {
-      if (error.response && error.response.data && error.response.data.mensaje) {
-        setMensaje(error.response.data.mensaje);
-      } else {
-        setMensaje('Error en la conexión con el servidor');
-      }
+      setMensaje(
+        error.response?.data?.mensaje || 'Error en la conexión con el servidor'
+      );
     } finally {
       setLoading(false);
     }
   };
 
   return (
-    <div className={styles.parent}>
-      <div className={styles.div1}>
-        <img src={fondo} alt="Logo" className={styles.logo} />
-
+    <div className={styles.container}>
+      <div className={styles.left}>
+        Bienvenido<br />
       </div>
-      <div className={styles.div2} onSubmit={handleSubmit}>
-        <input
-          type="text"
-          placeholder="Usuario"
-          value={usuario}
-          onChange={(e) => setUsuario(e.target.value)}
-          required
-        />
-        <input
-          type="password"
-          placeholder="Contraseña"
-          value={contrasena}
-          onChange={(e) => setContrasena(e.target.value)}
-          required
-        />
-        <button type="submit" disabled={loading}>
-          {loading ? 'Ingresando...' : 'Ingresar'}
-        </button>
-        <p>{mensaje}</p>
+      <div className={styles.right}>
+        <form className={styles.formulario} onSubmit={handleSubmit}>
+          <h2>Iniciar Sesión</h2>
+          <input
+            type="text"
+            placeholder="Usuario"
+            value={usuario}
+            onChange={(e) => setUsuario(e.target.value)}
+            required
+          />
+          <input
+            type="password"
+            placeholder="Contraseña"
+            value={contrasena}
+            onChange={(e) => setContrasena(e.target.value)}
+            required
+          />
+          <button type="submit" disabled={loading}>
+            {loading ? "Ingresando..." : "Ingresar"}
+          </button>
+          {mensaje && <p className={styles.mensaje}>{mensaje}</p>}
+        </form>
       </div>
     </div>
-
+ 
+  
   );
+  
 };
 
 export default Login;
