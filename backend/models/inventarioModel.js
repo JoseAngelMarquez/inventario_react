@@ -1,13 +1,24 @@
-class Inventario {
+
+  
+
+  class Inventario {
     static async obtenerTotales(conn) {
       // Total de materiales
-      const [total] = await conn.query("SELECT COUNT(*) AS total FROM materiales");
+      const [total] = await conn.query(
+        `SELECT SUM(cantidad_disponible) AS total FROM materiales`
+      );
   
-      // Materiales disponibles
       const [disponibles] = await conn.query(
         "SELECT COUNT(*) AS disponibles FROM materiales WHERE cantidad_disponible > 0"
       );
-  
+      // Materiales disponibles (mayor a 0)
+     /*   const [disponiblesPorTipo] = await conn.query(
+      `SELECT tipo, COUNT(*) AS disponibles
+       FROM materiales
+       WHERE cantidad_disponible > 0
+       GROUP BY tipo`
+    );
+   */
       // Materiales prestados (con base en préstamos activos)
       const [prestados] = await conn.query(
         `SELECT COUNT(*) AS prestados 
