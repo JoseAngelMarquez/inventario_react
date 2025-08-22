@@ -1,5 +1,7 @@
 // UsuarioTable.jsx
 import React from "react";
+import { MdDelete } from "react-icons/md";
+import { FaEdit } from "react-icons/fa";
 
 const UsuarioList = ({ usuarios, onEditar, onEliminar }) => {
   return (
@@ -17,8 +19,15 @@ const UsuarioList = ({ usuarios, onEditar, onEliminar }) => {
             <td>{user.usuario}</td>
             <td>{user.rol}</td>
             <td>
-              <button onClick={() => onEditar(user)}>Editar</button>
-              <button onClick={() => onEliminar(user.id)}>Eliminar</button>
+              <button onClick={() => onEditar(user)}>
+              <FaEdit style={{ marginRight: "5px" }} />
+                Editar
+              </button>
+
+              <button onClick={() => onEliminar(user.id)}>
+              <MdDelete style={{ marginRight: "5px" }} />
+              Eliminar
+              </button>
             </td>
           </tr>
         ))}
