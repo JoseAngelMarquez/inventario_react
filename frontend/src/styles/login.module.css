@@ -91,3 +91,6 @@
     font-size: 14px;
   }
   
+  img{
+    max-width: 200px;
+  }

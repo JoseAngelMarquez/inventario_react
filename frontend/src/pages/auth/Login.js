@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { login } from '../../services/usuarioService';
 import styles from '../../styles/login.module.css';
-
+import uaeh from '../../images/uaeh.png'; // Asegúrate de tener esta imagen en la ruta correcta
 const Login = () => {
   const [usuario, setUsuario] = useState('');
   const [contrasena, setContrasena] = useState('');
@@ -32,7 +32,7 @@ const Login = () => {
   return (
     <div className={styles.container}>
       <div className={styles.left}>
-        Bienvenido<br />
+        <img src={uaeh} alt="UAEMex" className={styles.logo} />
       </div>
       <div className={styles.right}>
         <form className={styles.formulario} onSubmit={handleSubmit}>
