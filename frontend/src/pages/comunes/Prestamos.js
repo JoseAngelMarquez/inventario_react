@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { obtenerMateriales } from '../../services/materialService';
 import { agregarPrestamo, obtenerPrestamos, finalizarPrestamo } from '../../services/prestamosService';
 import "../../styles/Prestamos.css";
+import { PiHandSwipeRightFill } from "react-icons/pi";
 
 function FormPrestamo() {
     const [materiales, setMateriales] = useState([]);
@@ -174,7 +175,10 @@ function FormPrestamo() {
                     />
                 </label>
 
-                <button type="submit">Prestar</button>
+                <button type="submit">
+                < PiHandSwipeRightFill style={{marginRight:"20px"}} />
+                Prestar
+                </button>
             </form>
 
             <hr />

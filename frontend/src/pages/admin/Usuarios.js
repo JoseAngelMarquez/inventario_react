@@ -3,6 +3,7 @@ import React, { useEffect, useState } from "react";
 import { crearUsuario, actualizarUsuario, eliminarUsuario, obtenerPaginados } from "../../services/usuarioService";
 import UsuarioList from "../../components/UsuarioList";
 import "../../styles/Usuarios.css";
+import { TiUserAdd } from "react-icons/ti";
 
 const Inicio = () => {
   const [usuarios, setUsuarios] = useState([]);
@@ -24,7 +25,7 @@ const Inicio = () => {
   const fetchUsuarios = async (paginaActual = 1) => {
     try {
       const data = await obtenerPaginados(paginaActual, filasPorPagina);
-      setUsuarios(data.usuarios); // suponiendo que tu API devuelve { usuarios, total }
+      setUsuarios(data.usuarios); 
       setTotalPaginas(Math.ceil(data.total / filasPorPagina));
     } catch (err) {
       console.error(err);
@@ -100,6 +101,7 @@ const Inicio = () => {
         <option value="admin">Admin</option>
       </select>
       <button onClick={handleSubmit}>
+        <TiUserAdd style={{ marginRight: "5px", fontSize:"2vh"}} />
         {usuarioSeleccionado ? "Actualizar" : "Crear"}
       </button>
       {usuarioSeleccionado && (
