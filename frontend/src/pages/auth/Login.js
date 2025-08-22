@@ -4,7 +4,7 @@ import { login } from '../../services/usuarioService';
 import styles from '../../styles/login.module.css';
 import uaeh from '../../images/uaeh.png'; 
 import { FaUserCircle, FaLock } from "react-icons/fa";
-
+import logo_login from '../../images/logo_login.png'; // Asegúrate de tener esta imagen en la ruta correcta
 const Login = () => {
   const [usuario, setUsuario] = useState('');
   const [contrasena, setContrasena] = useState('');
@@ -40,6 +40,9 @@ const Login = () => {
         <form className={styles.formulario} onSubmit={handleSubmit}>
           <h2>Iniciar Sesión</h2>
 
+<div>
+  <img src={logo_login} alt="Logo" className={styles.logoLogin} />
+</div>
           <div className={styles.inputGroup}>
             <FaUserCircle className={styles.icon} />
             <input
