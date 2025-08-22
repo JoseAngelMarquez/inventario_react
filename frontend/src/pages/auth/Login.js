@@ -1,7 +1,8 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { login } from '../../services/usuarioService';
-//import styles from'../../styles/login.css'; // Asegúrate de que la ruta sea correcta
+import fondo from  "../../images/fondo.png"; // Asegúrate de que la ruta sea correcta
+import styles from '../../styles/login.module.css'; // Asegúrate de que la ruta sea correcta
 const Login = () => {
   const [usuario, setUsuario] = useState('');
   const [contrasena, setContrasena] = useState('');
@@ -40,26 +41,33 @@ const Login = () => {
   };
 
   return (
-    <form className="div2" onSubmit={handleSubmit}>
-      <input
-        type="text"
-        placeholder="Usuario"
-        value={usuario}
-        onChange={(e) => setUsuario(e.target.value)}
-        required
-      />
-      <input
-        type="password"
-        placeholder="Contraseña"
-        value={contrasena}
-        onChange={(e) => setContrasena(e.target.value)}
-        required
-      />
-      <button type="submit" disabled={loading}>
-        {loading ? 'Ingresando...' : 'Ingresar'}
-      </button>
-      <p>{mensaje}</p>
-    </form>
+    <div className={styles.parent}>
+      <div className={styles.div1}>
+        <img src={fondo} alt="Logo" className={styles.logo} />
+
+      </div>
+      <div className={styles.div2} onSubmit={handleSubmit}>
+        <input
+          type="text"
+          placeholder="Usuario"
+          value={usuario}
+          onChange={(e) => setUsuario(e.target.value)}
+          required
+        />
+        <input
+          type="password"
+          placeholder="Contraseña"
+          value={contrasena}
+          onChange={(e) => setContrasena(e.target.value)}
+          required
+        />
+        <button type="submit" disabled={loading}>
+          {loading ? 'Ingresando...' : 'Ingresar'}
+        </button>
+        <p>{mensaje}</p>
+      </div>
+    </div>
+
   );
 };
 
