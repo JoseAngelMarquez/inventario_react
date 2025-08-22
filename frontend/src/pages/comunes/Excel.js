@@ -3,6 +3,7 @@ import React, { useEffect, useState } from 'react';
 import * as XLSX from 'xlsx';
 import { saveAs } from 'file-saver';
 import { obtenerReporteCompleto } from "../../services/prestamosService";
+import { FaFileExport } from "react-icons/fa6";
 
 export default function PrestamosReporte() {
   const [prestamos, setPrestamos] = useState([]);
@@ -63,7 +64,10 @@ export default function PrestamosReporte() {
   return (
     <div>
       <h1>Reporte de Préstamos</h1>
-      <button onClick={exportarExcelPorFecha} style={{ marginBottom: '20px' }}>Exportar Excel</button>
+      <button onClick={exportarExcelPorFecha} style={{ marginBottom: '20px' }}>
+        <FaFileExport style={{ marginRight: '5px' }} />
+        Exportar Excel
+        </button>
 
       <table border="1">
         <thead>
