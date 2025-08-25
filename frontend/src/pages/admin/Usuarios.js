@@ -101,7 +101,7 @@ const Inicio = () => {
         <option value="admin">Admin</option>
       </select>
       <button onClick={handleSubmit}>
-        <TiUserAdd style={{ marginRight: "5px", fontSize:"2vh"}} />
+        <TiUserAdd style={{ marginRight: "5px"}} />
         {usuarioSeleccionado ? "Actualizar" : "Crear"}
       </button>
       {usuarioSeleccionado && (

@@ -1,11 +1,20 @@
 import React from "react";
 import { Link, Outlet } from "react-router-dom";
 import CerrarSesion from "../components/UI/BtnCerrar";
+import styles from "../styles/LayoutPrestamos.module.css";
+import NavBar from "../components/navBar";
 const LayoutPrestamista = () => {
-  
+
   return (
-    <div className="layout">
-      <aside className="sidebar">
+    
+    <div className={styles.parent}>
+      <header className={styles.div1}>
+
+        <NavBar />
+      </header>
+
+        <aside className={styles.div2}>
+
         <h2>Prestamista</h2>
         <nav>
           <ul>
@@ -14,9 +23,9 @@ const LayoutPrestamista = () => {
             <li><Link to="/prestamista/materiales">Materiales</Link></li>
             <li><CerrarSesion /></li>
           </ul>
-        </nav>
-      </aside>
-      <main className="content">
+          </nav>
+        </aside>
+      <main className={styles.div3}>
         <Outlet />
       </main>
     </div>
