@@ -21,6 +21,7 @@ const LayoutPrestamista = () => {
             <li><Link to="/prestamista">Inicio</Link></li>
             <li><Link to="/prestamista/prestamos">Préstamos</Link></li>
             <li><Link to="/prestamista/materiales">Materiales</Link></li>
+            <li><Link to="/prestamista/Excel">Exportar Excel</Link></li>
             <li><CerrarSesion /></li>
           </ul>
           </nav>

@@ -45,6 +45,7 @@ function App() {
           <Route index element={<Inicio />} />
           <Route path="prestamos" element={<Prestamos />} />
           <Route path="materiales" element={<Materiales />} />
+          <Route path="Excel" element={<Excel />} />
 
         </Route>
       </Routes>

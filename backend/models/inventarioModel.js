@@ -21,7 +21,7 @@
    */
       // Materiales prestados (con base en préstamos activos)
       const [prestados] = await conn.query(
-        `SELECT COUNT(*) AS prestados 
+        `SELECT SUM(cantidad) AS prestados 
          FROM prestamos 
          WHERE estado = 'prestado'`
       );
