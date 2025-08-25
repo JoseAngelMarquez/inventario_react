@@ -176,8 +176,8 @@ function FormPrestamo() {
                 </label>
 
                 <button type="submit">
-                < PiHandSwipeRightFill style={{marginRight:"20px"}} />
-                Prestar
+                    < PiHandSwipeRightFill style={{ marginRight: "20px" }} />
+                    Prestar
                 </button>
             </form>
 

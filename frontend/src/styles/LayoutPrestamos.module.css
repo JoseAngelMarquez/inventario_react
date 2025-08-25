@@ -83,30 +83,7 @@ body {
   outline: none;
 }
 
-/* Estilo general de los links del menú */
-.navLink {
-  display: flex;
-  /* Flex para alinear texto e ícono */
-  align-items: center;
-  /* Centra verticalmente */
-  gap: 8px;
-  /* Espacio entre icono y texto */
-  text-decoration: none;
-  /* Sin subrayado */
-  color: white;
-  /* Texto blanco */
-  font-size: 16px;
-  font-weight: 500;
-  padding: 8px 12px;
-  border-radius: 6px;
-  transition: background 0.3s ease, transform 0.2s ease;
-}
 
-.icono {
-  font-size: 20px;
-  color: white;
-  vertical-align: middle;
-}
 
 /* Media query para dispositivos móviles */
 @media (max-width: 768px) {

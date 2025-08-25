@@ -7,7 +7,7 @@ import { FaHome } from "react-icons/fa";
 import { FaHandsHelping } from "react-icons/fa";
 import { FaTools } from "react-icons/fa";
 import { BiSolidFileExport } from "react-icons/bi";
-
+import "../styles/iconos.css";
 const LayoutPrestamista = () => {
 
   return (
@@ -24,23 +24,23 @@ const LayoutPrestamista = () => {
         <nav>
           <ul>
             <li>
-              <Link to="/prestamista" className={styles.navLink}>
-                <FaHome className={styles.icono} /> Inicio
+              <Link to="/prestamista" className="navLink">
+                <FaHome className="icono" /> Inicio
               </Link>
             </li>
 
-            <li><Link to="/prestamista/prestamos" className={styles.navLink} >
-              <FaHandsHelping className={styles.icono} /> Préstamos
+            <li><Link to="/prestamista/prestamos" className="navLink" >
+              <FaHandsHelping className="icono" /> Préstamos
             </Link>
             </li>
 
-            <li><Link to="/prestamista/materiales" className={styles.navLink} >
-              <FaTools className={styles.icono} /> Materiales
+            <li><Link to="/prestamista/materiales" className="navLink" >
+              <FaTools className="icono" /> Materiales
             </Link>
             </li>
             <li>
-              <Link to="/prestamista/Excel" className={styles.navBar} >
-                <BiSolidFileExport className={styles.icono} /> Exportar Excel
+              <Link to="/prestamista/Excel" className="navLink" >
+                <BiSolidFileExport className="icono" /> Exportar Excel
               </Link>
             </li>
             <li><CerrarSesion /></li>
