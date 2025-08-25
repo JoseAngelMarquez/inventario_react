@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { login } from '../../services/usuarioService';
 import styles from '../../styles/login.module.css';
-import uaeh from '../../images/uaeh.png'; 
+import uaeh from '../../images/uaeh.png';
 import { FaUserCircle, FaLock } from "react-icons/fa";
 import logo_login from '../../images/logo_login.png'; // Asegúrate de tener esta imagen en la ruta correcta
 const Login = () => {
@@ -40,9 +40,9 @@ const Login = () => {
         <form className={styles.formulario} onSubmit={handleSubmit}>
           <h2>Iniciar Sesión</h2>
 
-<div>
-  <img src={logo_login} alt="Logo" className={styles.logoLogin} />
-</div>
+          <div>
+            <img src={logo_login} alt="Logo" className={styles.logoLogin} />
+          </div>
           <div className={styles.inputGroup}>
             <FaUserCircle className={styles.icon} />
             <input
@@ -65,7 +65,7 @@ const Login = () => {
             />
           </div>
 
-          <button type="submit" disabled={loading}>
+          <button className={styles.button} type="submit" disabled={loading}>
             {loading ? "Ingresando..." : "Ingresar"}
           </button>
           {mensaje && <p className={styles.mensaje}>{mensaje}</p>}
