@@ -4,6 +4,8 @@ import { crearUsuario, actualizarUsuario, eliminarUsuario, obtenerPaginados } fr
 import UsuarioList from "../../components/UsuarioList";
 import "../../styles/Usuarios.css";
 import { TiUserAdd } from "react-icons/ti";
+import { FaTimes } from "react-icons/fa";
+import { GrUpdate } from "react-icons/gr";
 
 const Inicio = () => {
   const [usuarios, setUsuarios] = useState([]);
@@ -25,7 +27,7 @@ const Inicio = () => {
   const fetchUsuarios = async (paginaActual = 1) => {
     try {
       const data = await obtenerPaginados(paginaActual, filasPorPagina);
-      setUsuarios(data.usuarios); 
+      setUsuarios(data.usuarios);
       setTotalPaginas(Math.ceil(data.total / filasPorPagina));
     } catch (err) {
       console.error(err);
@@ -100,17 +102,30 @@ const Inicio = () => {
         <option value="prestamista">Prestamista</option>
         <option value="admin">Admin</option>
       </select>
-      <button onClick={handleSubmit}>
-        <TiUserAdd style={{ marginRight: "5px"}} />
+      <button
+        onClick={handleSubmit}
+        style={{ display: "flex", alignItems: "center", gap: "5px" }}
+      >
+        {usuarioSeleccionado ? <GrUpdate /> : <TiUserAdd />}
         {usuarioSeleccionado ? "Actualizar" : "Crear"}
       </button>
+
+
+      {/* Botón Cancelar */}
       {usuarioSeleccionado && (
-        <button onClick={() => {
-          setUsuarioSeleccionado(null);
-          setUsuario("");
-          setContrasena("");
-          setRol("prestamista");
-        }}>Cancelar</button>
+        <button
+          onClick={() => {
+            setUsuarioSeleccionado(null);
+            setUsuario("");
+            setContrasena("");
+            setRol("prestamista");
+          }}
+          style={{ display: "flex", alignItems: "center", gap: "5px" }}
+        >
+          {/* Aquí puedes usar otro icono */}
+          <FaTimes />
+          Cancelar
+        </button>
       )}
 
       {mensaje && <p style={{ color: "green" }}>{mensaje}</p>}
