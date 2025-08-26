@@ -60,14 +60,15 @@ const MaterialForm = ({ onSubmit, materialEditado, cancelar }) => {
         <option value="insumo">Insumo</option>
       </select>
       <input
-        type="number"
-        name="cantidad_disponible"
-        placeholder="Cantidad"
-        value={formData.cantidad_disponible}
-        onChange={handleChange}
-        min={0}
-        required
-      />
+  type="number"
+  name="cantidad_disponible"
+  placeholder="Cantidad"
+  value={formData.cantidad_disponible === 0 ? "" : formData.cantidad_disponible}
+  onChange={handleChange}
+  min={0}
+  required
+/>
+
       <input
         name="descripcion"
         placeholder="Descripción"
