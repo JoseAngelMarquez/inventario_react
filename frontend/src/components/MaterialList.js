@@ -1,6 +1,8 @@
 import React from "react";
 import { MdDelete } from "react-icons/md";
 import { FaEdit } from "react-icons/fa";
+
+
 const MaterialList = ({ materiales, onEditar, onEliminar }) => {
   if (materiales.length === 0) {
     return <p>No hay materiales registrados.</p>;
