@@ -1,5 +1,6 @@
 import React from "react";
-
+import { MdDelete } from "react-icons/md";
+import { FaEdit } from "react-icons/fa";
 const MaterialList = ({ materiales, onEditar, onEliminar }) => {
   if (materiales.length === 0) {
     return <p>No hay materiales registrados.</p>;
@@ -23,8 +24,14 @@ const MaterialList = ({ materiales, onEditar, onEliminar }) => {
               <td>{mat.tipo}</td>
               <td>{mat.cantidad_disponible}</td>
               <td>
-                <button onClick={() => onEditar(mat)}>Editar</button>
-                <button onClick={() => onEliminar(mat.id)}>Eliminar</button>
+                <button onClick={() => onEditar(mat)}>
+                  <FaEdit style={{ marginRight: "5px"}}/>
+                  Editar
+                  </button>
+                <button onClick={() => onEliminar(mat.id)}>
+                  <MdDelete style={{ marginRight: "5px"}}/>
+                  Eliminar
+                  </button>
               </td>
             </tr>
           ))}

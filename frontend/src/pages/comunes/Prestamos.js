@@ -229,7 +229,7 @@ function FormPrestamo() {
                                             display: "flex",
                                             alignItems: "center",
                                             justifyContent: "center",
-                                            gap: "8px" // espacio entre icono y texto
+                                            gap: "8px" 
                                         }}>
                                             <FaCheck style={{fontSize:"10px"}}/>
                                             Finalizar 
