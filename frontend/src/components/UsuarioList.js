@@ -19,12 +19,12 @@ const UsuarioList = ({ usuarios, onEditar, onEliminar }) => {
             <td>{user.usuario}</td>
             <td>{user.rol}</td>
             <td>
-              <button onClick={() => onEditar(user)}>
+              <button onClick={() => onEditar(user)} >
               <FaEdit style={{ marginRight: "5px" }} />
                 Editar
               </button>
 
-              <button onClick={() => onEliminar(user.id)}>
+              <button onClick={() => onEliminar(user.id)} style={{ marginLeft: "10px" }}>
               <MdDelete style={{ marginRight: "5px" }} />
               Eliminar
               </button>

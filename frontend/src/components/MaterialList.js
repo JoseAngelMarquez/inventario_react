@@ -7,37 +7,37 @@ const MaterialList = ({ materiales, onEditar, onEliminar }) => {
   }
 
   return (
-    
-      <table>
-        <thead>
-          <tr>
-            <th>Nombre</th>
-            <th>Tipo</th>
-            <th>Cantidad Disponible</th>
-            <th>Acciones</th>
+
+    <table>
+      <thead>
+        <tr>
+          <th>Nombre</th>
+          <th>Tipo</th>
+          <th>Cantidad Disponible</th>
+          <th>Acciones</th>
+        </tr>
+      </thead>
+      <tbody>
+        {materiales.map((mat) => (
+          <tr key={mat.id}>
+            <td>{mat.nombre}</td>
+            <td>{mat.tipo}</td>
+            <td>{mat.cantidad_disponible}</td>
+            <td>
+              <button onClick={() => onEditar(mat)}  >
+                <FaEdit style={{ marginRight: "5px" }} />
+                Editar
+              </button>
+              <button onClick={() => onEliminar(mat.id)} style={{ marginLeft: "10px" }}>
+                <MdDelete />
+                Eliminar
+              </button>
+            </td>
           </tr>
-        </thead>
-        <tbody>
-          {materiales.map((mat) => (
-            <tr key={mat.id}>
-              <td>{mat.nombre}</td>
-              <td>{mat.tipo}</td>
-              <td>{mat.cantidad_disponible}</td>
-              <td>
-                <button onClick={() => onEditar(mat)}>
-                  <FaEdit style={{ marginRight: "5px"}}/>
-                  Editar
-                  </button>
-                <button onClick={() => onEliminar(mat.id)}>
-                  <MdDelete style={{ marginRight: "5px"}}/>
-                  Eliminar
-                  </button>
-              </td>
-            </tr>
-          ))}
-        </tbody>
-      </table>
-        
+        ))}
+      </tbody>
+    </table>
+
   );
 };
 

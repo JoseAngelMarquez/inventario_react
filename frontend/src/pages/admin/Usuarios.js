@@ -86,6 +86,9 @@ const Inicio = () => {
   return (
     <div>
       <h2>{usuarioSeleccionado ? "Editar usuario" : "Crear usuario"}</h2>
+
+    <div className="form-group">
+     
       <input
         type="text"
         placeholder="Usuario"
@@ -122,7 +125,6 @@ const Inicio = () => {
           }}
           style={{ display: "flex", alignItems: "center", gap: "5px" }}
         >
-          {/* Aquí puedes usar otro icono */}
           <FaTimes />
           Cancelar
         </button>
@@ -148,6 +150,8 @@ const Inicio = () => {
         </button>
       </div>
     </div>
+    </div>
+
   );
 };
 
