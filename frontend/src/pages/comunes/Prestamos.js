@@ -19,7 +19,7 @@ function FormPrestamo() {
         correo: '',
         id_material: '',
         cantidad: 1,
-        fecha_prestamo: new Date().toISOString().slice(0, 16),
+        fecha_prestamo: new Date().toLocaleString('sv-SE', { hour12: false }).replace(' ', 'T'),
     });
 
     // Cargar materiales
@@ -183,7 +183,7 @@ function FormPrestamo() {
                         display: "flex",
                         alignItems: "center",
                         justifyContent: "center",
-                        gap: "8px" // espacio entre icono y texto
+                        gap: "8px" 
                     }}
                 >
                     <PiHandSwipeRightFill style={{ fontSize: "15px" }} />
