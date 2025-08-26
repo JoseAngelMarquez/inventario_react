@@ -73,6 +73,7 @@ const MaterialForm = ({ onSubmit, materialEditado, cancelar }) => {
         placeholder="Descripción"
         value={formData.descripcion}
         onChange={handleChange}
+        required
       />
        {/* Botón Guardar / Actualizar */}
        <button type="submit" style={{ display: "flex", alignItems: "center", gap: "6px" }}>
