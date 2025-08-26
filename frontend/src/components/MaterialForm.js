@@ -1,4 +1,8 @@
 import React, { useState, useEffect } from "react";
+import { CiSaveDown2 } from "react-icons/ci";
+import { FaEdit } from "react-icons/fa";
+import { FaTimes } from "react-icons/fa";
+
 const MaterialForm = ({ onSubmit, materialEditado, cancelar }) => {
   const [formData, setFormData] = useState({
     nombre: "",
@@ -70,10 +74,27 @@ const MaterialForm = ({ onSubmit, materialEditado, cancelar }) => {
         value={formData.descripcion}
         onChange={handleChange}
       />
-      <button type="submit">{materialEditado ? "Actualizar" : "Guardar"}</button>
+       {/* Botón Guardar / Actualizar */}
+       <button type="submit" style={{ display: "flex", alignItems: "center", gap: "6px" }}>
+        {materialEditado ? (
+          <>
+            <FaEdit /> Actualizar
+          </>
+        ) : (
+          <>
+            <CiSaveDown2 /> Guardar
+          </>
+        )}
+      </button>
+
+      {/* Botón Cancelar */}
       {materialEditado && (
-        <button type="button" onClick={cancelar}>
-          Cancelar
+        <button
+          type="button"
+          onClick={cancelar}
+          style={{ display: "flex", alignItems: "center", gap: "6px" }}
+        >
+          <FaTimes /> Cancelar
         </button>
       )}
     </form>
