@@ -3,6 +3,8 @@ import { obtenerMateriales } from '../../services/materialService';
 import { agregarPrestamo, obtenerPrestamos, finalizarPrestamo } from '../../services/prestamosService';
 import "../../styles/Prestamos.css";
 import { PiHandSwipeRightFill } from "react-icons/pi";
+import { FaCheck } from "react-icons/fa";
+
 
 function FormPrestamo() {
     const [materiales, setMateriales] = useState([]);
@@ -175,10 +177,19 @@ function FormPrestamo() {
                     />
                 </label>
 
-                <button type="submit">
-                    < PiHandSwipeRightFill style={{ marginRight: "20px" }} />
+                <button
+                    type="submit"
+                    style={{
+                        display: "flex",
+                        alignItems: "center",
+                        justifyContent: "center",
+                        gap: "8px" // espacio entre icono y texto
+                    }}
+                >
+                    <PiHandSwipeRightFill style={{ fontSize: "15px" }} />
                     Prestar
                 </button>
+
             </form>
 
             <hr />
@@ -214,7 +225,15 @@ function FormPrestamo() {
                                 <td>{prestamo.usuario_finalizador || '—'}</td>
                                 <td>
                                     {prestamo.estado === 'prestado' && (
-                                        <button onClick={() => handleFinalizar(prestamo.id)}>Finalizar préstamo</button>
+                                        <button onClick={() => handleFinalizar(prestamo.id)} style={{
+                                            display: "flex",
+                                            alignItems: "center",
+                                            justifyContent: "center",
+                                            gap: "8px" // espacio entre icono y texto
+                                        }}>
+                                            <FaCheck style={{fontSize:"10px"}}/>
+                                            Finalizar 
+                                        </button>
                                     )}
                                 </td>
                             </tr>

@@ -45,13 +45,13 @@ const Inicio = () => {
     <div>
       <h2>Panel de Materiales</h2>
 
-      <div className= {styles["boton-cerrar"]}>
+      <div className={styles["boton-cerrar"]}>
         <div className={styles["panel-box"]}>
           <h3>Materiales Totales</h3>
           <p>{totales?.totalMateriales ?? "N/A"}</p>
         </div>
         <div className={styles["panel-box"]}>
-          <h3>Materiales Disponibles</h3>
+          <h3>Tipos de Materiales Disponibles</h3>
           <p>{totales?.materialesDisponibles ?? "N/A"}</p>
         </div>
         <div className={styles["panel-box"]}>
@@ -63,13 +63,13 @@ const Inicio = () => {
       <h3>Lista de Materiales</h3>
 
       <div className={styles["search-container"]}>
-      <CiSearch className={styles["search-icon"]}/>
+        <CiSearch className={styles["search-icon"]} />
 
         <input className={styles["search-input"]}
-        
+
           label="Buscar material"
           value={busqueda}
-          onChange={(e) => setBusqueda(e.target.value)} 
+          onChange={(e) => setBusqueda(e.target.value)}
         />
       </div>
 
