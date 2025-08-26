@@ -14,6 +14,7 @@ const MaterialList = ({ materiales, onEditar, onEliminar }) => {
           <th>Nombre</th>
           <th>Tipo</th>
           <th>Cantidad Disponible</th>
+          <th>Descripción</th>
           <th>Acciones</th>
         </tr>
       </thead>
@@ -23,16 +24,20 @@ const MaterialList = ({ materiales, onEditar, onEliminar }) => {
             <td>{mat.nombre}</td>
             <td>{mat.tipo}</td>
             <td>{mat.cantidad_disponible}</td>
+            <td>{mat.descripcion}</td>
             <td>
-              <button onClick={() => onEditar(mat)}  >
-                <FaEdit style={{ marginRight: "5px" }} />
-                Editar
-              </button>
-              <button onClick={() => onEliminar(mat.id)} style={{ marginLeft: "10px" }}>
-                <MdDelete />
-                Eliminar
-              </button>
+              <div style={{ display: "flex", gap: "10px" }}>
+                <button onClick={() => onEditar(mat)}>
+                  <FaEdit style={{ marginRight: "5px" }} />
+                  Editar
+                </button>
+                <button onClick={() => onEliminar(mat.id)}>
+                  <MdDelete style={{ marginRight: "5px" }} />
+                  Eliminar
+                </button>
+              </div>
             </td>
+
           </tr>
         ))}
       </tbody>
