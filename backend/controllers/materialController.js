@@ -74,3 +74,19 @@ exports.eliminarMaterial = async (req, res) => {
   }
 };
 
+exports.filtrarMaterialPorNombre = async (req, res) => {
+  const conn = await pool.getConnection();
+  try {
+    const { nombre } = req.query;
+    if (!nombre) {
+      return res.status(400).json({ mensaje: 'El parámetro nombre es obligatorio' });
+    }
+    const materiales = await Material.filtrarPorMaterial(conn, nombre);
+    res.json(materiales);
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ mensaje: 'Error al filtrar materiales', error: error.message });
+  } finally {
+    if (conn) conn.release(); 
+  }
+};
