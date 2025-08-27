@@ -10,3 +10,4 @@ export const agregarMaterial = (material) => axios.post(API_URL, material);
 export const actualizarMaterial = (id, material) => axios.put(`${API_URL}/${id}`, material);
 
 export const eliminarMaterial = (id) => axios.delete(`${API_URL}/${id}`);
+

@@ -60,14 +60,14 @@ const MaterialForm = ({ onSubmit, materialEditado, cancelar }) => {
         <option value="insumo">Insumo</option>
       </select>
       <input
-  type="number"
-  name="cantidad_disponible"
-  placeholder="Cantidad"
-  value={formData.cantidad_disponible === 0 ? "" : formData.cantidad_disponible}
-  onChange={handleChange}
-  min={0}
-  required
-/>
+        type="number"
+        name="cantidad_disponible"
+        placeholder="Cantidad"
+        value={formData.cantidad_disponible === 0 ? "" : formData.cantidad_disponible}
+        onChange={handleChange}
+        min={0}
+        required
+      />
 
       <input
         name="descripcion"
@@ -76,8 +76,8 @@ const MaterialForm = ({ onSubmit, materialEditado, cancelar }) => {
         onChange={handleChange}
         required
       />
-       {/* Botón Guardar / Actualizar */}
-       <button type="submit" style={{ display: "flex", alignItems: "center", gap: "6px" }}>
+      {/* Botón Guardar / Actualizar */}
+      <button type="submit" style={{ display: "flex", alignItems: "center", gap: "6px" }}>
         {materialEditado ? (
           <>
             <FaEdit /> Actualizar

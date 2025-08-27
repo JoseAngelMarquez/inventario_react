@@ -31,6 +31,17 @@ class Material {
     const [result] = await conn.query('DELETE FROM materiales WHERE id = ?', [id]);
     return result.affectedRows;
   }
+
+  static async filtrarPorMaterial(conn, nombreMaterial) {
+    const [rows] = await conn.query(
+      'SELECT * FROM materiales WHERE nombre LIKE ?',
+      [`%${nombreMaterial}%`]
+    );
+    return rows;
+  }
+
+
+
 }
 
 module.exports = Material;

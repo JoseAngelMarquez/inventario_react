@@ -73,3 +73,4 @@ exports.eliminarMaterial = async (req, res) => {
     if (conn) conn.release(); 
   }
 };
+
