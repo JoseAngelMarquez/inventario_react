@@ -1,7 +1,8 @@
 import React, { useEffect, useState } from "react";
 import MaterialForm from "../../components/materialForm";
 import MaterialList from "../../components/MaterialList";
-import styles from "../../styles/Materiales.module.css";
+import SearchInput from "../../components/UI/InputBusqueda";
+
 import {
   obtenerMateriales,
   agregarMaterial,
@@ -90,12 +91,10 @@ const Materiales = () => {
         cancelar={() => setEditando(null)}
       />
 
-      <input
-        
-        placeholder="Buscar material..."
-        className={styles.searchInput}
+      <SearchInput
         value={busqueda}
-        onChange={(e) => setBusqueda(e.target.value)}
+        onChange={setBusqueda}
+        placeholder="Buscar material..."
       />
 
       {cargando && <p>Cargando materiales...</p>}

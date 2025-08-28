@@ -1,16 +1,17 @@
 import React, { useEffect, useState } from "react";
-import { obtenerMateriales } from "../../services/materialService";
+import { obtenerMateriales, filtrarMaterialPorNombre } from "../../services/materialService";
 import { obtenerTotales } from "../../services/inventarioService";
 import styles from "../../styles/Inicio.module.css";
 import { CiSearch } from "react-icons/ci";
 
 const Inicio = () => {
-  const [materiales, setMateriales] = useState(null);
-  const [totales, setTotales] = useState(null);
+  const [materiales, setMateriales] = useState([]);
+  const [totales, setTotales] = useState({});
   const [error, setError] = useState(null);
   const [loading, setLoading] = useState(true);
   const [busqueda, setBusqueda] = useState("");
 
+  // Cargar materiales y totales al inicio
   useEffect(() => {
     const cargarDatos = async () => {
       try {
@@ -31,15 +32,28 @@ const Inicio = () => {
     cargarDatos();
   }, []);
 
+  // Filtrar materiales según busqueda
+  useEffect(() => {
+    const fetchBusqueda = async () => {
+      try {
+        if (busqueda.trim() === "") {
+          const res = await obtenerMateriales();
+          setMateriales(res.data);
+        } else {
+          const res = await filtrarMaterialPorNombre(busqueda);
+          setMateriales(res.data);
+        }
+      } catch (err) {
+        console.error("Error en búsqueda:", err);
+        setError("Error en la búsqueda");
+      }
+    };
+
+    fetchBusqueda();
+  }, [busqueda]);
+
   if (loading) return <p>Cargando datos...</p>;
   if (error) return <p>{error}</p>;
-
-  // Filtrar materiales por texto ingresado
-  const materialesFiltrados = materiales.filter((mat) =>
-    mat.nombre.toLowerCase().includes(busqueda.toLowerCase()) ||
-    mat.tipo.toLowerCase().includes(busqueda.toLowerCase()) ||
-    mat.descripcion.toLowerCase().includes(busqueda.toLowerCase())
-  );
 
   return (
     <div>
@@ -64,10 +78,9 @@ const Inicio = () => {
 
       <div className={styles["search-container"]}>
         <CiSearch className={styles["search-icon"]} />
-
-        <input className={styles["search-input"]}
-
-          label="Buscar material"
+        <input
+          className={styles["search-input"]}
+          placeholder="Buscar material"
           value={busqueda}
           onChange={(e) => setBusqueda(e.target.value)}
         />
@@ -83,8 +96,8 @@ const Inicio = () => {
           </tr>
         </thead>
         <tbody>
-          {materialesFiltrados.length > 0 ? (
-            materialesFiltrados.map((mat) => (
+          {materiales.length > 0 ? (
+            materiales.map((mat) => (
               <tr key={mat.id}>
                 <td>{mat.nombre}</td>
                 <td>{mat.tipo}</td>
@@ -100,7 +113,6 @@ const Inicio = () => {
         </tbody>
       </table>
     </div>
-
   );
 };
 
