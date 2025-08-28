@@ -1,7 +1,7 @@
 const express = require('express');
 const router = express.Router();
 const controller = require('../controllers/prestamosController');
-
+router.get('/filtro',controller.filtrarPrestamos)
 
 router.get('/', controller.obtenerTodos);
 router.get('/:id', controller.obtenerPorId);
