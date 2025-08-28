@@ -171,3 +171,29 @@ exports.reporteCompleto = async (req, res) => {
   
 };
 
+exports.filtrarPrestamos = async (req, res) => {
+  let conn;
+   try {
+     conn = await pool.getConnection();
+
+     // Tomamos los filtros del query string (?solicitante=Juan&material=Martillo)
+     const { solicitante, material, fecha } = req.query;
+ 
+     // Llamamos al modelo pasándole un objeto con los filtros
+     const resultados = await Prestamos.filtrarPrestamos(conn, {
+       solicitante,
+       material,
+       fecha,
+     });
+ 
+     conn.release();
+ 
+     // Enviamos los resultados al cliente
+     res.json(resultados);
+   } catch (error) {
+     console.error(error);
+     res.status(500).json({ error: "Error al filtrar préstamos" });
+   }finally{
+     if (conn) conn.release();
+   }
+ };
