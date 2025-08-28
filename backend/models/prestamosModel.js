@@ -200,6 +200,38 @@ class Prestamos {
     `);
     return rows;
   }
+
+  // modelo/Prestamo.js
+static async filtrarPrestamos(conn, { solicitante, material, fecha }) {
+  let sql = `
+      SELECT p.id, s.nombre_completo AS solicitante, m.nombre AS material, p.fecha_prestamo
+      FROM prestamos p
+      JOIN solicitantes s ON p.id_solicitante = s.id
+      JOIN materiales m ON p.id_material = m.id
+      WHERE 1=1
+  `;
+
+  const params = [];
+
+  if (solicitante) {
+      sql += " AND s.nombre_completo LIKE ?";
+      params.push(`%${solicitante}%`);
+  }
+
+  if (material) {
+      sql += " AND m.nombre LIKE ?";
+      params.push(`%${material}%`);
+  }
+
+  if (fecha) {
+      sql += " AND DATE(p.fecha_prestamo) = ?";
+      params.push(fecha);
+  }
+
+  const [rows] = await conn.query(sql, params);
+  return rows;
+}
+
   
 
 }
