@@ -1,20 +1,21 @@
 import React, { useEffect, useState } from "react";
 import MaterialForm from "../../components/materialForm";
 import MaterialList from "../../components/MaterialList";
-
+import styles from "../../styles/Materiales.module.css";
 import {
   obtenerMateriales,
   agregarMaterial,
   actualizarMaterial,
   eliminarMaterial,
+  filtrarMaterialPorNombre,
 } from "../../services/materialService";
-
 
 const Materiales = () => {
   const [materiales, setMateriales] = useState([]);
   const [editando, setEditando] = useState(null);
   const [cargando, setCargando] = useState(false);
   const [error, setError] = useState(null);
+  const [busqueda, setBusqueda] = useState("");
 
   const cargarMateriales = async () => {
     setCargando(true);
@@ -32,6 +33,27 @@ const Materiales = () => {
   useEffect(() => {
     cargarMateriales();
   }, []);
+
+  useEffect(() => {
+    const fetchData = async () => {
+      setCargando(true);
+      try {
+        if (busqueda.trim() === "") {
+          await cargarMateriales();
+        } else {
+          const res = await filtrarMaterialPorNombre(busqueda);
+          setMateriales(res.data);
+        }
+      } catch (error) {
+        console.error("Error en búsqueda:", error);
+        setError("Error en la búsqueda");
+      } finally {
+        setCargando(false);
+      }
+    };
+
+    fetchData();
+  }, [busqueda]);
 
   const handleAddOrUpdate = async (material) => {
     try {
@@ -66,6 +88,14 @@ const Materiales = () => {
         onSubmit={handleAddOrUpdate}
         materialEditado={editando}
         cancelar={() => setEditando(null)}
+      />
+
+      <input
+        
+        placeholder="Buscar material..."
+        className={styles.searchInput}
+        value={busqueda}
+        onChange={(e) => setBusqueda(e.target.value)}
       />
 
       {cargando && <p>Cargando materiales...</p>}
