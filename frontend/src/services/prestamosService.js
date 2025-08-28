@@ -16,7 +16,8 @@ export const descargarExcelPrestamos = () => axios.get(API_URL_PRESTAMOS + '/exp
 export const obtenerReporteCompleto = () => axios.get(API_URL_PRESTAMOS + '/reporte/completo');
 
 export const filtrarPrestamos = (filtros) => {
-  return axios.get(API_URL_PRESTAMOS+'/filtros', {
+  return axios.get(API_URL_PRESTAMOS + '/filtro', {
     params: filtros
   });
 };
+

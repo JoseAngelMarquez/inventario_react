@@ -9,6 +9,8 @@ import { FaCheck } from "react-icons/fa";
 function FormPrestamo() {
     const [materiales, setMateriales] = useState([]);
     const [prestamos, setPrestamos] = useState([]);
+    const [filtros, setFiltros] = useState({ solicitante: "", material: "", fecha: "" });
+
     const [form, setForm] = useState({
         tipo: 'estudiante',
         nombre_completo: '',
@@ -47,11 +49,25 @@ function FormPrestamo() {
         cargarPrestamos();
     }, []);
 
+
+    useEffect(() => {
+        filtrarPrestamos(filtros).then((res) => {
+            setPrestamos(res.data);
+        });
+    }, [filtros]);
+
+    const handleBuscar = (e) => {
+        setFiltros({
+            ...filtros,
+            [e.target.name]: e.target.value,
+        });
+    };
     // Manejo de cambios en el formulario
     function handleChange(e) {
         const { name, value } = e.target;
         setForm(prev => ({ ...prev, [name]: value }));
     }
+
 
     // Crear préstamo
     async function handleSubmit(e) {
@@ -167,6 +183,8 @@ function FormPrestamo() {
                 </label>
 
                 <label>
+
+
                     Fecha préstamo:
                     <input
                         type="datetime-local"
@@ -183,7 +201,7 @@ function FormPrestamo() {
                         display: "flex",
                         alignItems: "center",
                         justifyContent: "center",
-                        gap: "8px" 
+                        gap: "8px"
                     }}
                 >
                     <PiHandSwipeRightFill style={{ fontSize: "15px" }} />
@@ -193,7 +211,28 @@ function FormPrestamo() {
             </form>
 
             <hr />
+            <input
+                type="text"
+                name="solicitante"
+                value={filtros.solicitante}
+                onChange={handleBuscar}
+                placeholder="Buscar por nombre"
+            />
 
+            <input
+                type="text"
+                name="material"
+                value={filtros.material}
+                onChange={handleBuscar}
+                placeholder="Buscar por material"
+            />
+
+            <input
+                type="date"
+                name="fecha"
+                value={filtros.fecha}
+                onChange={handleBuscar}
+            />
             <h2>Lista de Préstamos</h2>
             {prestamos.length === 0 ? (
                 <p>No hay préstamos registrados.</p>
@@ -229,10 +268,10 @@ function FormPrestamo() {
                                             display: "flex",
                                             alignItems: "center",
                                             justifyContent: "center",
-                                            gap: "8px" 
+                                            gap: "8px"
                                         }}>
-                                            <FaCheck style={{fontSize:"10px"}}/>
-                                            Finalizar 
+                                            <FaCheck style={{ fontSize: "10px" }} />
+                                            Finalizar
                                         </button>
                                     )}
                                 </td>

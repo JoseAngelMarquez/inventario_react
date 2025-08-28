@@ -25,7 +25,7 @@ class Prestamos {
   }
 
 
-// Obtener préstamos por ID de solicitante
+  // Obtener préstamos por ID de solicitante
   static async obtenerPorId(conn, id) {
     const [rows] = await conn.query(`
       SELECT 
@@ -126,18 +126,18 @@ class Prestamos {
   // Finalizar préstamo y devolver stock
   static async finalizarPrestamo(conn, idPrestamo, idUsuarioFinaliza) {
     await conn.beginTransaction();
-  try {
-    // Bloquea el préstamo para evitar condiciones de carrera
-    const [prestamoRows] = await conn.query(
-      'SELECT id_material, cantidad, estado FROM prestamos WHERE id = ? FOR UPDATE',
-      [idPrestamo]
-    );
-    if (prestamoRows.length === 0) throw new Error('Préstamo no encontrado');
-    if (prestamoRows[0].estado === 'finalizado')
-      throw new Error('El préstamo ya está finalizado');
+    try {
+      // Bloquea el préstamo para evitar condiciones de carrera
+      const [prestamoRows] = await conn.query(
+        'SELECT id_material, cantidad, estado FROM prestamos WHERE id = ? FOR UPDATE',
+        [idPrestamo]
+      );
+      if (prestamoRows.length === 0) throw new Error('Préstamo no encontrado');
+      if (prestamoRows[0].estado === 'finalizado')
+        throw new Error('El préstamo ya está finalizado');
 
-    // Actualizar préstamo a finalizado
-    await conn.query(`
+      // Actualizar préstamo a finalizado
+      await conn.query(`
       UPDATE prestamos
       SET estado = 'finalizado',
           id_finalizado_por = ?,   -- 🔹 usa el nombre real de tu columna
@@ -145,40 +145,40 @@ class Prestamos {
       WHERE id = ?
     `, [idUsuarioFinaliza, idPrestamo]);
 
-    // Devolver stock
-    await conn.query(`
+      // Devolver stock
+      await conn.query(`
       UPDATE materiales
       SET cantidad_disponible = cantidad_disponible + ?
       WHERE id = ?
     `, [prestamoRows[0].cantidad, prestamoRows[0].id_material]);
 
-    // Obtener los datos completos del préstamo y solicitante
-    const [prestamoData] = await conn.query(
-      `SELECT p.id, p.cantidad, p.fecha_prestamo, 
+      // Obtener los datos completos del préstamo y solicitante
+      const [prestamoData] = await conn.query(
+        `SELECT p.id, p.cantidad, p.fecha_prestamo, 
               s.nombre_completo, s.correo, 
               m.nombre AS material_nombre
        FROM prestamos p
        JOIN solicitantes s ON p.id_solicitante = s.id
        JOIN materiales m ON p.id_material = m.id
        WHERE p.id = ?`,
-      [idPrestamo]
-    );
+        [idPrestamo]
+      );
 
-    await conn.commit();
+      await conn.commit();
 
-    return { 
-      message: 'Préstamo finalizado y stock actualizado correctamente',
-      prestamo: prestamoData.length ? prestamoData[0] : null
-    };
+      return {
+        message: 'Préstamo finalizado y stock actualizado correctamente',
+        prestamo: prestamoData.length ? prestamoData[0] : null
+      };
 
-  } catch (error) {
-    await conn.rollback();
-    throw error;
+    } catch (error) {
+      await conn.rollback();
+      throw error;
+    }
   }
-  }
 
 
-//Obtener reporte completo de préstamos
+  //Obtener reporte completo de préstamos
   static async obtenerReporteCompleto(conn) {
     const [rows] = await conn.query(`
       SELECT 
@@ -201,38 +201,50 @@ class Prestamos {
     return rows;
   }
 
-  // modelo/Prestamo.js
-static async filtrarPrestamos(conn, { solicitante, material, fecha }) {
-  let sql = `
-      SELECT p.id, s.nombre_completo AS solicitante, m.nombre AS material, p.fecha_prestamo
-      FROM prestamos p
-      JOIN solicitantes s ON p.id_solicitante = s.id
-      JOIN materiales m ON p.id_material = m.id
-      WHERE 1=1
-  `;
+  static async filtrarPrestamos(conn, { solicitante, material, fecha }) {
+    let sql = `
+        SELECT 
+  p.id,
+  s.nombre_completo AS nombre_solicitante,
+  s.tipo AS tipo_solicitante,
+  m.nombre AS nombre_material,
+  p.cantidad,
+  p.fecha_prestamo,
+  p.estado,
+  u_presto.usuario AS usuario_prestamista,
+  u_finalizo.usuario AS usuario_finalizador
+FROM prestamos p
+JOIN solicitantes s ON p.id_solicitante = s.id
+JOIN materiales m ON p.id_material = m.id
+JOIN usuarios u_presto ON p.id_usuario = u_presto.id
+LEFT JOIN usuarios u_finalizo ON p.id_finalizado_por = u_finalizo.id
+WHERE 1=1
 
-  const params = [];
+    `;
 
-  if (solicitante) {
+    const params = [];
+
+    if (solicitante) {
       sql += " AND s.nombre_completo LIKE ?";
       params.push(`%${solicitante}%`);
-  }
+    }
 
-  if (material) {
+    if (material) {
       sql += " AND m.nombre LIKE ?";
       params.push(`%${material}%`);
-  }
+    }
 
-  if (fecha) {
+    if (fecha) {
       sql += " AND DATE(p.fecha_prestamo) = ?";
       params.push(fecha);
+    }
+
+    const [rows] = await conn.query(sql, params);
+    return rows;
   }
 
-  const [rows] = await conn.query(sql, params);
-  return rows;
-}
 
-  
+
 
 }
 
