@@ -167,8 +167,6 @@ exports.reporteCompleto = async (req, res) => {
   } finally {
     if (conn) conn.release();
   }
-
-  
 };
 
 exports.filtrarPrestamos = async (req, res) => {

@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { obtenerMateriales } from '../../services/materialService';
-import { agregarPrestamo, obtenerPrestamos, finalizarPrestamo } from '../../services/prestamosService';
+import { agregarPrestamo, obtenerPrestamos, finalizarPrestamo, filtrarPrestamos } from '../../services/prestamosService';
 import "../../styles/Prestamos.css";
 import { PiHandSwipeRightFill } from "react-icons/pi";
 import { FaCheck } from "react-icons/fa";

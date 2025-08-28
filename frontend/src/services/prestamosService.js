@@ -14,3 +14,9 @@ export const finalizarPrestamo = (id) => axios.put(`${API_URL_PRESTAMOS}/${id}/f
 export const descargarExcelPrestamos = () => axios.get(API_URL_PRESTAMOS + '/exportar/excel', { responseType: 'blob' });
 
 export const obtenerReporteCompleto = () => axios.get(API_URL_PRESTAMOS + '/reporte/completo');
+
+export const filtrarPrestamos = (filtros) => {
+  return axios.get(API_URL_PRESTAMOS+'/filtros', {
+    params: filtros
+  });
+};
