@@ -17,6 +17,7 @@ function FormPrestamo() {
         matricula: '',
         carrera: '',
         lugar_trabajo: '',
+        numero_empleado: '',
         telefono: '',
         correo: '',
         id_material: '',
@@ -139,10 +140,16 @@ function FormPrestamo() {
                 )}
 
                 {form.tipo === 'trabajador' && (
-                    <label>
-                        Lugar de trabajo:
-                        <input type="text" name="lugar_trabajo" value={form.lugar_trabajo} onChange={handleChange} />
-                    </label>
+                    <>
+                        <label>
+                            Lugar de trabajo:
+                            <input type="text" name="lugar_trabajo" value={form.lugar_trabajo} onChange={handleChange} />
+                        </label>
+                        <label>
+                            Número de empleado:
+                            <input type="text" name="numero_empleado" value={form.numero_empleado} onChange={handleChange} />
+                        </label>
+                    </>
                 )}
 
                 <label>
@@ -254,7 +261,12 @@ function FormPrestamo() {
                     <tbody>
                         {prestamos.map(prestamo => (
                             <tr key={prestamo.id}>
-                                <td>{prestamo.nombre_solicitante}</td>
+                                <td>
+                                    {prestamo.nombre_solicitante || '—'} <br />
+                                    {prestamo.tipo_solicitante === 'estudiante'
+                                        ? `Matrícula: ${prestamo.matricula || '—'}`
+                                        : `Número de empleado: ${prestamo.numero_empleado_solicitante || '—'}`}
+                                </td>
                                 <td>{prestamo.tipo_solicitante}</td>
                                 <td>{prestamo.nombre_material}</td>
                                 <td>{prestamo.cantidad}</td>
