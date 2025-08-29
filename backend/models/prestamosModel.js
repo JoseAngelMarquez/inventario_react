@@ -243,7 +243,31 @@ WHERE 1=1
     return rows;
   }
 
-
+  static async filtrarPorFecha(conn, fecha) {
+    const [rows] = await conn.query(
+      `SELECT 
+          p.id,
+          s.nombre_completo AS solicitante,
+          u.usuario AS prestamista,
+          u2.usuario AS finalizador,
+          p.cantidad,
+          p.fecha_prestamo,
+          p.fecha_devolucion,
+          m.nombre AS nombre_material,
+          m.tipo AS tipo_material,
+          p.estado
+       FROM prestamos p
+       LEFT JOIN solicitantes s ON p.id_solicitante = s.id
+       LEFT JOIN usuarios u ON p.id_usuario = u.id
+       LEFT JOIN usuarios u2 ON p.id_finalizado_por = u2.id
+       LEFT JOIN materiales m ON p.id_material = m.id
+       WHERE DATE(p.fecha_prestamo) = ?`,
+      [fecha]
+    );
+    return rows;
+  }
+  
+  
 
 
 }

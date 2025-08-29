@@ -194,4 +194,26 @@ exports.filtrarPrestamos = async (req, res) => {
    }finally{
      if (conn) conn.release();
    }
+
+
+
+   
  };
+
+ exports.filtrarPorFecha = async (req, res) => {
+  try {
+    const fecha = req.query.fecha; // ejemplo: /filtroFecha?fecha=2025-08-29
+    const conn = await pool.getConnection();
+    const resultados = await Prestamos.filtrarPorFecha(conn, fecha);
+    conn.release();
+
+    if (!resultados.length) return res.status(404).json({ error: 'Préstamo no encontrado' });
+    res.json(resultados);
+
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ error: 'Error del servidor' });
+  }
+};
+
+
