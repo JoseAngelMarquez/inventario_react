@@ -40,7 +40,7 @@ exports.crear = async (req, res) => {
 
   let conn;
   try {
-    conn = await pool.getConnection(); 
+    conn = await pool.getConnection();
     const resultado = await Prestamos.crear(conn, {
       ...req.body,
       id_usuario: req.session.usuario.id
@@ -54,6 +54,14 @@ exports.crear = async (req, res) => {
       'Confirmación de préstamo',
       `Hola ${resultado.nombreSolicitante},\n\nTu préstamo del material "${resultado.nombreMaterial}" (cantidad: ${resultado.cantidad}) fue registrado correctamente el día ${req.body.fecha_prestamo}.\n\nGracias.`
     );
+
+    const correoAdmin = process.env.ADMIN_EMAIL;
+    enviarCorreo(
+      correoAdmin,
+      'Nuevo préstamo registrado',
+      `El usuario ${resultado.nombreSolicitante} ha solicitado un préstamo del material "${resultado.nombreMaterial}" (cantidad: ${resultado.cantidad}) el día ${req.body.fecha_prestamo}.\n\nRevisa el sistema para más detalles.`
+    );
+
 
   } catch (error) {
     console.error('Error al crear préstamo:', error);
@@ -87,6 +95,13 @@ exports.finalizar = async (req, res) => {
         p.correo,
         'Préstamo finalizado',
         `Hola ${p.nombre_completo},\n\nTu préstamo del material "${p.material_nombre}" (cantidad: ${p.cantidad}) realizado el ${p.fecha_prestamo} ha sido finalizado.\n\nGracias.`
+      );
+
+      const correoAdmin = process.env.ADMIN_EMAIL;
+      enviarCorreo(
+        correoAdmin,
+        'Préstamo finalizado - Información',
+        `El usuario ${p.nombre_completo} ha finalizado un préstamo del material "${p.material_nombre}" (cantidad: ${p.cantidad}) realizado el ${p.fecha_prestamo}.\n\nRevisa el sistema para más detalles.`
       );
     } else {
       console.warn('No se encontró el préstamo para enviar correo.');
@@ -171,36 +186,36 @@ exports.reporteCompleto = async (req, res) => {
 
 exports.filtrarPrestamos = async (req, res) => {
   let conn;
-   try {
-     conn = await pool.getConnection();
+  try {
+    conn = await pool.getConnection();
 
-     // Tomamos los filtros del query string (?solicitante=Juan&material=Martillo)
-     const { solicitante, material, fecha } = req.query;
- 
-     // Llamamos al modelo pasándole un objeto con los filtros
-     const resultados = await Prestamos.filtrarPrestamos(conn, {
-       solicitante,
-       material,
-       fecha,
-     });
- 
-     conn.release();
- 
-     // Enviamos los resultados al cliente
-     res.json(resultados);
-   } catch (error) {
-     console.error(error);
-     res.status(500).json({ error: "Error al filtrar préstamos" });
-   }finally{
-     if (conn) conn.release();
-   }
+    // Tomamos los filtros del query string (?solicitante=Juan&material=Martillo)
+    const { solicitante, material, fecha } = req.query;
+
+    // Llamamos al modelo pasándole un objeto con los filtros
+    const resultados = await Prestamos.filtrarPrestamos(conn, {
+      solicitante,
+      material,
+      fecha,
+    });
+
+    conn.release();
+
+    // Enviamos los resultados al cliente
+    res.json(resultados);
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ error: "Error al filtrar préstamos" });
+  } finally {
+    if (conn) conn.release();
+  }
 
 
 
-   
- };
 
- exports.filtrarPorFecha = async (req, res) => {
+};
+
+exports.filtrarPorFecha = async (req, res) => {
   try {
     const fecha = req.query.fecha; // ejemplo: /filtroFecha?fecha=2025-08-29
     const conn = await pool.getConnection();
