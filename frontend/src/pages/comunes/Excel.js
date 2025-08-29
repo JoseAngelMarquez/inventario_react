@@ -2,18 +2,26 @@
 import React, { useEffect, useState } from 'react';
 import * as XLSX from 'xlsx';
 import { saveAs } from 'file-saver';
-import { obtenerReporteCompleto } from "../../services/prestamosService";
+import { obtenerReporteCompleto, filtrarPrestamosPorFecha } from '../../services/prestamosService';
 import { FaFileExport } from "react-icons/fa6";
 
 export default function PrestamosReporte() {
   const [prestamos, setPrestamos] = useState([]);
+  const [fechaFiltro, setFechaFiltro] = useState("");
 
   useEffect(() => {
-    obtenerReporteCompleto()
-      .then(res => setPrestamos(res.data))
-      .catch(err => console.error(err));
+    const cargarPrestamos = async () => {
+      try {
+        const res = await obtenerReporteCompleto();
+        setPrestamos(res.data);
+      } catch (err) {
+        console.error(err);
+      }
+    };
+  
+    cargarPrestamos();
   }, []);
-
+  
   // Función para formatear fecha a hora de México
   const formatoMexico = (fecha) => {
     return new Intl.DateTimeFormat("es-MX", {
@@ -27,35 +35,37 @@ export default function PrestamosReporte() {
     }).format(new Date(fecha));
   };
 
-  const exportarExcelPorFecha = () => {
-    const fechasUnicas = [...new Set(prestamos.map(p => {
-      const fecha = new Date(p.fecha_prestamo);
-      return fecha.toISOString().split('T')[0];
-    }))];
+  // Función para filtrar préstamos por fecha
+  const aplicarFiltroFecha = async () => {
+    try {
+      let res;
+      if (!fechaFiltro) {
+        res = await obtenerReporteCompleto();
+      } else {
+        res = await filtrarPrestamosPorFecha(fechaFiltro);
+      }
+      setPrestamos(res.data);
+    } catch (err) {
+      console.error(err);
+    }
+  };
 
+  const exportarExcelPorFecha = () => {
     const libro = XLSX.utils.book_new();
 
-    fechasUnicas.forEach(fecha => {
-      const datosFiltrados = prestamos.filter(p => {
-        const fechaPrestamo = new Date(p.fecha_prestamo).toISOString().split('T')[0];
-        return fechaPrestamo === fecha;
-      });
+    const datosParaExcel = prestamos.map(({ solicitante, prestamista, finalizador, cantidad, fecha_prestamo, fecha_devolucion, tipo_material, nombre_material }) => ({
+      Solicitante: solicitante,
+      Prestamista: prestamista,
+      Finalizador: finalizador || 'No finalizado',
+      Cantidad: cantidad,
+      FechaPrestamo: formatoMexico(fecha_prestamo),
+      TipoMaterial: tipo_material,
+      Nombre: nombre_material || 'Sin nombre',
+      Devolucion: fecha_devolucion ? formatoMexico(fecha_devolucion) : 'No devuelto',
+    }));
 
-      const datosParaExcel = datosFiltrados.map(({ solicitante, prestamista, finalizador, cantidad, fecha_prestamo, fecha_devolucion, tipo_material, nombre_material }) => ({
-        Solicitante: solicitante,
-        Prestamista: prestamista,
-        Finalizador: finalizador || 'No finalizado',
-        Cantidad: cantidad,
-        FechaPrestamo: formatoMexico(fecha_prestamo),
-        TipoMaterial: tipo_material,
-        Nombre: nombre_material || 'Sin nombre',
-        Devolucion: fecha_devolucion ? formatoMexico(fecha_devolucion) : 'No devuelto',
-      }));
-
-      const hoja = XLSX.utils.json_to_sheet(datosParaExcel);
-      XLSX.utils.book_append_sheet(libro, hoja, fecha);
-    });
-
+    const hoja = XLSX.utils.json_to_sheet(datosParaExcel);
+    XLSX.utils.book_append_sheet(libro, hoja, "Préstamos");
     const excelBuffer = XLSX.write(libro, { bookType: 'xlsx', type: 'array' });
     const archivo = new Blob([excelBuffer], { type: 'application/octet-stream' });
     saveAs(archivo, 'prestamos_por_fecha.xlsx');
@@ -64,10 +74,20 @@ export default function PrestamosReporte() {
   return (
     <div>
       <h1>Reporte de Préstamos</h1>
-      <button onClick={exportarExcelPorFecha} style={{ marginBottom: '20px' }}>
-        <FaFileExport style={{ marginRight: '5px' }} />
-        Exportar Excel
+
+      <div style={{ marginBottom: '20px' }}>
+        <input
+          type="date"
+          value={fechaFiltro}
+          onChange={e => setFechaFiltro(e.target.value)}
+          style={{ marginRight: '10px' }}
+        />
+        <button onClick={aplicarFiltroFecha} style={{ marginRight: '10px' }}>Filtrar</button>
+        <button onClick={exportarExcelPorFecha}>
+          <FaFileExport style={{ marginRight: '5px' }} />
+          Exportar Excel
         </button>
+      </div>
 
       <table border="1">
         <thead>

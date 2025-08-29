@@ -21,3 +21,9 @@ export const filtrarPrestamos = (filtros) => {
   });
 };
 
+export const filtrarPrestamosPorFecha = (fecha) => {
+  return axios.get(`${API_URL_PRESTAMOS}/filtroFecha`, {
+    params: { fecha }
+  });
+};
+
