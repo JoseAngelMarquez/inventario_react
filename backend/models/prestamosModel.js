@@ -70,13 +70,49 @@ class Prestamos {
     } = prestamo;
 
     await conn.beginTransaction();
+
     try {
-      // Insertar solicitante
-      const [resultSolicitante] = await conn.query(`
-        INSERT INTO solicitantes (tipo, nombre_completo, matricula, carrera, lugar_trabajo, telefono, correo, numero_empleado)
-        VALUES (?, ?, ?, ?, ?, ?, ?, ?)
-      `, [tipo, nombre_completo, matricula, carrera, lugar_trabajo, telefono, correo, numero_empleado]);
-      const id_solicitante = resultSolicitante.insertId;
+      // Determinar qué campos insertar según tipo
+      let matriculaInsert = null;
+      let carreraInsert = null;
+      let numeroEmpleadoInsert = null;
+
+      if (tipo === 'estudiante') {
+        matriculaInsert = matricula;
+        carreraInsert = carrera;
+      } else if (tipo === 'empleado') {
+        numeroEmpleadoInsert = numero_empleado;
+      }
+
+      // Verificar si el solicitante ya existe
+      let id_solicitante;
+      const [existing] = await conn.query(
+        tipo === 'empleado'
+          ? 'SELECT id FROM solicitantes WHERE numero_empleado = ?'
+          : 'SELECT id FROM solicitantes WHERE matricula = ?',
+        [tipo === 'empleado' ? numero_empleado : matricula]
+      );
+
+      if (existing.length) {
+        id_solicitante = existing[0].id;
+      } else {
+        // Insertar solicitante nuevo
+        const [resultSolicitante] = await conn.query(`
+          INSERT INTO solicitantes 
+            (tipo, nombre_completo, matricula, carrera, lugar_trabajo, telefono, correo, numero_empleado)
+          VALUES (?, ?, ?, ?, ?, ?, ?, ?)
+        `, [
+          tipo,
+          nombre_completo,
+          matriculaInsert,
+          carreraInsert,
+          lugar_trabajo,
+          telefono,
+          correo,
+          numeroEmpleadoInsert
+        ]);
+        id_solicitante = resultSolicitante.insertId;
+      }
 
       // Verificar stock y bloquear fila
       const [materialRows] = await conn.query(
@@ -101,13 +137,14 @@ class Prestamos {
       `, [cantidad, id_material]);
 
       await conn.commit();
+
       return {
         idPrestamo: resultPrestamo.insertId,
         nombreMaterial: materialRows[0].nombre,
         correoSolicitante: correo,
         nombreSolicitante: nombre_completo,
-        numeroEmpleadoSolicitante: numero_empleado,
-        matriculaSolicitante: matricula,
+        numeroEmpleadoSolicitante: numeroEmpleadoInsert,
+        matriculaSolicitante: matriculaInsert,
         cantidad
       };
 
@@ -116,6 +153,7 @@ class Prestamos {
       throw error;
     }
   }
+
 
   // Finalizar préstamo y devolver stock
   static async finalizarPrestamo(conn, idPrestamo, idUsuarioFinaliza) {
