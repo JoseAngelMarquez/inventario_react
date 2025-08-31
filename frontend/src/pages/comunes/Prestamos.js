@@ -4,7 +4,7 @@ import { agregarPrestamo, obtenerPrestamos, finalizarPrestamo, filtrarPrestamos 
 import "../../styles/Prestamos.css";
 import { PiHandSwipeRightFill } from "react-icons/pi";
 import { FaCheck } from "react-icons/fa";
-
+import FiltroPrestamos from '../../components/prestamos/FiltrosPrestamos';
 
 function FormPrestamo() {
     const [materiales, setMateriales] = useState([]);
@@ -239,28 +239,9 @@ function FormPrestamo() {
             </form>
 
             <hr />
-            <input
-                type="text"
-                name="solicitante"
-                value={filtros.solicitante}
-                onChange={handleBuscar}
-                placeholder="Buscar por nombre"
-            />
+            
+            <FiltroPrestamos filtros={filtros} onChange={handleBuscar} />
 
-            <input
-                type="text"
-                name="material"
-                value={filtros.material}
-                onChange={handleBuscar}
-                placeholder="Buscar por material"
-            />
-
-            <input
-                type="date"
-                name="fecha"
-                value={filtros.fecha}
-                onChange={handleBuscar}
-            />
             <h2>Lista de Préstamos</h2>
             {prestamos.length === 0 ? (
                 <p>No hay préstamos registrados.</p>

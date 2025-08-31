@@ -1,40 +1,35 @@
-import React from 'react';
+import React from "react";
+import "../../styles/Prestamos.css";
 
-function FiltrosPrestamos({ filtros, setFiltros }) {
+function FiltroPrestamos({ filtros, onChange }) {
+  return (
+    <div style={{ marginBottom: "1rem" }}>
+      <input
+        type="text"
+        name="solicitante"
+        value={filtros.solicitante}
+        onChange={onChange}
+        placeholder="Buscar por nombre"
+        style={{ marginRight: "8px" }}
+      />
 
-    const handleBuscar = (e) => {
-        setFiltros({
-            ...filtros,
-            [e.target.name]: e.target.value,
-        });
-    };
+      <input
+        type="text"
+        name="material"
+        value={filtros.material}
+        onChange={onChange}
+        placeholder="Buscar por material"
+        style={{ marginRight: "8px" }}
+      />
 
-    return (
-        <div className="filtros-prestamos">
-            <input
-                type="text"
-                name="solicitante"
-                value={filtros.solicitante}
-                onChange={handleBuscar}
-                placeholder="Buscar por nombre"
-            />
-
-            <input
-                type="text"
-                name="material"
-                value={filtros.material}
-                onChange={handleBuscar}
-                placeholder="Buscar por material"
-            />
-
-            <input
-                type="date"
-                name="fecha"
-                value={filtros.fecha}
-                onChange={handleBuscar}
-            />
-        </div>
-    );
+      <input
+        type="date"
+        name="fecha"
+        value={filtros.fecha}
+        onChange={onChange}
+      />
+    </div>
+  );
 }
 
-export default FiltrosPrestamos;
+export default FiltroPrestamos;
