@@ -8,9 +8,12 @@ export const agregarPrestamo = (prestamo) => axios.post(API_URL_PRESTAMOS, prest
     withCredentials: true
 });
 
-export const finalizarPrestamo = (id) => axios.put(`${API_URL_PRESTAMOS}/${id}/finalizar`, {}, {
-    withCredentials: true
-  });
+export const finalizarPrestamo = (id, insumoTerminado = false) => 
+  axios.put(`${API_URL_PRESTAMOS}/${id}/finalizar`, 
+    { insumoTerminado },  // <-- aquí le pasamos el valor
+    { withCredentials: true }
+  );
+
 export const descargarExcelPrestamos = () => axios.get(API_URL_PRESTAMOS + '/exportar/excel', { responseType: 'blob' });
 
 export const obtenerReporteCompleto = () => axios.get(API_URL_PRESTAMOS + '/reporte/completo');

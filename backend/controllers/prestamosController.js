@@ -81,14 +81,17 @@ exports.finalizar = async (req, res) => {
   const idUsuarioFinaliza = req.session.usuario.id;
   const idPrestamo = req.params.id;
 
+  // Convertir a booleano seguro
+// Convertir a booleano seguro
+const insumoTerminado = req.body.insumoTerminado === true || req.body.insumoTerminado === 'true';
+
   let conn;
   try {
     conn = await pool.getConnection();
 
-    // Lógica de BD centralizada en el model
-    const resultado = await Prestamos.finalizarPrestamo(conn, idPrestamo, idUsuarioFinaliza);
+    // Pasar el valor de insumoTerminado al model
+    const resultado = await Prestamos.finalizarPrestamo(conn, idPrestamo, idUsuarioFinaliza, insumoTerminado);
 
-    // Si se obtuvo info del préstamo, enviar correo
     if (resultado.prestamo) {
       const p = resultado.prestamo;
       enviarCorreo(
@@ -116,6 +119,7 @@ exports.finalizar = async (req, res) => {
     if (conn) conn.release();
   }
 };
+
 
 
 exports.actualizar = async (req, res) => {

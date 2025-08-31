@@ -10,6 +10,7 @@ function FormPrestamo() {
     const [materiales, setMateriales] = useState([]);
     const [prestamos, setPrestamos] = useState([]);
     const [filtros, setFiltros] = useState({ solicitante: "", material: "", fecha: "" });
+    const [insumoTerminado, setInsumoTerminado] = useState({});
 
     const [form, setForm] = useState({
         tipo: 'estudiante',
@@ -101,14 +102,17 @@ function FormPrestamo() {
     async function handleFinalizar(id) {
         if (!window.confirm('¿Seguro que deseas finalizar este préstamo?')) return;
         try {
-            await finalizarPrestamo(id);
+            await finalizarPrestamo(id, insumoTerminado[id] || false);
             alert('Préstamo finalizado correctamente');
             await cargarPrestamos();
             await cargarMateriales();
+            // Limpiar la casilla después de finalizar
+            setInsumoTerminado(prev => ({ ...prev, [id]: false }));
         } catch (error) {
             alert('Error al finalizar préstamo: ' + (error.response?.data?.detalle || error.message));
         }
     }
+
 
     return (
         <>
@@ -158,7 +162,7 @@ function FormPrestamo() {
                         <label>
                             Lugar de trabajo:
                             <input type="text" name="lugar_trabajo" value={form.lugar_trabajo} onChange={handleChange} pattern="[A-Za-zÁÉÍÓÚáéíóúÑñ ]+"
-                                title="Solo letras y espacios permitidos"/>
+                                title="Solo letras y espacios permitidos" />
                         </label>
                         <label>
                             Número de empleado:
@@ -171,7 +175,7 @@ function FormPrestamo() {
                 <label>
                     Teléfono:
                     <input type="tel" name="telefono" value={form.telefono} onChange={handleChange} pattern="[0-9]+"
-                                title="Solo números permitidos (sin espacios)"/>
+                        title="Solo números permitidos (sin espacios)" />
                 </label>
 
                 <label>
@@ -292,18 +296,43 @@ function FormPrestamo() {
                                 <td>{prestamo.usuario_prestamista || '—'}</td>
                                 <td>{prestamo.usuario_finalizador || '—'}</td>
                                 <td>
-                                    {prestamo.estado === 'prestado' && (
-                                        <button onClick={() => handleFinalizar(prestamo.id)} style={{
-                                            display: "flex",
-                                            alignItems: "center",
-                                            justifyContent: "center",
-                                            gap: "8px"
-                                        }}>
-                                            <FaCheck style={{ fontSize: "10px" }} />
-                                            Finalizar
-                                        </button>
-                                    )}
-                                </td>
+  {prestamo.estado === 'prestado' && (
+    <>
+      {/* Mostrar checkbox solo si es insumo */}
+      {prestamo.tipo_material === 'insumo' && (
+        <label style={{ display: "flex", alignItems: "center", gap: "4px" }}>
+          <input
+            type="checkbox"
+            checked={insumoTerminado[prestamo.id] || false}
+            onChange={(e) =>
+              setInsumoTerminado(prev => ({
+                ...prev,
+                [prestamo.id]: e.target.checked
+              }))
+            }
+          />
+          Insumo terminado
+        </label>
+      )}
+
+      {/* Botón Finalizar siempre visible */}
+      <button
+        onClick={() => handleFinalizar(prestamo.id)}
+        style={{
+          display: "flex",
+          alignItems: "center",
+          justifyContent: "center",
+          gap: "8px",
+          marginTop: "4px"
+        }}
+      >
+        <FaCheck style={{ fontSize: "10px" }} />
+        Finalizar
+      </button>
+    </>
+  )}
+</td>
+
                             </tr>
                         ))}
                     </tbody>
