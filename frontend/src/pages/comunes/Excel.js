@@ -53,8 +53,8 @@ export default function PrestamosReporte() {
   const exportarExcelPorFecha = () => {
     const libro = XLSX.utils.book_new();
 
-    const datosParaExcel = prestamos.map(({ solicitante, prestamista, finalizador, cantidad, fecha_prestamo, fecha_devolucion, tipo_material, nombre_material }) => ({
-      Solicitante: solicitante,
+    const datosParaExcel = prestamos.map(({ nombre_solicitante, prestamista, finalizador, cantidad, fecha_prestamo, fecha_devolucion, tipo_material, nombre_material }) => ({
+      Solicitante: nombre_solicitante,
       Prestamista: prestamista,
       Finalizador: finalizador || 'No finalizado',
       Cantidad: cantidad,
@@ -105,7 +105,7 @@ export default function PrestamosReporte() {
         <tbody>
           {prestamos.map(p => (
             <tr key={p.id}>
-              <td>{p.solicitante}</td>
+              <td>{p.nombre_solicitante}</td>
               <td>{p.prestamista}</td>
               <td>{p.finalizador || 'No finalizado'}</td>
               <td>{p.cantidad}</td>
