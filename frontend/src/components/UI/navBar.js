@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import logo_uaeh from "../images/logo_uaeh.png"; // Asegúrate de que la ruta sea correcta
+import logo_uaeh from "../../images/logo_uaeh.png"; // Asegúrate de que la ruta sea correcta
 
 const NavBar = () => {
   const [userName, setUserName] = useState("Cargando...");

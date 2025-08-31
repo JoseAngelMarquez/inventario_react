@@ -2,7 +2,7 @@ import React from "react";
 import { Link, Outlet } from "react-router-dom";
 import CerrarSesion from "../components/UI/BtnCerrar";
 import styles from "../styles/LayoutAdmin.module.css"; 
-import NavBar from "../components/navBar";
+import NavBar from "../components/UI/navBar";
 import "../styles/iconos.css";
 import { FaUsers } from "react-icons/fa";
 import { FaHome } from "react-icons/fa";
