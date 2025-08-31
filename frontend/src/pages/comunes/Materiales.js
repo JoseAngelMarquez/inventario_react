@@ -46,7 +46,7 @@ const Materiales = () => {
           setMateriales(res.data);
         }
       } catch (error) {
-        console.error("Error en búsqueda:", error);
+        //console.error("Error en búsqueda:", error);
         setError("Error en la búsqueda");
       } finally {
         setCargando(false);

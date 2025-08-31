@@ -21,7 +21,7 @@ class Usuario {
 
   static async eliminar(conn, id) {
     try {
-      console.log("Intentando eliminar usuario id:", id);
+      //console.log("Intentando eliminar usuario id:", id);
   
       // Verificar préstamos activos
       const [prestamos] = await conn.query(
@@ -30,7 +30,7 @@ class Usuario {
       );
   
       const totalPrestamos = Number(prestamos[0]?.total || 0);
-      console.log("Préstamos activos encontrados:", totalPrestamos);
+      //console.log("Préstamos activos encontrados:", totalPrestamos);
   
       if (totalPrestamos > 0) {
         throw new Error("El usuario tiene préstamos activos, no puede ser eliminado");
@@ -38,11 +38,11 @@ class Usuario {
   
       // Eliminar usuario
       const [result] = await conn.query('DELETE FROM usuarios WHERE id = ?', [id]);
-      console.log("Resultado DELETE:", result);
+      //console.log("Resultado DELETE:", result);
       return result.affectedRows;
   
     } catch (error) {
-      console.error("Error al eliminar usuario:", error.message);
+      //console.error("Error al eliminar usuario:", error.message);
       throw error;
     }
   }
@@ -66,7 +66,7 @@ class Usuario {
       );
       return result.affectedRows;
     } catch (error) {
-      console.error("Error al actualizar usuario:", error.message);
+      //console.error("Error al actualizar usuario:", error.message);
       throw error; // Propagar el error para que el controller lo maneje
     }
   }

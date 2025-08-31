@@ -15,7 +15,7 @@ export default function PrestamosReporte() {
         const res = await obtenerReporteCompleto();
         setPrestamos(res.data);
       } catch (err) {
-        console.error(err);
+        //console.error(err);
       }
     };
   
@@ -46,7 +46,7 @@ export default function PrestamosReporte() {
       }
       setPrestamos(res.data);
     } catch (err) {
-      console.error(err);
+      //console.error(err);
     }
   };
 

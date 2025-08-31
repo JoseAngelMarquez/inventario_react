@@ -26,9 +26,9 @@ async function enviarCorreo(destinatario, asunto, mensaje) {
 
   try {
     const info = await transporter.sendMail(mailOptions);
-    console.log('Correo enviado:', info.messageId);
+    //console.log('Correo enviado:', info.messageId);
   } catch (error) {
-    console.error('Error enviando correo:', error);
+    //console.error('Error enviando correo:', error);
   }
 }
 

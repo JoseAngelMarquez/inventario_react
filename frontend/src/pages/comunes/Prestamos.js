@@ -32,7 +32,7 @@ function FormPrestamo() {
             const res = await obtenerMateriales();
             setMateriales(res.data);
         } catch (error) {
-            console.error('Error cargando materiales:', error);
+            //console.error('Error cargando materiales:', error);
         }
     };
 
@@ -42,7 +42,7 @@ function FormPrestamo() {
             const res = await obtenerPrestamos();
             setPrestamos(res.data);
         } catch (error) {
-            console.error('Error cargando préstamos:', error);
+            //console.error('Error cargando préstamos:', error);
         }
     };
 
@@ -296,42 +296,42 @@ function FormPrestamo() {
                                 <td>{prestamo.usuario_prestamista || '—'}</td>
                                 <td>{prestamo.usuario_finalizador || '—'}</td>
                                 <td>
-  {prestamo.estado === 'prestado' && (
-    <>
-      {/* Mostrar checkbox solo si es insumo */}
-      {prestamo.tipo_material === 'insumo' && (
-        <label style={{ display: "flex", alignItems: "center", gap: "4px" }}>
-          <input
-            type="checkbox"
-            checked={insumoTerminado[prestamo.id] || false}
-            onChange={(e) =>
-              setInsumoTerminado(prev => ({
-                ...prev,
-                [prestamo.id]: e.target.checked
-              }))
-            }
-          />
-          Insumo terminado
-        </label>
-      )}
+                                    {prestamo.estado === 'prestado' && (
+                                        <>
+                                            {/* Mostrar checkbox solo si es insumo */}
+                                            {prestamo.tipo_material === 'insumo' && (
+                                                <label style={{ display: "flex", alignItems: "center", gap: "4px" }}>
+                                                    <input
+                                                        type="checkbox"
+                                                        checked={insumoTerminado[prestamo.id] || false}
+                                                        onChange={(e) =>
+                                                            setInsumoTerminado(prev => ({
+                                                                ...prev,
+                                                                [prestamo.id]: e.target.checked
+                                                            }))
+                                                        }
+                                                    />
+                                                    Insumo terminado
+                                                </label>
+                                            )}
 
-      {/* Botón Finalizar siempre visible */}
-      <button
-        onClick={() => handleFinalizar(prestamo.id)}
-        style={{
-          display: "flex",
-          alignItems: "center",
-          justifyContent: "center",
-          gap: "8px",
-          marginTop: "4px"
-        }}
-      >
-        <FaCheck style={{ fontSize: "10px" }} />
-        Finalizar
-      </button>
-    </>
-  )}
-</td>
+                                            {/* Botón Finalizar siempre visible */}
+                                            <button
+                                                onClick={() => handleFinalizar(prestamo.id)}
+                                                style={{
+                                                    display: "flex",
+                                                    alignItems: "center",
+                                                    justifyContent: "center",
+                                                    gap: "8px",
+                                                    marginTop: "4px"
+                                                }}
+                                            >
+                                                <FaCheck style={{ fontSize: "10px" }} />
+                                                Finalizar
+                                            </button>
+                                        </>
+                                    )}
+                                </td>
 
                             </tr>
                         ))}

@@ -7,7 +7,7 @@ exports.obtenerTotalesMateriales = async (req, res) => {
     const totales = await Inventario.obtenerTotales(conn);
     res.json(totales);
   } catch (err) {
-    console.error("Error obteniendo totales:", err);
+    //console.error("Error obteniendo totales:", err);
     res.status(500).json({ error: "Error en el servidor" });
   } finally {
     if (conn) conn.release(); 

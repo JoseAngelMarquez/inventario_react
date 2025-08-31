@@ -14,10 +14,10 @@ async function insertarUsuario() {
     const sql = 'INSERT INTO usuarios (usuario, contrasena, rol) VALUES (?, ?, ?)';
     const [result] = await pool.execute(sql, [usuario, hashedPassword, rol]);
 
-    console.log(`Usuario insertado con ID: ${result.insertId}`);
-    console.log(`Hash: ${hashedPassword}`);
+    //console.log(`Usuario insertado con ID: ${result.insertId}`);
+    //console.log(`Hash: ${hashedPassword}`);
   } catch (error) {
-    console.error('Error insertando usuario:', error.message);
+    //console.error('Error insertando usuario:', error.message);
   } finally {
     pool.end();
   }

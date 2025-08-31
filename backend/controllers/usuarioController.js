@@ -37,7 +37,7 @@ exports.login = async (req, res) => {
       return res.status(401).json({ mensaje: 'Contraseña incorrecta' });
     }
   } catch (error) {
-    console.error('Error en login:', error.message);
+    //console.error('Error en login:', error.message);
     return res.status(500).json({ mensaje: 'Error en el servidor' });
   } finally {
     if (conn) conn.release();
@@ -72,7 +72,7 @@ exports.crearUsuario = async (req, res) => {
 
     return res.status(201).json({ mensaje: 'Usuario creado', id: idNuevo });
   } catch (error) {
-    console.error('Error creando usuario:', error.message);
+    //console.error('Error creando usuario:', error.message);
     return res.status(500).json({ mensaje: 'Error en el servidor' });
   } finally {
     if (conn) conn.release(); 
@@ -85,7 +85,7 @@ exports.obtenerUsuarios = async (req, res) => {
     const usuarios = await Usuario.obtenerUsuarios(conn);
     res.json(usuarios);
   }catch(error){
-    console.error('Error al obtener usuarios:', error);
+    //console.error('Error al obtener usuarios:', error);
     res.status(500).json({ mensaje: 'Error al obtener usuarios' });
   } finally {
     if (conn) conn.release(); 
@@ -127,7 +127,7 @@ exports.actualizarUsuario = async (req, res) => {
 
     res.json({ mensaje: 'Usuario actualizado exitosamente' });
   } catch (error) {
-    console.error("Error al actualizar usuario:", error.message);
+    //console.error("Error al actualizar usuario:", error.message);
     res.status(500).json({ mensaje: 'Error al actualizar usuario', error: error.message });
   } finally {
     if (conn) conn.release(); 
@@ -158,7 +158,7 @@ exports.obtenerPaginados = async (req, res) => {
       totalPaginas: Math.ceil(total / limite)
     });
   } catch (error) {
-    console.error('Error al obtener usuarios paginados:', error);
+    //console.error('Error al obtener usuarios paginados:', error);
     res.status(500).json({ mensaje: 'Error al obtener usuarios paginados' });
   } finally {
     if (conn) conn.release();

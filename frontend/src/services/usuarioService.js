@@ -13,7 +13,7 @@ export const login = async (usuario, contrasena) => {
     );
     return response.data;
   } catch (error) {
-    console.error('Error en login:', error);
+    //console.error('Error en login:', error);
     throw error;
   }
 };
@@ -28,7 +28,7 @@ export const crearUsuario = async (usuario, contrasena, rol) => {
     );
     return response.data;
   } catch (error) {
-    console.error('Error al crear usuario:', error);
+    //console.error('Error al crear usuario:', error);
     throw error;
   }
 };
@@ -39,7 +39,7 @@ export const obtenerUsuarios = async () => {
     const response = await axios.get(`${API_URL}/`, { withCredentials: true });
     return response.data;
   } catch (error) {
-    console.error('Error al obtener usuarios:', error);
+    //console.error('Error al obtener usuarios:', error);
     throw error;
   }
 };
@@ -50,7 +50,7 @@ export const eliminarUsuario = async (id) => {
     const response = await axios.delete(`${API_URL}/${id}`, { withCredentials: true });
     return response.data;
   } catch (error) {
-    console.error('Error al eliminar usuario:', error);
+    //console.error('Error al eliminar usuario:', error);
     throw error;
   }
 };
@@ -65,7 +65,7 @@ export const actualizarUsuario = async (id, usuario, contrasena, rol) => {
     );
     return response.data;
   } catch (error) {
-    console.error('Error al actualizar usuario:', error);
+    //console.error('Error al actualizar usuario:', error);
     throw error;
   }
 };
@@ -79,7 +79,7 @@ export const obtenerPaginados = async (pagina = 1, filasPorPagina = 10) => {
     });
     return response.data;
   } catch (error) {
-    console.error('Error al obtener usuarios paginados:', error);
+    //console.error('Error al obtener usuarios paginados:', error);
     throw error;
   }
 };

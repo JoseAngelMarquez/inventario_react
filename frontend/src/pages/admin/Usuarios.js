@@ -30,7 +30,7 @@ const Inicio = () => {
       setUsuarios(data.usuarios);
       setTotalPaginas(Math.ceil(data.total / filasPorPagina));
     } catch (err) {
-      console.error(err);
+      //console.error(err);
     }
   };
 
@@ -42,7 +42,7 @@ const Inicio = () => {
 
     try {
       if (usuarioSeleccionado && usuarioSeleccionado.id) {
-        console.log("Actualizando usuario ID:", usuarioSeleccionado.id);
+        //console.log("Actualizando usuario ID:", usuarioSeleccionado.id);
         await actualizarUsuario(usuarioSeleccionado.id, usuario, contrasena, rol);
         setMensaje("Usuario actualizado correctamente");
       } else {
@@ -56,7 +56,7 @@ const Inicio = () => {
       fetchUsuarios(pagina);
     } catch (err) {
       setMensaje("Error al procesar usuario: " + (err.response?.data?.message || err.message));
-      console.error(err);
+      //console.error(err);
     }
   };
 

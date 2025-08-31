@@ -11,7 +11,7 @@ exports.obtenerTodos = async (req, res) => {
     const prestamos = await Prestamos.obtenerTodosConDetalles(conn);
     res.json(prestamos);
   } catch (error) {
-    console.error(error);
+    //console.error(error);
     res.status(500).json({ error: 'Error al obtener préstamos' });
   } finally {
     if (conn) conn.release();
@@ -26,7 +26,7 @@ exports.obtenerPorId = async (req, res) => {
     if (!prestamo) return res.status(404).json({ error: 'Préstamo no encontrado' });
     res.json(prestamo);
   } catch (error) {
-    console.error(error);
+    //console.error(error);
     res.status(500).json({ error: 'Error al obtener préstamo' });
   } finally {
     if (conn) conn.release();
@@ -64,7 +64,7 @@ exports.crear = async (req, res) => {
 
 
   } catch (error) {
-    console.error('Error al crear préstamo:', error);
+    //console.error('Error al crear préstamo:', error);
     if (!res.headersSent)
       res.status(500).json({ error: 'Error al crear préstamo', detalle: error.message });
   } finally {
@@ -73,7 +73,7 @@ exports.crear = async (req, res) => {
 };
 
 exports.finalizar = async (req, res) => {
-  console.log('Sesión actual:', req.session.usuario);
+  //console.log('Sesión actual:', req.session.usuario);
   if (!req.session.usuario) {
     return res.status(401).json({ mensaje: 'No autorizado, inicia sesión' });
   }
@@ -82,8 +82,7 @@ exports.finalizar = async (req, res) => {
   const idPrestamo = req.params.id;
 
   // Convertir a booleano seguro
-// Convertir a booleano seguro
-const insumoTerminado = req.body.insumoTerminado === true || req.body.insumoTerminado === 'true';
+  const insumoTerminado = req.body.insumoTerminado === true || req.body.insumoTerminado === 'true';
 
   let conn;
   try {
@@ -107,13 +106,13 @@ const insumoTerminado = req.body.insumoTerminado === true || req.body.insumoTerm
         `El usuario ${p.nombre_completo} ha finalizado un préstamo del material "${p.material_nombre}" (cantidad: ${p.cantidad}) realizado el ${p.fecha_prestamo}.\n\nRevisa el sistema para más detalles.`
       );
     } else {
-      console.warn('No se encontró el préstamo para enviar correo.');
+      //console.warn('No se encontró el préstamo para enviar correo.');
     }
 
     res.json({ mensaje: resultado.message });
 
   } catch (error) {
-    console.error(error);
+    //console.error(error);
     res.status(500).json({ error: 'Error al finalizar préstamo', detalle: error.message });
   } finally {
     if (conn) conn.release();
@@ -130,7 +129,7 @@ exports.actualizar = async (req, res) => {
     if (!actualizado) return res.status(404).json({ error: 'Préstamo no encontrado' });
     res.json({ mensaje: 'Préstamo actualizado' });
   } catch (error) {
-    console.error(error);
+    //console.error(error);
     res.status(500).json({ error: 'Error al actualizar préstamo' });
   } finally {
     if (conn) conn.release();
@@ -167,7 +166,7 @@ exports.exportarExcel = async (req, res) => {
     await workbook.xlsx.write(res);
     res.status(200).end();
   } catch (error) {
-    console.error('Error exportando Excel:', error);
+    //console.error('Error exportando Excel:', error);
     res.status(500).send({ message: 'Error generando Excel', error: error.message });
   } finally {
     if (conn) conn.release();
@@ -181,7 +180,7 @@ exports.reporteCompleto = async (req, res) => {
     const reporte = await Prestamos.obtenerReporteCompleto(conn);
     res.json(reporte);
   } catch (error) {
-    console.error(error);
+    //console.error(error);
     res.status(500).json({ error: 'Error al obtener reporte completo' });
   } finally {
     if (conn) conn.release();
@@ -208,7 +207,7 @@ exports.filtrarPrestamos = async (req, res) => {
     // Enviamos los resultados al cliente
     res.json(resultados);
   } catch (error) {
-    console.error(error);
+    //console.error(error);
     res.status(500).json({ error: "Error al filtrar préstamos" });
   } finally {
     if (conn) conn.release();
@@ -230,7 +229,7 @@ exports.filtrarPorFecha = async (req, res) => {
     res.json(resultados);
 
   } catch (error) {
-    console.error(error);
+    //console.error(error);
     res.status(500).json({ error: 'Error del servidor' });
   }
 };

@@ -23,7 +23,7 @@ const Inicio = () => {
         setTotales(resTotales.data);
         setError(null);
       } catch (err) {
-        console.error("Error cargando datos:", err);
+        //console.error("Error cargando datos:", err);
         setError("Error cargando datos");
       } finally {
         setLoading(false);
@@ -44,7 +44,7 @@ const Inicio = () => {
           setMateriales(res.data);
         }
       } catch (err) {
-        console.error("Error en búsqueda:", err);
+        //console.error("Error en búsqueda:", err);
         setError("Error en la búsqueda");
       }
     };
