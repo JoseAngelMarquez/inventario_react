@@ -123,18 +123,32 @@ function FormPrestamo() {
 
                 <label>
                     Nombre completo:
-                    <input type="text" name="nombre_completo" value={form.nombre_completo} onChange={handleChange} required />
+                    <input
+                        type="text"
+                        name="nombre_completo"
+                        value={form.nombre_completo}
+                        onChange={handleChange}
+                        required
+                        pattern="[A-Za-zÁÉÍÓÚáéíóúÑñ ]+"
+                        title="Solo letras y espacios permitidos" />
+
                 </label>
 
                 {form.tipo === 'estudiante' && (
                     <>
                         <label>
                             Matrícula:
-                            <input type="text" name="matricula" value={form.matricula} onChange={handleChange} />
+                            <input type="text" name="matricula" value={form.matricula} onChange={handleChange} pattern="[0-9]+"
+                                title="Solo números permitidos (sin espacios)" />
                         </label>
                         <label>
                             Carrera:
-                            <input type="text" name="carrera" value={form.carrera} onChange={handleChange} />
+                            <input type="text"
+                                name="carrera"
+                                value={form.carrera}
+                                onChange={handleChange}
+                                pattern="[A-Za-zÁÉÍÓÚáéíóúÑñ ]+"
+                                title="Solo letras y espacios permitidos" />
                         </label>
                     </>
                 )}
@@ -143,18 +157,21 @@ function FormPrestamo() {
                     <>
                         <label>
                             Lugar de trabajo:
-                            <input type="text" name="lugar_trabajo" value={form.lugar_trabajo} onChange={handleChange} />
+                            <input type="text" name="lugar_trabajo" value={form.lugar_trabajo} onChange={handleChange} pattern="[A-Za-zÁÉÍÓÚáéíóúÑñ ]+"
+                                title="Solo letras y espacios permitidos"/>
                         </label>
                         <label>
                             Número de empleado:
-                            <input type="text" name="numero_empleado" value={form.numero_empleado} onChange={handleChange} />
+                            <input type="text" name="numero_empleado" value={form.numero_empleado} onChange={handleChange} pattern="[0-9]+"
+                                title="Solo números permitidos (sin espacios)" />
                         </label>
                     </>
                 )}
 
                 <label>
                     Teléfono:
-                    <input type="tel" name="telefono" value={form.telefono} onChange={handleChange} />
+                    <input type="tel" name="telefono" value={form.telefono} onChange={handleChange} pattern="[0-9]+"
+                                title="Solo números permitidos (sin espacios)"/>
                 </label>
 
                 <label>
