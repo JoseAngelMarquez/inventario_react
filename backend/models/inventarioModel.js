@@ -1,8 +1,14 @@
-
-  
-
-  class Inventario {
-    static async obtenerTotales(conn) {
+class Inventario {
+    
+  /**
+   * Obtiene los totales de materiales disponibles,los tipos de materiales disponibles y materiales prestados
+   *
+   * @static
+   * @param {*} conn
+   * @return {*} 
+   * @memberof Inventario
+   */
+  static async obtenerTotales(conn) {
       // Total de materiales
       const [total] = await conn.query(
         `SELECT SUM(cantidad_disponible) AS total FROM materiales`
