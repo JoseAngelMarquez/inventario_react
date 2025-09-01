@@ -124,7 +124,10 @@ function FormPrestamo() {
 
             <hr />
 
-            <FiltroPrestamos filtros={filtros} onChange={handleBuscar} />
+            <FiltroPrestamos 
+            filtros={filtros} 
+            onChange={handleBuscar} 
+            />
 
             <ListaPrestamos
                 prestamos={prestamos}

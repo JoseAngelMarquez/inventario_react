@@ -61,7 +61,7 @@ const Inicio = () => {
 
       <div className={styles["boton-cerrar"]}>
         <div className={styles["panel-box"]}>
-          <h3>Materiales Totales</h3>
+          <h3>Materiales Totales Disponibles</h3>
           <p>{totales?.totalMateriales ?? "N/A"}</p>
         </div>
         <div className={styles["panel-box"]}>

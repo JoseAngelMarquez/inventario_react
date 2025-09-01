@@ -11,12 +11,26 @@ class Material {
 
   static async crear(conn, material) {
     const { nombre, tipo, cantidad_disponible, descripcion } = material;
+  
+    // Verificar si ya existe
+    const [rows] = await conn.query(
+      'SELECT id FROM materiales WHERE nombre = ?',
+      [nombre]
+    );
+  
+    if (rows.length > 0) {
+      throw new Error('El nombre del material ya existe');
+    }
+  
+    // Si no existe, insertar
     const [result] = await conn.query(
       'INSERT INTO materiales (nombre, tipo, cantidad_disponible, descripcion) VALUES (?, ?, ?, ?)',
       [nombre, tipo, cantidad_disponible, descripcion]
     );
+  
     return result.insertId;
   }
+  
 
   static async actualizar(conn, id, material) {
     const { nombre, tipo, cantidad_disponible, descripcion } = material;
