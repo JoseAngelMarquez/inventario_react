@@ -66,32 +66,36 @@ FROM prestamos p
       fecha_devolucion = null,
       id_usuario
     } = prestamo;
-
+  
     await conn.beginTransaction();
-
+  
     try {
       // Determinar qué campos insertar según tipo
       let matriculaInsert = null;
       let carreraInsert = null;
       let numeroEmpleadoInsert = null;
-
+  
       if (tipo === 'estudiante') {
         matriculaInsert = matricula;
         carreraInsert = carrera;
       } else if (tipo === 'empleado') {
         numeroEmpleadoInsert = numero_empleado;
       }
-
+  
       // Verificar si el solicitante ya existe
       let id_solicitante;
       const [existing] = await conn.query(
         tipo === 'empleado'
-          ? 'SELECT id FROM solicitantes WHERE numero_empleado = ?'
-          : 'SELECT id FROM solicitantes WHERE matricula = ?',
+          ? 'SELECT id, nombre_completo FROM solicitantes WHERE numero_empleado = ?'
+          : 'SELECT id, nombre_completo FROM solicitantes WHERE matricula = ?',
         [tipo === 'empleado' ? numero_empleado : matricula]
       );
-
+  
       if (existing.length) {
+        // Validar que el nombre coincida
+        if (existing[0].nombre_completo !== nombre_completo) {
+          throw new Error('La matrícula o número de empleado ya está registrada con otro nombre');
+        }
         id_solicitante = existing[0].id;
       } else {
         // Insertar solicitante nuevo
@@ -111,7 +115,7 @@ FROM prestamos p
         ]);
         id_solicitante = resultSolicitante.insertId;
       }
-
+  
       // Verificar stock y bloquear fila
       const [materialRows] = await conn.query(
         'SELECT cantidad_disponible, nombre FROM materiales WHERE id = ? FOR UPDATE',
@@ -120,22 +124,22 @@ FROM prestamos p
       if (materialRows.length === 0) throw new Error('Material no encontrado');
       if (materialRows[0].cantidad_disponible < cantidad)
         throw new Error('No hay suficiente stock disponible');
-
+  
       // Insertar préstamo
       const [resultPrestamo] = await conn.query(`
         INSERT INTO prestamos (id_material, cantidad, fecha_prestamo, fecha_devolucion, id_usuario, id_solicitante, estado)
         VALUES (?, ?, ?, ?, ?, ?, 'prestado')
       `, [id_material, cantidad, fecha_prestamo, fecha_devolucion, id_usuario, id_solicitante]);
-
+  
       // Actualizar stock
       await conn.query(`
         UPDATE materiales
         SET cantidad_disponible = cantidad_disponible - ?
         WHERE id = ?
       `, [cantidad, id_material]);
-
+  
       await conn.commit();
-
+  
       return {
         idPrestamo: resultPrestamo.insertId,
         nombreMaterial: materialRows[0].nombre,
@@ -145,12 +149,13 @@ FROM prestamos p
         matriculaSolicitante: matriculaInsert,
         cantidad
       };
-
+  
     } catch (error) {
       await conn.rollback();
       throw error;
     }
   }
+  
 
   // Finalizar préstamo, solo actualizar stock si NO se terminó
   static async finalizarPrestamo(conn, idPrestamo, idUsuarioFinaliza, insumoTerminado = false) {
