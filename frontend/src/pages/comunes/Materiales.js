@@ -59,16 +59,19 @@ const Materiales = () => {
   const handleAddOrUpdate = async (material) => {
     try {
       if (editando) {
-        await actualizarMaterial(editando.id, material);
+        const res = await actualizarMaterial(editando.id, material);
+        alert(res.data.message); // mensaje del backend
         setEditando(null);
       } else {
-        await agregarMaterial(material);
+        const res = await agregarMaterial(material);
+        alert(res.data.message); // mensaje del backend
       }
       cargarMateriales();
     } catch (e) {
       alert("Error guardando material");
     }
   };
+  
 
   const handleDelete = async (id) => {
     if (window.confirm("¿Seguro que quieres eliminar este material?")) {
