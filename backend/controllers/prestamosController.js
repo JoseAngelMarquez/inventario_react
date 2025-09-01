@@ -96,15 +96,16 @@ exports.finalizar = async (req, res) => {
       enviarCorreo(
         p.correo,
         'Préstamo finalizado',
-        `Hola ${p.nombre_completo},\n\nTu préstamo del material "${p.material_nombre}" (cantidad: ${p.cantidad}) realizado el ${p.fecha_prestamo} ha sido finalizado.\n\nGracias.`
+        `Hola ${p.nombre_solicitante},\n\nTu préstamo del material "${p.nombre_material}" (cantidad: ${p.cantidad}) realizado el ${p.fecha_prestamo} ha sido finalizado.\n\nGracias.`
       );
 
       const correoAdmin = process.env.ADMIN_EMAIL;
       enviarCorreo(
         correoAdmin,
         'Préstamo finalizado - Información',
-        `El usuario ${p.nombre_completo} ha finalizado un préstamo del material "${p.material_nombre}" (cantidad: ${p.cantidad}) realizado el ${p.fecha_prestamo}.\n\nRevisa el sistema para más detalles.`
+        `El usuario ${p.nombre_solicitante} ha finalizado un préstamo del material "${p.nombre_material}" (cantidad: ${p.cantidad}) realizado el ${p.fecha_prestamo}.\n\nRevisa el sistema para más detalles.`
       );
+
     } else {
       //console.warn('No se encontró el préstamo para enviar correo.');
     }

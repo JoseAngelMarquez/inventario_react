@@ -193,12 +193,13 @@ FROM prestamos p
   s.numero_empleado AS numero_empleado_solicitante,
   s.correo, 
   m.nombre AS nombre_material,
-  m.tipo AS tipo_material,      -- <--- esto es clave
-  p.insumo_terminado            -- <--- para mostrar si ya estaba marcado
+  m.tipo AS tipo_material,
+  p.insumo_terminado
 FROM prestamos p
 JOIN solicitantes s ON p.id_solicitante = s.id
 JOIN materiales m ON p.id_material = m.id
 WHERE p.id = ?
+
 
     `, [idPrestamo]);
 
