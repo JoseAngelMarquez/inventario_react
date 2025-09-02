@@ -3,6 +3,11 @@ import { useNavigate } from "react-router-dom";
 import styles from "../../styles/BotonCerrar.module.css";
 import { LuLogIn } from "react-icons/lu";
 
+/**
+ *Componente para cerrar sesión
+ *
+ * @return {*} 
+ */
 const CerrarSesion = () => {
   const navigate = useNavigate();
 

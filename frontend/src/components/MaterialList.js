@@ -3,6 +3,12 @@ import { MdDelete } from "react-icons/md";
 import { FaEdit } from "react-icons/fa";
 
 
+/**
+ *Componente para mostrar la lista de materiales y editar o eliminar
+ *
+ * @param {*} { materiales, onEditar, onEliminar }
+ * @return {*} 
+ */
 const MaterialList = ({ materiales, onEditar, onEliminar }) => {
   if (materiales.length === 0) {
     return <p>No hay materiales registrados.</p>;

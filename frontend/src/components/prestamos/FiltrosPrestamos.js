@@ -1,6 +1,12 @@
 import React from "react";
 import "../../styles/Prestamos.css";
 
+/**
+ *Componente para filtrar por nombre del solicitante,
+ *nombre de material o por fecha de préstamo
+ * @param {*} { filtros, onChange }
+ * @return {*} 
+ */
 function FiltroPrestamos({ filtros, onChange }) {
   return (
     <div style={{ marginBottom: "1rem" }}>

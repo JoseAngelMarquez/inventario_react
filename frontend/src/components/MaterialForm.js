@@ -3,6 +3,13 @@ import { CiSaveDown2 } from "react-icons/ci";
 import { FaEdit } from "react-icons/fa";
 import { FaTimes } from "react-icons/fa";
 
+
+/**
+ *Formulario para agregar materiales
+ *
+ * @param {*} { onSubmit, materialEditado, cancelar }
+ * @return {*} 
+ */
 const MaterialForm = ({ onSubmit, materialEditado, cancelar }) => {
   const [formData, setFormData] = useState({
     nombre: "",

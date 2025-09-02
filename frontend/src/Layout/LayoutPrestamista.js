@@ -8,6 +8,13 @@ import { FaHandsHelping } from "react-icons/fa";
 import { FaTools } from "react-icons/fa";
 import { BiSolidFileExport } from "react-icons/bi";
 import "../styles/iconos.css";
+
+
+/**
+ *Rutas permitidas del prestamista
+ *
+ * @return {*} 
+ */
 const LayoutPrestamista = () => {
 
   return (

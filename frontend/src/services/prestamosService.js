@@ -10,7 +10,7 @@ export const agregarPrestamo = (prestamo) => axios.post(API_URL_PRESTAMOS, prest
 
 export const finalizarPrestamo = (id, insumoTerminado = false) => 
   axios.put(`${API_URL_PRESTAMOS}/${id}/finalizar`, 
-    { insumoTerminado },  // <-- aquí le pasamos el valor
+    { insumoTerminado },  
     { withCredentials: true }
   );
 

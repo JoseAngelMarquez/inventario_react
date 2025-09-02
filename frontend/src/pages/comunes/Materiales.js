@@ -18,6 +18,8 @@ const Materiales = () => {
   const [error, setError] = useState(null);
   const [busqueda, setBusqueda] = useState("");
 
+    // Cargar todos los materiales desde el backend
+
   const cargarMateriales = async () => {
     setCargando(true);
     setError(null);
@@ -31,9 +33,14 @@ const Materiales = () => {
     }
   };
 
+    // Cuando se carga el componente, traer los materiales
+
   useEffect(() => {
     cargarMateriales();
   }, []);
+
+
+    // Cada vez que cambia la búsqueda, volver a cargar datos (filtrados o no)
 
   useEffect(() => {
     const fetchData = async () => {
@@ -56,13 +63,17 @@ const Materiales = () => {
     fetchData();
   }, [busqueda]);
 
+    // Agregar o actualizar material
+
   const handleAddOrUpdate = async (material) => {
     try {
       if (editando) {
+        // Si hay un material en edición - actualizar
         const res = await actualizarMaterial(editando.id, material);
         alert(res.data.message); // mensaje del backend
         setEditando(null);
       } else {
+        // Si no → agregar nuevo
         const res = await agregarMaterial(material);
         alert(res.data.message); // mensaje del backend
       }
@@ -72,6 +83,7 @@ const Materiales = () => {
     }
   };
   
+  // Eliminar material
 
   const handleDelete = async (id) => {
     if (window.confirm("¿Seguro que quieres eliminar este material?")) {

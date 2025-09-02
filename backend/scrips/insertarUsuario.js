@@ -1,10 +1,17 @@
 const bcrypt = require('bcrypt');
 const pool = require('../config/db');
 
+
+
+/**
+ *Scrip para insertar usuario directamente
+ *
+ */
+
 async function insertarUsuario() {
-  const usuario = 'test';
-  const contrasena = '1234';
-  const rol = 'prestamista';
+  const usuario = 'admin_';
+  const contrasena = '123';
+  const rol = 'admin';
 
   try {
     // Hashear contraseña

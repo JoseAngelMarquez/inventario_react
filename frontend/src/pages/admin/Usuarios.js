@@ -20,10 +20,14 @@ const Inicio = () => {
   const [totalPaginas, setTotalPaginas] = useState(1);
   const filasPorPagina = 5;
 
+  // Al cargar o cambiar página, obtener usuarios
+
   useEffect(() => {
     fetchUsuarios(pagina);
   }, [pagina]);
 
+
+  //Obtener usuarios con paginación
   const fetchUsuarios = async (paginaActual = 1) => {
     try {
       const data = await obtenerPaginados(paginaActual, filasPorPagina);
@@ -34,6 +38,7 @@ const Inicio = () => {
     }
   };
 
+  //Crear o actualizar usuario
   const handleSubmit = async () => {
     if (!usuario || !contrasena) {
       setMensaje("Usuario y contraseña son obligatorios");
@@ -60,6 +65,8 @@ const Inicio = () => {
     }
   };
 
+  // Cargar datos de usuario en el formulario
+
   const handleEditar = (user) => {
     setUsuarioSeleccionado(user);
     setUsuario(user.usuario);
@@ -67,6 +74,7 @@ const Inicio = () => {
     setContrasena("");
   };
 
+  //Elimina usuarios
   const handleEliminar = async (id) => {
     if (!window.confirm("¿Estás seguro de eliminar este usuario?")) return;
     try {

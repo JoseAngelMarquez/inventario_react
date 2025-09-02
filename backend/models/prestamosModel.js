@@ -1,5 +1,13 @@
 class Prestamos {
-  // Obtener todos los préstamos con detalles de solicitante y material
+
+  /**
+   * Obtiene todos los préstamos con detalles del solicitante y material.
+   *
+   * @static
+   * @param {*} conn
+   * @return {*} 
+   * @memberof Prestamos
+   */
   static async obtenerTodosConDetalles(conn) {
     const [rows] = await conn.query(`
      SELECT 
@@ -27,7 +35,15 @@ FROM prestamos p
     return rows;
   }
 
-  // Obtener préstamos por ID de solicitante
+  /**
+   * Obtiene un préstamo por su ID con detalles del solicitante y material.
+   *
+   * @static
+   * @param {*} conn
+   * @param {*} id
+   * @return {*} 
+   * @memberof Prestamos
+   */
   static async obtenerPorId(conn, id) {
     const [rows] = await conn.query(`
       SELECT 
@@ -49,7 +65,15 @@ FROM prestamos p
     return rows[0];
   }
 
-  // Crear préstamo y actualizar stock
+  /**
+   *Crea un nuevo préstamo, manejando solicitantes y stock de materiales.
+   *
+   * @static
+   * @param {*} conn
+   * @param {*} prestamo
+   * @return {*} 
+   * @memberof Prestamos
+   */
   static async crear(conn, prestamo) {
     const {
       tipo,
@@ -157,7 +181,17 @@ FROM prestamos p
   }
   
 
-  // Finalizar préstamo, solo actualizar stock si NO se terminó
+  /**
+   *  Finaliza un préstamo, actualizando stock si es necesario.
+   *
+   * @static
+   * @param {*} conn
+   * @param {*} idPrestamo
+   * @param {*} idUsuarioFinaliza
+   * @param {boolean} [insumoTerminado=false]
+   * @return {*} 
+   * @memberof Prestamos
+   */
   static async finalizarPrestamo(conn, idPrestamo, idUsuarioFinaliza, insumoTerminado = false) {
     await conn.beginTransaction();
     try {
@@ -221,7 +255,15 @@ WHERE p.id = ?
     }
   }
 
-  // Obtener reporte completo de préstamos
+
+  /**
+   *obtiene un reporte completo de todos los préstamos con detalles.
+   *
+   * @static
+   * @param {*} conn
+   * @return {*} 
+   * @memberof Prestamos
+   */
   static async obtenerReporteCompleto(conn) {
     const [rows] = await conn.query(`
       SELECT 
@@ -246,7 +288,16 @@ WHERE p.id = ?
     return rows;
   }
 
-  // Filtrar préstamos
+
+  /**
+   *Filtra préstamos por solicitante, material o fecha.
+   *
+   * @static
+   * @param {*} conn
+   * @param {*} { solicitante, material, fecha }
+   * @return {*} 
+   * @memberof Prestamos
+   */
   static async filtrarPrestamos(conn, { solicitante, material, fecha }) {
     let sql = `
       SELECT 
@@ -290,6 +341,16 @@ WHERE p.id = ?
     return rows;
   }
 
+  
+  /**
+   *Filtra préstamos por una fecha específica.
+   *
+   * @static
+   * @param {*} conn
+   * @param {*} fecha
+   * @return {*} 
+   * @memberof Prestamos
+   */
   static async filtrarPorFecha(conn, fecha) {
     const [rows] = await conn.query(`
       SELECT 

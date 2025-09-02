@@ -2,6 +2,13 @@
 import React from "react";
 import { FaCheck } from "react-icons/fa";
 
+
+
+/**
+ *Componente para mostrar la lista de préstamos con funciones
+ * @param {*} { prestamos, insumoTerminado, setInsumoTerminado, onFinalizar }
+ * @return {*} 
+ */
 function ListaPrestamos({ prestamos, insumoTerminado, setInsumoTerminado, onFinalizar }) {
   return (
     <>

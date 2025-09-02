@@ -4,21 +4,25 @@ import { login } from '../../services/usuarioService';
 import styles from '../../styles/login.module.css';
 import uaeh from '../../images/uaeh.png';
 import { FaUserCircle, FaLock } from "react-icons/fa";
-import logo_login from '../../images/logo_login.png'; // Asegúrate de tener esta imagen en la ruta correcta
+import logo_login from '../../images/logo_login.png';
+
 const Login = () => {
   const [usuario, setUsuario] = useState('');
   const [contrasena, setContrasena] = useState('');
   const [mensaje, setMensaje] = useState('');
   const [loading, setLoading] = useState(false);
+
+    // Hook de React Router para redirecciones
   const navigate = useNavigate();
 
+    // Manejo del formulario de login
   const handleSubmit = async (e) => {
     e.preventDefault();
     setMensaje('');
     setLoading(true);
     try {
       const data = await login(usuario, contrasena);
-      localStorage.setItem('usuario', JSON.stringify(data.usuario));
+      localStorage.setItem('usuario', JSON.stringify(data.usuario)); // Guarda usuario en localStorage
       if (data.usuario.rol === 'admin') navigate('/admin');
       else if (data.usuario.rol === 'prestamista') navigate('/prestamista');
       else setMensaje('Rol no reconocido');

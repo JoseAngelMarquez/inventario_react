@@ -9,6 +9,7 @@ export default function PrestamosReporte() {
   const [prestamos, setPrestamos] = useState([]);
   const [fechaFiltro, setFechaFiltro] = useState("");
 
+    // Al cargar la página, obtener todos los préstamos
   useEffect(() => {
     const cargarPrestamos = async () => {
       try {
@@ -50,6 +51,8 @@ export default function PrestamosReporte() {
     }
   };
 
+      // Estructura de datos para Excel
+
   const exportarExcelPorFecha = () => {
     const libro = XLSX.utils.book_new();
 
@@ -63,6 +66,8 @@ export default function PrestamosReporte() {
       Nombre: nombre_material || 'Sin nombre',
       Devolucion: fecha_devolucion ? formatoMexico(fecha_devolucion) : 'No devuelto',
     }));
+
+        // Crear hoja y archivo Excel
 
     const hoja = XLSX.utils.json_to_sheet(datosParaExcel);
     XLSX.utils.book_append_sheet(libro, hoja, "Préstamos");

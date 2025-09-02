@@ -1,6 +1,11 @@
 import React, { useEffect, useState } from "react";
-import logo_uaeh from "../../images/logo_uaeh.png"; // Asegúrate de que la ruta sea correcta
+import logo_uaeh from "../../images/logo_uaeh.png"; 
 
+/**
+ *Componente de encabezado del programa
+ *Muestra el logo y el nombre de usuario que inicia sesión
+ * @return {*} 
+ */
 const NavBar = () => {
   const [userName, setUserName] = useState("Cargando...");
 

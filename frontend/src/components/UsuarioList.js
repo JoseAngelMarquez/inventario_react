@@ -3,6 +3,13 @@ import React from "react";
 import { MdDelete } from "react-icons/md";
 import { FaEdit } from "react-icons/fa";
 
+
+/**
+ *Componente para mostrar lista de usuarios asi como función de eliminar o editar 
+ *
+ * @param {*} { usuarios, onEditar, onEliminar }
+ * @return {*} 
+ */
 const UsuarioList = ({ usuarios, onEditar, onEliminar }) => {
   return (
     <table>

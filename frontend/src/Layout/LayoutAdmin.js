@@ -10,6 +10,12 @@ import { FaHandsHelping } from "react-icons/fa";
 import { FaTools } from "react-icons/fa";
 import { BiSolidFileExport } from "react-icons/bi";
 
+
+/**
+ *Rutas permitidas del administrador
+ *
+ * @return {*} 
+ */
 const LayoutAdmin = () => {
   return (
     <div className={styles.parent}>

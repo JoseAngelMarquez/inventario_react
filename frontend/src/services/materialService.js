@@ -11,7 +11,6 @@ export const actualizarMaterial = (id, material) => axios.put(`${API_URL}/${id}`
 
 export const eliminarMaterial = (id) => axios.delete(`${API_URL}/${id}`);
 
-// servicios con axios
 export const filtrarMaterialPorNombre = (nombre) => 
     axios.get(`${API_URL}/filtro`, {
       params: { nombre } 

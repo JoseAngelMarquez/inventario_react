@@ -1,6 +1,14 @@
 import React from 'react';
 import { PiHandSwipeRightFill } from "react-icons/pi";
 
+
+
+/**
+ *Componente para añadir el formulario al form
+ *
+ * @param {*} { form, materiales, handleChange, handleSubmit }
+ * @return {*} 
+ */
 function PrestamoForm({ form, materiales, handleChange, handleSubmit }) {
     return (
         <form onSubmit={handleSubmit}>
