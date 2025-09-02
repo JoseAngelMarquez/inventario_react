@@ -101,7 +101,7 @@ const Inicio = () => {
         type="text"
         placeholder="Usuario"
         value={usuario}
-        onChange={(e) => setUsuario(e.target.value.replace(/\s/g, ''))}
+        onChange={(e) => setUsuario(e.target.value.replace(/\s/g, ''))} //Evita espacios para usuarios
         />
       <input
         type="password"
