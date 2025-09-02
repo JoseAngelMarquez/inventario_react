@@ -101,8 +101,8 @@ const Inicio = () => {
         type="text"
         placeholder="Usuario"
         value={usuario}
-        onChange={(e) => setUsuario(e.target.value)}
-      />
+        onChange={(e) => setUsuario(e.target.value.replace(/\s/g, ''))}
+        />
       <input
         type="password"
         placeholder="Contraseña"
