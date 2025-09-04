@@ -3,6 +3,7 @@ const router = express.Router();
 const materialController = require('../controllers/materialController');
 
 
+router.get('/exportar-excel', materialController.exportarEcxel);
 
 router.get("/filtro", materialController.filtrarMaterialPorNombre);
 router.get('/', materialController.obtenerMateriales);

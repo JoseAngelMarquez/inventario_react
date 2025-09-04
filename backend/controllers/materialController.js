@@ -1,5 +1,7 @@
 const pool = require('../config/db');
 const Material = require('../models/materialModel');
+const excelJS = require('exceljs');
+
 
 exports.obtenerMateriales = async (req, res) => {
   const conn = await pool.getConnection();
@@ -90,3 +92,30 @@ exports.filtrarMaterialPorNombre = async (req, res) => {
     if (conn) conn.release(); 
   }
 };
+
+exports.exportarEcxel = async (req, res) => {
+let conn;
+try {
+  conn = await pool.getConnection();
+  const materiales = await Material.obtenerTodos(conn);
+
+  const workbook = new excelJS.Workbook();
+  const worksheet = workbook.addWorksheet('Materiales');
+
+  worksheet.columns = [
+    { header: 'ID', key: 'id', width: 10 },
+    { header: 'Nombre', key: 'nombre', width: 30 },
+    { header: 'Tipo', key: 'tipo', width: 20 },
+    { header: 'Cantidad Disponible', key: 'cantidad_disponible', width: 20 },
+    { header: 'Descripción', key: 'descripcion', width: 40 },
+  ];
+  materiales.forEach(material => {
+    worksheet.addRow(material);
+  });
+  await workbook.xlsx.write(res);
+  res.status(200).end();
+} catch (error) {
+  res.status(500).json({ mensaje: 'Error al exportar materiales', error: error.message });
+}
+if (conn) conn.release();
+}
