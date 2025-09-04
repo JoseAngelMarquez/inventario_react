@@ -136,7 +136,6 @@ exports.actualizar = async (req, res) => {
     if (conn) conn.release();
   }
 };
-
 exports.exportarExcel = async (req, res) => {
   let conn;
   try {
@@ -147,32 +146,43 @@ exports.exportarExcel = async (req, res) => {
     const worksheet = workbook.addWorksheet('Préstamos');
 
     worksheet.columns = [
-      { header: 'Solicitante', key: 'Solicitante', width: 30 },
-      { header: 'Prestamista', key: 'Prestamista', width: 30 },
-      { header: 'Finalizador', key: 'Finalizador', width: 30 },
-      { header: 'Cantidad', key: 'Cantidad', width: 10 },
-      { header: 'Fecha Préstamo', key: 'FechaPrestamo', width: 20, style: { numFmt: 'dd/mm/yyyy hh:mm' } },
-      { header: 'Tipo Material', key: 'TipoMaterial', width: 20 },
-      { header: 'Nombre', key: 'Nombre', width: 30 },
-      { header: 'Devolución', key: 'Devolucion', width: 20, style: { numFmt: 'dd/mm/yyyy hh:mm' } },
+      { header: 'Solicitante', key: 'nombre_solicitante', width: 30 },
+      { header: 'Prestamista', key: 'usuario_prestamista', width: 30 },
+      { header: 'Finalizador', key: 'usuario_finalizador', width: 30 },
+      { header: 'Cantidad', key: 'cantidad', width: 10 },
+      { header: 'Fecha Préstamo', key: 'fecha_prestamo', width: 20, style: { numFmt: 'dd/mm/yyyy hh:mm' } },
+      { header: 'Tipo Material', key: 'tipo_material', width: 20 },
+      { header: 'Nombre', key: 'nombre_material', width: 30 },
+      { header: 'Devolución', key: 'fecha_devolucion', width: 20, style: { numFmt: 'dd/mm/yyyy hh:mm' } },
     ];
 
     prestamos.forEach(prestamo => {
-      worksheet.addRow(prestamo);
+      worksheet.addRow({
+        nombre_solicitante: prestamo.nombre_solicitante || 'Sin solicitante',
+        usuario_prestamista: prestamo.usuario_prestamista || 'Desconocido',
+        usuario_finalizador: prestamo.usuario_finalizador || 'No finalizado',
+        cantidad: prestamo.cantidad,
+        fecha_prestamo: prestamo.fecha_prestamo ? new Date(prestamo.fecha_prestamo) : null,
+        tipo_material: prestamo.tipo_material || 'Sin tipo',
+        nombre_material: prestamo.nombre_material || 'Sin nombre',
+        fecha_devolucion: prestamo.fecha_devolucion ? new Date(prestamo.fecha_devolucion) : null,
+      });
     });
 
+    // Cabeceras para descargar como Excel
     res.setHeader('Content-Type', 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
     res.setHeader('Content-Disposition', 'attachment; filename=prestamos.xlsx');
 
     await workbook.xlsx.write(res);
     res.status(200).end();
+
   } catch (error) {
-    //console.error('Error exportando Excel:', error);
     res.status(500).send({ message: 'Error generando Excel', error: error.message });
   } finally {
     if (conn) conn.release();
   }
 };
+
 
 exports.reporteCompleto = async (req, res) => {
   let conn;

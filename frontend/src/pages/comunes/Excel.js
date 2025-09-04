@@ -1,15 +1,15 @@
 // src/pages/PrestamosReporte.js
 import React, { useEffect, useState } from 'react';
-import * as XLSX from 'xlsx';
 import { saveAs } from 'file-saver';
 import { obtenerReporteCompleto, filtrarPrestamosPorFecha } from '../../services/prestamosService';
 import { FaFileExport } from "react-icons/fa6";
+import { descargarExcelPrestamos } from '../../services/prestamosService';
 
 export default function PrestamosReporte() {
   const [prestamos, setPrestamos] = useState([]);
   const [fechaFiltro, setFechaFiltro] = useState("");
 
-    // Al cargar la página, obtener todos los préstamos
+  // Al cargar la página, obtener todos los préstamos
   useEffect(() => {
     const cargarPrestamos = async () => {
       try {
@@ -19,10 +19,10 @@ export default function PrestamosReporte() {
         //console.error(err);
       }
     };
-  
+
     cargarPrestamos();
   }, []);
-  
+
   // Función para formatear fecha a hora de México
   const formatoMexico = (fecha) => {
     return new Intl.DateTimeFormat("es-MX", {
@@ -51,31 +51,43 @@ export default function PrestamosReporte() {
     }
   };
 
-      // Estructura de datos para Excel
+  // Estructura de datos para Excel
 
-  const exportarExcelPorFecha = () => {
-    const libro = XLSX.utils.book_new();
-
-    const datosParaExcel = prestamos.map(({ nombre_solicitante, prestamista, finalizador, cantidad, fecha_prestamo, fecha_devolucion, tipo_material, nombre_material }) => ({
-      Solicitante: nombre_solicitante,
-      Prestamista: prestamista,
-      Finalizador: finalizador || 'No finalizado',
-      Cantidad: cantidad,
-      FechaPrestamo: formatoMexico(fecha_prestamo),
-      TipoMaterial: tipo_material,
-      Nombre: nombre_material || 'Sin nombre',
-      Devolucion: fecha_devolucion ? formatoMexico(fecha_devolucion) : 'No devuelto',
-    }));
-
-        // Crear hoja y archivo Excel
-
-    const hoja = XLSX.utils.json_to_sheet(datosParaExcel);
-    XLSX.utils.book_append_sheet(libro, hoja, "Préstamos");
-    const excelBuffer = XLSX.write(libro, { bookType: 'xlsx', type: 'array' });
-    const archivo = new Blob([excelBuffer], { type: 'application/octet-stream' });
-    saveAs(archivo, 'prestamos_por_fecha.xlsx');
+  const exportarExcelDesdeBackend = async () => {
+    try {
+      const response = await descargarExcelPrestamos();
+      saveAs(new Blob([response.data]), "Prestamos.xlsx");
+    } catch (error) {
+      console.error("Error al exportar Excel:", error);
+    }
   };
 
+  //Exportar desde frontend (librería XLSX)
+
+  /* 
+        const exportarExcelPorFecha = () => {
+          const libro = XLSX.utils.book_new();
+      
+          const datosParaExcel = prestamos.map(({ nombre_solicitante, prestamista, finalizador, cantidad, fecha_prestamo, fecha_devolucion, tipo_material, nombre_material }) => ({
+            Solicitante: nombre_solicitante,
+            Prestamista: prestamista,
+            Finalizador: finalizador || 'No finalizado',
+            Cantidad: cantidad,
+            FechaPrestamo: formatoMexico(fecha_prestamo),
+            TipoMaterial: tipo_material,
+            Nombre: nombre_material || 'Sin nombre',
+            Devolucion: fecha_devolucion ? formatoMexico(fecha_devolucion) : 'No devuelto',
+          }));
+      
+              // Crear hoja y archivo Excel
+      
+          const hoja = XLSX.utils.json_to_sheet(datosParaExcel);
+          XLSX.utils.book_append_sheet(libro, hoja, "Préstamos");
+          const excelBuffer = XLSX.write(libro, { bookType: 'xlsx', type: 'array' });
+          const archivo = new Blob([excelBuffer], { type: 'application/octet-stream' });
+          saveAs(archivo, 'prestamos_por_fecha.xlsx');
+        };
+   */
   return (
     <div>
       <h1>Reporte de Préstamos</h1>
@@ -88,7 +100,7 @@ export default function PrestamosReporte() {
           style={{ marginRight: '10px' }}
         />
         <button onClick={aplicarFiltroFecha} style={{ marginRight: '10px' }}>Filtrar</button>
-        <button onClick={exportarExcelPorFecha}>
+        <button onClick={exportarExcelDesdeBackend}>
           <FaFileExport style={{ marginRight: '5px' }} />
           Exportar Excel
         </button>
