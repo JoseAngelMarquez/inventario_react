@@ -15,4 +15,6 @@ export const filtrarMaterialPorNombre = (nombre) =>
     axios.get(`${API_URL}/filtro`, {
       params: { nombre } 
     });
+
+    export const descargarExcelMateriales = () => axios.get(API_URL + '/exportar-excel', { responseType: 'blob' });
   

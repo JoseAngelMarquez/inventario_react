@@ -2,6 +2,7 @@ import React, { useEffect, useState } from "react";
 import MaterialForm from "../../components/materialForm";
 import MaterialList from "../../components/MaterialList";
 import SearchInput from "../../components/UI/InputBusqueda";
+import { descargarExcelMateriales } from "../../services/materialService";
 
 import {
   obtenerMateriales,
@@ -10,6 +11,7 @@ import {
   eliminarMaterial,
   filtrarMaterialPorNombre,
 } from "../../services/materialService";
+import { saveAs } from "file-saver";
 
 const Materiales = () => {
   const [materiales, setMateriales] = useState([]);
@@ -18,7 +20,7 @@ const Materiales = () => {
   const [error, setError] = useState(null);
   const [busqueda, setBusqueda] = useState("");
 
-    // Cargar todos los materiales desde el backend
+  // Cargar todos los materiales desde el backend
 
   const cargarMateriales = async () => {
     setCargando(true);
@@ -33,14 +35,14 @@ const Materiales = () => {
     }
   };
 
-    // Cuando se carga el componente, traer los materiales
+  // Cuando se carga el componente, traer los materiales
 
   useEffect(() => {
     cargarMateriales();
   }, []);
 
 
-    // Cada vez que cambia la búsqueda, volver a cargar datos (filtrados o no)
+  // Cada vez que cambia la búsqueda, volver a cargar datos (filtrados o no)
 
   useEffect(() => {
     const fetchData = async () => {
@@ -63,7 +65,7 @@ const Materiales = () => {
     fetchData();
   }, [busqueda]);
 
-    // Agregar o actualizar material
+  // Agregar o actualizar material
 
   const handleAddOrUpdate = async (material) => {
     try {
@@ -82,7 +84,7 @@ const Materiales = () => {
       alert("Error guardando material");
     }
   };
-  
+
   // Eliminar material
 
   const handleDelete = async (id) => {
@@ -93,6 +95,15 @@ const Materiales = () => {
       } catch (e) {
         alert("Error eliminando material");
       }
+    }
+  };
+
+  const exportarExcelDesdeBackend = async () => {
+    try {
+      const response = await descargarExcelMateriales();
+      saveAs(new Blob([response.data]), "materiales.xlsx");
+    } catch (error) {
+      console.error("Error al exportar Excel:", error);
     }
   };
 
@@ -111,6 +122,9 @@ const Materiales = () => {
         onChange={setBusqueda}
         placeholder="Buscar material..."
       />
+      <button onClick={exportarExcelDesdeBackend}>
+        Exportar Excel
+      </button>
 
       {cargando && <p>Cargando materiales...</p>}
       {error && <p style={{ color: "red" }}>{error}</p>}
