@@ -26,6 +26,16 @@ function FormPrestamo() {
         fecha_prestamo: new Date().toLocaleString('sv-SE', { hour12: false }).replace(' ', 'T'),
     });
 
+    // --- Persistencia de insumoTerminado ---
+    useEffect(() => {
+        const guardado = localStorage.getItem('insumoTerminado');
+        if (guardado) setInsumoTerminado(JSON.parse(guardado));
+    }, []);
+
+    useEffect(() => {
+        localStorage.setItem('insumoTerminado', JSON.stringify(insumoTerminado));
+    }, [insumoTerminado]);
+
     // Cargar materiales
     const cargarMateriales = async () => {
         try {
@@ -36,38 +46,41 @@ function FormPrestamo() {
         }
     };
 
-    // Cargar préstamos y inicializar insumoTerminado
-    const cargarPrestamos = useCallback(async () => {
+    // Cargar préstamos filtrados y mantener los checkboxes
+    const cargarPrestamosFiltrados = useCallback(async () => {
         try {
-            const res = await obtenerPrestamos();
+            let res;
+            if (filtros.solicitante || filtros.material || filtros.fecha) {
+                res = await filtrarPrestamos(filtros);
+            } else {
+                res = await obtenerPrestamos();
+            }
+
             setPrestamos(res.data);
 
-            // Inicializar insumoTerminado para los préstamos tipo 'insumo' prestados
-            const inicial = {};
-            res.data.forEach(p => {
-                if (p.tipo_material === 'insumo' && p.estado === 'prestado') {
-                    inicial[p.id] = insumoTerminado[p.id] || false;
-                }
+            // Mantener los valores previos de insumoTerminado y asegurar que todos los préstamos tengan un valor
+            setInsumoTerminado(prev => {
+                const nuevo = { ...prev };
+                res.data.forEach(p => {
+                    if (p.tipo_material === 'insumo' && p.estado === 'prestado') {
+                        if (!(p.id in nuevo)) nuevo[p.id] = false; // si no existe, agregar false
+                    }
+                });
+                return nuevo;
             });
-            setInsumoTerminado(prev => ({ ...inicial, ...prev }));
         } catch (error) {
             console.error(error);
         }
-    }, [insumoTerminado]);
-
-    // useEffect para cargar materiales y préstamos al montar
-    useEffect(() => {
-        cargarMateriales();
-        cargarPrestamos();
-    }, [cargarPrestamos]);
-
-    // Filtrar préstamos cuando cambian los filtros
-    useEffect(() => {
-        filtrarPrestamos(filtros).then(res => setPrestamos(res.data));
     }, [filtros]);
 
+    // Cargar materiales y préstamos al montar
+    useEffect(() => {
+        cargarMateriales();
+        cargarPrestamosFiltrados();
+    }, [cargarPrestamosFiltrados]);
+
     const handleBuscar = (e) => {
-        setFiltros({ ...filtros, [e.target.name]: e.target.value });
+        setFiltros(prev => ({ ...prev, [e.target.name]: e.target.value }));
     };
 
     const handleChange = (e) => {
@@ -84,7 +97,7 @@ function FormPrestamo() {
 
             // Recargar datos
             await cargarMateriales();
-            await cargarPrestamos();
+            await cargarPrestamosFiltrados();
 
             // Reset parcial del formulario
             setForm(prev => ({ ...prev, id_material: '', cantidad: 1 }));
@@ -98,7 +111,7 @@ function FormPrestamo() {
         try {
             await finalizarPrestamo(id, insumoTerminado[id] || false);
             alert('Préstamo finalizado correctamente');
-            await cargarPrestamos();
+            await cargarPrestamosFiltrados();
             await cargarMateriales();
 
             // Limpiar la casilla después de finalizar
@@ -119,9 +132,9 @@ function FormPrestamo() {
 
             <hr />
 
-            <FiltroPrestamos 
-                filtros={filtros} 
-                onChange={handleBuscar} 
+            <FiltroPrestamos
+                filtros={filtros}
+                onChange={handleBuscar}
             />
 
             <ListaPrestamos

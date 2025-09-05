@@ -10,27 +10,29 @@ class Prestamos {
    */
   static async obtenerTodosConDetalles(conn) {
     const [rows] = await conn.query(`
-     SELECT 
+    SELECT 
   p.id,
   p.cantidad,
   p.fecha_prestamo,
   p.fecha_devolucion,
   p.estado,
+  p.insumo_terminado,    -- <--- agregar
   s.nombre_completo AS nombre_solicitante,
   s.matricula AS matricula,
   s.numero_empleado AS numero_empleado_solicitante,
   s.tipo AS tipo_solicitante,
   m.nombre AS nombre_material,
-  m.tipo AS tipo_material,       -- <--- agregar
+  m.tipo AS tipo_material,
   m.descripcion AS descripcion_material,
   u_presto.usuario AS usuario_prestamista,
   u_finalizo.usuario AS usuario_finalizador
 FROM prestamos p
-      JOIN solicitantes s ON p.id_solicitante = s.id
-      JOIN materiales m ON p.id_material = m.id
-      JOIN usuarios u_presto ON p.id_usuario = u_presto.id
-      LEFT JOIN usuarios u_finalizo ON p.id_finalizado_por = u_finalizo.id
-      ORDER BY p.fecha_prestamo DESC
+JOIN solicitantes s ON p.id_solicitante = s.id
+JOIN materiales m ON p.id_material = m.id
+JOIN usuarios u_presto ON p.id_usuario = u_presto.id
+LEFT JOIN usuarios u_finalizo ON p.id_finalizado_por = u_finalizo.id
+ORDER BY p.fecha_prestamo DESC
+
     `);
     return rows;
   }
@@ -302,14 +304,18 @@ WHERE p.id = ?
     let sql = `
       SELECT 
         p.id,
+        p.cantidad,
+        p.fecha_prestamo,
+        p.fecha_devolucion,
+        p.estado,
+        p.insumo_terminado,
         s.nombre_completo AS nombre_solicitante,
         s.matricula AS matricula,
         s.numero_empleado AS numero_empleado_solicitante,
         s.tipo AS tipo_solicitante,
         m.nombre AS nombre_material,
-        p.cantidad,
-        p.fecha_prestamo,
-        p.estado,
+        m.tipo AS tipo_material,
+        m.descripcion AS descripcion_material,
         u_presto.usuario AS usuario_prestamista,
         u_finalizo.usuario AS usuario_finalizador
       FROM prestamos p
@@ -322,20 +328,21 @@ WHERE p.id = ?
 
     const params = [];
 
-    if (solicitante) {
+    if (solicitante && solicitante.trim() !== "") {
       sql += " AND s.nombre_completo LIKE ?";
       params.push(`%${solicitante}%`);
     }
-
-    if (material) {
+    
+    if (material && material.trim() !== "") {
       sql += " AND m.nombre LIKE ?";
       params.push(`%${material}%`);
     }
-
-    if (fecha) {
+    
+    if (fecha && fecha.trim() !== "") {
       sql += " AND DATE(p.fecha_prestamo) = ?";
       params.push(fecha);
     }
+    
 
     const [rows] = await conn.query(sql, params);
     return rows;
