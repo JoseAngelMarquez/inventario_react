@@ -8,11 +8,16 @@ export const agregarPrestamo = (prestamo) => axios.post(API_URL_PRESTAMOS, prest
     withCredentials: true
 });
 
-export const finalizarPrestamo = (id, insumoTerminado = false) => 
-  axios.put(`${API_URL_PRESTAMOS}/${id}/finalizar`, 
-    { insumoTerminado },  
-    { withCredentials: true }
+export const finalizarPrestamo = (id, insumoTerminado = false, cantidadDevuelta = null) => 
+  axios.put(
+    `${API_URL_PRESTAMOS}/${id}/finalizar`, 
+    { 
+      insumoTerminado,
+      cantidadDevuelta
+    },  
+    { withCredentials: true } 
   );
+
 
 export const descargarExcelPrestamos = () => axios.get(API_URL_PRESTAMOS + '/exportar/excel', { responseType: 'blob' });
 

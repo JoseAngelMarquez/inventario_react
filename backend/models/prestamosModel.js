@@ -182,31 +182,42 @@ FROM prestamos p
     }
   }
   
+/**
+ *  Finaliza un préstamo, actualizando stock si es necesario.
+ *
+ * @static
+ * @param {*} conn
+ * @param {*} idPrestamo
+ * @param {*} idUsuarioFinaliza
+ * @param {boolean} [insumoTerminado=false]
+ * @param {number} [cantidadDevuelta=null] - cantidad que realmente regresa
+ * @return {*} 
+ * @memberof Prestamos
+ */
+static async finalizarPrestamo(conn, idPrestamo, idUsuarioFinaliza, insumoTerminado = false, cantidadDevuelta = null) {
+  await conn.beginTransaction();
+  try {
+    const [prestamoRows] = await conn.query(
+      `SELECT 
+         p.id_material, 
+         p.cantidad, 
+         p.estado, 
+         p.insumo_terminado, 
+         m.tipo AS tipo_material
+       FROM prestamos p
+       JOIN materiales m ON p.id_material = m.id
+       WHERE p.id = ? FOR UPDATE`,
+      [idPrestamo]
+    );
+    
+    if (prestamoRows.length === 0) throw new Error('Préstamo no encontrado');
+    if (prestamoRows[0].estado === 'finalizado')
+      throw new Error('El préstamo ya está finalizado');
 
-  /**
-   *  Finaliza un préstamo, actualizando stock si es necesario.
-   *
-   * @static
-   * @param {*} conn
-   * @param {*} idPrestamo
-   * @param {*} idUsuarioFinaliza
-   * @param {boolean} [insumoTerminado=false]
-   * @return {*} 
-   * @memberof Prestamos
-   */
-  static async finalizarPrestamo(conn, idPrestamo, idUsuarioFinaliza, insumoTerminado = false) {
-    await conn.beginTransaction();
-    try {
-      const [prestamoRows] = await conn.query(
-        'SELECT id_material, cantidad, estado FROM prestamos WHERE id = ? FOR UPDATE',
-        [idPrestamo]
-      );
-      if (prestamoRows.length === 0) throw new Error('Préstamo no encontrado');
-      if (prestamoRows[0].estado === 'finalizado')
-        throw new Error('El préstamo ya está finalizado');
+    const prestamo = prestamoRows[0];
 
-      // Actualizar estado del préstamo y marcar si el insumo está terminado
-      await conn.query(`
+    // Actualizar estado del préstamo y marcar si el insumo está terminado
+    await conn.query(`
       UPDATE prestamos
       SET estado = 'finalizado',
           id_finalizado_por = ?,
@@ -215,47 +226,50 @@ FROM prestamos p
       WHERE id = ?
     `, [idUsuarioFinaliza, insumoTerminado ? 1 : 0, idPrestamo]);
 
-      // Solo devolver al stock si NO se terminó
-      if (!insumoTerminado) {
-        await conn.query(`
+    // Solo devolver al stock si NO se terminó
+    if (!insumoTerminado) {
+      // Si es insumo y cantidad > 1, usar cantidadDevuelta si se proporciona
+      const devolver = prestamo.tipo_material === 'insumo' && prestamo.cantidad > 1
+        ? (cantidadDevuelta ?? prestamo.cantidad)
+        : prestamo.cantidad;
+
+      await conn.query(`
         UPDATE materiales
         SET cantidad_disponible = cantidad_disponible + ?
         WHERE id = ?
-      `, [prestamoRows[0].cantidad, prestamoRows[0].id_material]);
-      }
+      `, [devolver, prestamo.id_material]);
+    }
 
-      const [prestamoData] = await conn.query(`
-     SELECT 
-  p.id, 
-  p.cantidad,
-  p.fecha_prestamo,
-  s.nombre_completo AS nombre_solicitante,
-  s.matricula,
-  s.numero_empleado AS numero_empleado_solicitante,
-  s.correo, 
-  m.nombre AS nombre_material,
-  m.tipo AS tipo_material,
-  p.insumo_terminado
-FROM prestamos p
-JOIN solicitantes s ON p.id_solicitante = s.id
-JOIN materiales m ON p.id_material = m.id
-WHERE p.id = ?
-
-
+    const [prestamoData] = await conn.query(`
+      SELECT 
+        p.id, 
+        p.cantidad,
+        p.fecha_prestamo,
+        s.nombre_completo AS nombre_solicitante,
+        s.matricula,
+        s.numero_empleado AS numero_empleado_solicitante,
+        s.correo, 
+        m.nombre AS nombre_material,
+        m.tipo AS tipo_material,
+        p.insumo_terminado
+      FROM prestamos p
+      JOIN solicitantes s ON p.id_solicitante = s.id
+      JOIN materiales m ON p.id_material = m.id
+      WHERE p.id = ?
     `, [idPrestamo]);
 
-      await conn.commit();
+    await conn.commit();
 
-      return {
-        message: 'Préstamo finalizado correctamente',
-        prestamo: prestamoData.length ? prestamoData[0] : null
-      };
+    return {
+      message: 'Préstamo finalizado correctamente',
+      prestamo: prestamoData.length ? prestamoData[0] : null
+    };
 
-    } catch (error) {
-      await conn.rollback();
-      throw error;
-    }
+  } catch (error) {
+    await conn.rollback();
+    throw error;
   }
+}
 
 
   /**

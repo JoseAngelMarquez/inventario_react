@@ -73,7 +73,6 @@ exports.crear = async (req, res) => {
 };
 
 exports.finalizar = async (req, res) => {
-  //console.log('Sesión actual:', req.session.usuario);
   if (!req.session.usuario) {
     return res.status(401).json({ mensaje: 'No autorizado, inicia sesión' });
   }
@@ -84,12 +83,26 @@ exports.finalizar = async (req, res) => {
   // Convertir a booleano seguro
   const insumoTerminado = req.body.insumoTerminado === true || req.body.insumoTerminado === 'true';
 
+  // Nuevo: obtener la cantidad devuelta (solo si aplica)
+  let cantidadDevuelta = null;
+  if (req.body.cantidadDevuelta) {
+    // Convertir a número y validar
+    cantidadDevuelta = parseInt(req.body.cantidadDevuelta, 10);
+    if (isNaN(cantidadDevuelta) || cantidadDevuelta < 0) cantidadDevuelta = null;
+  }
+
   let conn;
   try {
     conn = await pool.getConnection();
 
-    // Pasar el valor de insumoTerminado al model
-    const resultado = await Prestamos.finalizarPrestamo(conn, idPrestamo, idUsuarioFinaliza, insumoTerminado);
+    // Pasar el valor de insumoTerminado y cantidadDevuelta al model
+    const resultado = await Prestamos.finalizarPrestamo(
+      conn,
+      idPrestamo,
+      idUsuarioFinaliza,
+      insumoTerminado,
+      cantidadDevuelta
+    );
 
     if (resultado.prestamo) {
       const p = resultado.prestamo;
@@ -105,20 +118,17 @@ exports.finalizar = async (req, res) => {
         'Préstamo finalizado - Información',
         `El usuario ${p.nombre_solicitante} ha finalizado un préstamo del material "${p.nombre_material}" (cantidad: ${p.cantidad}) realizado el ${p.fecha_prestamo}.\n\nRevisa el sistema para más detalles.`
       );
-
-    } else {
-      //console.warn('No se encontró el préstamo para enviar correo.');
     }
 
     res.json({ mensaje: resultado.message });
 
   } catch (error) {
-    //console.error(error);
     res.status(500).json({ error: 'Error al finalizar préstamo', detalle: error.message });
   } finally {
     if (conn) conn.release();
   }
 };
+
 
 
 
