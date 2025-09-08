@@ -123,8 +123,8 @@ export default function PrestamosReporte() {
           {prestamos.map(p => (
             <tr key={p.id}>
               <td>{p.nombre_solicitante}</td>
-              <td>{p.prestamista}</td>
-              <td>{p.finalizador || 'No finalizado'}</td>
+              <td>{p.usuario_prestamista}</td>
+              <td>{p.usuario_finalizador || 'No finalizado'}</td>
               <td>{p.cantidad}</td>
               <td>{formatoMexico(p.fecha_prestamo)}</td>
               <td>{p.fecha_devolucion ? formatoMexico(p.fecha_devolucion) : 'No devuelto'}</td>
