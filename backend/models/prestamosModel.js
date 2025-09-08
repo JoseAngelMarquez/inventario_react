@@ -76,7 +76,7 @@ FROM prestamos p
    * @return {*} 
    * @memberof Prestamos
    */
-  static async crear(conn, prestamo) {
+   static async crear(conn, prestamo) {
     const {
       tipo,
       nombre_completo,
@@ -93,6 +93,13 @@ FROM prestamos p
       id_usuario
     } = prestamo;
   
+    // 🔹 Función para normalizar nombres (quita acentos y pasa a minúsculas)
+    function normalizarTexto(texto) {
+      return texto
+        ? texto.normalize("NFD").replace(/[\u0300-\u036f]/g, "").toLowerCase()
+        : "";
+    }
+  
     await conn.beginTransaction();
   
     try {
@@ -101,68 +108,89 @@ FROM prestamos p
       let carreraInsert = null;
       let numeroEmpleadoInsert = null;
   
-      if (tipo === 'estudiante') {
+      if (tipo === "estudiante") {
         matriculaInsert = matricula;
         carreraInsert = carrera;
-      } else if (tipo === 'empleado') {
+      } else if (tipo === "empleado") {
         numeroEmpleadoInsert = numero_empleado;
       }
   
       // Verificar si el solicitante ya existe
       let id_solicitante;
       const [existing] = await conn.query(
-        tipo === 'empleado'
-          ? 'SELECT id, nombre_completo FROM solicitantes WHERE numero_empleado = ?'
-          : 'SELECT id, nombre_completo FROM solicitantes WHERE matricula = ?',
-        [tipo === 'empleado' ? numero_empleado : matricula]
+        tipo === "empleado"
+          ? "SELECT id, nombre_completo FROM solicitantes WHERE numero_empleado = ?"
+          : "SELECT id, nombre_completo FROM solicitantes WHERE matricula = ?",
+        [tipo === "empleado" ? numero_empleado : matricula]
       );
   
       if (existing.length) {
-        // Validar que el nombre coincida
-        if (existing[0].nombre_completo !== nombre_completo) {
-          throw new Error('La matrícula o número de empleado ya está registrada con otro nombre');
+        // Validar con comparación insensible a acentos/mayúsculas
+        const nombreExistente = normalizarTexto(existing[0].nombre_completo);
+        const nombreNuevo = normalizarTexto(nombre_completo);
+  
+        if (nombreExistente !== nombreNuevo) {
+          throw new Error(
+            "La matrícula o número de empleado ya está registrada con otro nombre"
+          );
         }
         id_solicitante = existing[0].id;
       } else {
         // Insertar solicitante nuevo
-        const [resultSolicitante] = await conn.query(`
+        const [resultSolicitante] = await conn.query(
+          `
           INSERT INTO solicitantes 
             (tipo, nombre_completo, matricula, carrera, lugar_trabajo, telefono, correo, numero_empleado)
           VALUES (?, ?, ?, ?, ?, ?, ?, ?)
-        `, [
-          tipo,
-          nombre_completo,
-          matriculaInsert,
-          carreraInsert,
-          lugar_trabajo,
-          telefono,
-          correo,
-          numeroEmpleadoInsert
-        ]);
+        `,
+          [
+            tipo,
+            nombre_completo,
+            matriculaInsert,
+            carreraInsert,
+            lugar_trabajo,
+            telefono,
+            correo,
+            numeroEmpleadoInsert
+          ]
+        );
         id_solicitante = resultSolicitante.insertId;
       }
   
       // Verificar stock y bloquear fila
       const [materialRows] = await conn.query(
-        'SELECT cantidad_disponible, nombre FROM materiales WHERE id = ? FOR UPDATE',
+        "SELECT cantidad_disponible, nombre FROM materiales WHERE id = ? FOR UPDATE",
         [id_material]
       );
-      if (materialRows.length === 0) throw new Error('Material no encontrado');
+      if (materialRows.length === 0) throw new Error("Material no encontrado");
       if (materialRows[0].cantidad_disponible < cantidad)
-        throw new Error('No hay suficiente stock disponible');
+        throw new Error("No hay suficiente stock disponible");
   
       // Insertar préstamo
-      const [resultPrestamo] = await conn.query(`
+      const [resultPrestamo] = await conn.query(
+        `
         INSERT INTO prestamos (id_material, cantidad, fecha_prestamo, fecha_devolucion, id_usuario, id_solicitante, estado)
         VALUES (?, ?, ?, ?, ?, ?, 'prestado')
-      `, [id_material, cantidad, fecha_prestamo, fecha_devolucion, id_usuario, id_solicitante]);
+      `,
+        [
+          id_material,
+          cantidad,
+          fecha_prestamo,
+          fecha_devolucion,
+          id_usuario,
+          id_solicitante
+        ]
+      );
   
       // Actualizar stock
-      await conn.query(`
+      await conn.query(
+        `
         UPDATE materiales
         SET cantidad_disponible = cantidad_disponible - ?
         WHERE id = ?
-      `, [cantidad, id_material]);
+      `,
+        [cantidad, id_material]
+      );
   
       await conn.commit();
   
@@ -175,12 +203,12 @@ FROM prestamos p
         matriculaSolicitante: matriculaInsert,
         cantidad
       };
-  
     } catch (error) {
       await conn.rollback();
       throw error;
     }
   }
+  
   
 /**
  *  Finaliza un préstamo, actualizando stock si es necesario.
