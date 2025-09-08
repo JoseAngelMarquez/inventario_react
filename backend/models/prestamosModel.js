@@ -178,6 +178,7 @@ class Prestamos {
    * @param {boolean} [insumoTerminado=false]
    * @param {number|null} [cantidadDevuelta=null]
    */
+
   static async finalizarPrestamo(conn, idPrestamo, idUsuarioFinaliza, insumoTerminado = false, cantidadDevuelta = null) {
     await conn.beginTransaction();
     try {
@@ -194,12 +195,12 @@ class Prestamos {
          WHERE p.id = ? FOR UPDATE`,
         [idPrestamo]
       );
-  
+
       if (prestamoRows.length === 0) throw new Error("Préstamo no encontrado");
       if (prestamoRows[0].estado === "finalizado") throw new Error("El préstamo ya está finalizado");
-  
+
       const prestamo = prestamoRows[0];
-  
+
       // Actualizar estado del préstamo y marcar si el insumo está terminado
       await conn.query(
         `
@@ -212,16 +213,15 @@ class Prestamos {
         `,
         [idUsuarioFinaliza, insumoTerminado ? 1 : 0, idPrestamo]
       );
-  
-      // Devolver al stock solo si NO se terminó
+
       // Devolver al stock solo si NO se terminó
       if (!insumoTerminado) {
         // Convertir cantidadDevuelta a número
         const cantidadNum = Number(cantidadDevuelta);
-        
+
         // Si no es número o es negativo, usar 0; si es válido, usarlo
         const devolver = (!isNaN(cantidadNum) && cantidadNum >= 0) ? cantidadNum : 0;
-      
+
         await conn.query(
           `
           UPDATE materiales
@@ -231,16 +231,12 @@ class Prestamos {
           [devolver, prestamo.id_material]
         );
       }
-      
-    
-      
 
-  
       // Obtener datos actualizados para respuesta
       const [prestamoData] = await conn.query(this.getBaseQuery() + " WHERE p.id = ?", [idPrestamo]);
-  
+
       await conn.commit();
-  
+
       return {
         message: "Préstamo finalizado correctamente",
         prestamo: prestamoData.length ? prestamoData[0] : null
@@ -250,11 +246,11 @@ class Prestamos {
       throw error;
     }
   }
-  
 
   /**
    * Obtiene un reporte completo de todos los préstamos con detalles.
    */
+
   static async obtenerReporteCompleto(conn) {
     const [rows] = await conn.query(this.getBaseQuery() + " ORDER BY p.fecha_prestamo DESC");
     return rows;
@@ -263,6 +259,7 @@ class Prestamos {
   /**
    * Filtra préstamos por solicitante, material o fecha.
    */
+
   static async filtrarPrestamos(conn, { solicitante, material, fecha }) {
     let sql = this.getBaseQuery() + " WHERE 1=1";
     const params = [];
@@ -289,6 +286,7 @@ class Prestamos {
   /**
    * Filtra préstamos por una fecha específica.
    */
+  
   static async filtrarPorFecha(conn, fecha) {
     const [rows] = await conn.query(this.getBaseQuery() + " WHERE DATE(p.fecha_prestamo) = ?", [fecha]);
     return rows;
