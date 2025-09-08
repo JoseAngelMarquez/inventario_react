@@ -39,23 +39,23 @@ function ListaPrestamos({ prestamos, insumoTerminado, setInsumoTerminado, onFina
                                 <td>{prestamo.usuario_prestamista || '—'}</td>
                                 <td>{prestamo.usuario_finalizador || '—'}</td>
                                 <td>
-                                {prestamo.estado === 'prestado' 
- && prestamo.tipo_material?.toLowerCase() === 'insumo'
- && prestamo.cantidad === 1 && (   // <-- nueva condición
-    <label style={{ display: "flex", alignItems: "center", gap: "4px" }}>
-        <input
-            type="checkbox"
-            checked={insumoTerminado[prestamo.id] || false}
-            onChange={(e) =>
-                setInsumoTerminado(prev => ({
-                    ...prev,
-                    [prestamo.id]: e.target.checked
-                }))
-            }
-        />
-        Insumo terminado
-    </label>
-)}
+                                    {prestamo.estado === 'prestado'
+                                        && prestamo.tipo_material?.toLowerCase() === 'insumo'
+                                        && prestamo.cantidad === 1 && (   // <-- nueva condición
+                                            <label style={{ display: "flex", alignItems: "center", gap: "4px" }}>
+                                                <input
+                                                    type="checkbox"
+                                                    checked={insumoTerminado[prestamo.id] || false}
+                                                    onChange={(e) =>
+                                                        setInsumoTerminado(prev => ({
+                                                            ...prev,
+                                                            [prestamo.id]: e.target.checked
+                                                        }))
+                                                    }
+                                                />
+                                                Insumo terminado
+                                            </label>
+                                        )}
 
 
                                     {prestamo.estado === 'prestado' && (

@@ -105,7 +105,6 @@ function FormPrestamo() {
             alert('Error al crear préstamo: ' + (error.response?.data?.detalle || error.message));
         }
     };
-
     const handleFinalizar = async (id) => {
         // Buscar el préstamo correspondiente
         const prestamo = prestamos.find(p => p.id === id);
@@ -119,19 +118,27 @@ function FormPrestamo() {
     
             // Si es insumo y cantidad > 1, preguntar cuántos regresan
             if (prestamo.tipo_material === 'insumo' && prestamo.cantidad > 1) {
-                const input = prompt(`Este préstamo tiene ${prestamo.cantidad} insumos. ¿Cuántos se regresan?`, prestamo.cantidad);
+                const input = prompt(
+                    `Este préstamo tiene ${prestamo.cantidad} insumos. ¿Cuántos se regresan?`,
+                    prestamo.cantidad
+                );
                 if (input === null) return; // canceló
+    
                 const cantidadNum = parseInt(input, 10);
                 if (isNaN(cantidadNum) || cantidadNum < 0 || cantidadNum > prestamo.cantidad) {
                     alert('Cantidad inválida');
                     return;
                 }
-                cantidadDevuelta = cantidadNum;
+    
+                // Asegurarnos de que sea un número
+                cantidadDevuelta = Number(cantidadNum);
             }
     
-            await finalizarPrestamo(id, insumoTerminado[id] || false, cantidadDevuelta);
+            // Enviar al backend
+            await finalizarPrestamo(id, !!insumoTerminado[id], cantidadDevuelta);
     
             alert('Préstamo finalizado correctamente');
+    
             await cargarPrestamosFiltrados();
             await cargarMateriales();
     
@@ -142,6 +149,7 @@ function FormPrestamo() {
             alert('Error al finalizar préstamo: ' + (error.response?.data?.detalle || error.message));
         }
     };
+    
     
 
     return (
