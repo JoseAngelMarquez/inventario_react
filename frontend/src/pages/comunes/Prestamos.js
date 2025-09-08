@@ -11,6 +11,7 @@ function FormPrestamo() {
     const [prestamos, setPrestamos] = useState([]);
     const [filtros, setFiltros] = useState({ solicitante: "", material: "", fecha: "" });
     const [insumoTerminado, setInsumoTerminado] = useState({});
+    const [ocultarFinalizados, setOcultarFinalizados] = useState(false);
 
     const [form, setForm] = useState({
         tipo: 'estudiante',
@@ -105,7 +106,7 @@ function FormPrestamo() {
             alert('Error al crear préstamo: ' + (error.response?.data?.detalle || error.message));
         }
     };
-    
+
     const handleFinalizar = async (id) => {
         // Buscar el préstamo correspondiente
         const prestamo = prestamos.find(p => p.id === id);
@@ -151,10 +152,13 @@ function FormPrestamo() {
         }
     };
 
-
+    const prestamosAMostrar = ocultarFinalizados
+        ? prestamos.filter(p => p.estado !== 'finalizado')
+        : prestamos;
 
     return (
         <>
+
             <PrestamoForm
                 form={form}
                 materiales={materiales}
@@ -169,8 +173,32 @@ function FormPrestamo() {
                 onChange={handleBuscar}
             />
 
+            <label style={{
+                display: "flex",
+                alignItems: "center",
+                gap: "8px",
+                backgroundColor: "#f0f0f0",
+                padding: "6px 12px",
+                borderRadius: "6px",
+                fontSize: "14px",
+                cursor: "pointer",
+                userSelect: "none"
+            }}>
+                <input
+                    type="checkbox"
+                    checked={ocultarFinalizados}
+                    onChange={e => setOcultarFinalizados(e.target.checked)}
+                    style={{
+                        width: "16px",
+                        height: "16px",
+                        cursor: "pointer"
+                    }}
+                />
+                Ocultar préstamos finalizados
+            </label>
+
             <ListaPrestamos
-                prestamos={prestamos}
+                prestamos={prestamosAMostrar}
                 insumoTerminado={insumoTerminado}
                 setInsumoTerminado={setInsumoTerminado}
                 onFinalizar={handleFinalizar}
