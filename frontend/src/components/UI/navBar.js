@@ -10,12 +10,12 @@ const NavBar = () => {
   const [userName, setUserName] = useState("Cargando...");
 
   useEffect(() => {
-    const usuarioLogueado = JSON.parse(localStorage.getItem("usuario"));
-    if (usuarioLogueado && usuarioLogueado.usuario) {
-      setUserName(usuarioLogueado.usuario);
-    } else {
-      setUserName("Usuario");
-    }
+      const usuarioLogueado = JSON.parse(localStorage.getItem("usuario"));
+      if (usuarioLogueado && usuarioLogueado.usuario) {
+        setUserName(usuarioLogueado.usuario);
+      } else {
+        setUserName("Usuario");
+      }
   }, []);
 
   // Definir estilos antes del return

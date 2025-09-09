@@ -10,6 +10,8 @@ import { FaEdit } from "react-icons/fa";
  * @param {*} { usuarios, onEditar, onEliminar }
  * @return {*} 
  */
+
+const usuarioLogueado = JSON.parse(localStorage.getItem("usuario"));
 const UsuarioList = ({ usuarios, onEditar, onEliminar }) => {
   return (
     <table>
@@ -26,15 +28,25 @@ const UsuarioList = ({ usuarios, onEditar, onEliminar }) => {
             <td>{user.usuario}</td>
             <td>{user.rol}</td>
             <td>
-              <button onClick={() => onEditar(user)} >
-              <FaEdit style={{ marginRight: "5px" }} />
-                Editar
-              </button>
 
-              <button onClick={() => onEliminar(user.id)} style={{ marginLeft: "10px" }}>
-              <MdDelete style={{ marginRight: "5px" }} />
-              Eliminar
-              </button>
+              {usuarioLogueado?.usuario === user.usuario ? (
+                <span style={{ fontWeight: "bold", color: "green" }}>
+                  <p>Texto</p>
+                </span>
+              ) : (
+                <>
+                  <button onClick={() => onEditar(user)} >
+                    <FaEdit style={{ marginRight: "5px" }} />
+                    Editar
+                  </button>
+
+                  <button onClick={() => onEliminar(user.id)} style={{ marginLeft: "10px" }}>
+                    <MdDelete style={{ marginRight: "5px" }} />
+                    Eliminar
+                  </button>
+
+                </>
+              )}
             </td>
           </tr>
         ))}
