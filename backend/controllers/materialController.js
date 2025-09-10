@@ -108,6 +108,8 @@ try {
     { header: 'Tipo', key: 'tipo', width: 20 },
     { header: 'Cantidad Disponible', key: 'cantidad_disponible', width: 20 },
     { header: 'Descripción', key: 'descripcion', width: 40 },
+    { header: 'Ubicación', key: 'ubicacion', width: 40 },
+
   ];
   materiales.forEach(material => {
     worksheet.addRow(material);

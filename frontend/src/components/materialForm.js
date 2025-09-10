@@ -16,6 +16,7 @@ const MaterialForm = ({ onSubmit, materialEditado, cancelar }) => {
     tipo: "herramienta manual",
     cantidad_disponible: 0,
     descripcion: "",
+    ubicacion: "",
   });
 
   useEffect(() => {
@@ -27,6 +28,7 @@ const MaterialForm = ({ onSubmit, materialEditado, cancelar }) => {
         tipo: "herramienta manual",
         cantidad_disponible: 0,
         descripcion: "",
+        ubicacion: "",
       });
     }
   }, [materialEditado]);
@@ -48,6 +50,7 @@ const MaterialForm = ({ onSubmit, materialEditado, cancelar }) => {
         tipo: "herramienta manual",
         cantidad_disponible: 0,
         descripcion: "",
+        ubicacion:"",
       });
     }
   };
@@ -83,6 +86,16 @@ const MaterialForm = ({ onSubmit, materialEditado, cancelar }) => {
         onChange={handleChange}
         required
       />
+
+
+<input
+  name="ubicacion"
+  placeholder="Ubicación"
+  value={formData.ubicacion}
+  onChange={handleChange}
+  required
+/>
+
       {/* Botón Guardar / Actualizar */}
       <button type="submit" style={{ display: "flex", alignItems: "center", gap: "6px" }}>
         {materialEditado ? (

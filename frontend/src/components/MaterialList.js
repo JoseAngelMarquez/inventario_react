@@ -23,7 +23,9 @@ const MaterialList = ({ materiales, onEditar, onEliminar }) => {
           <th>Tipo</th>
           <th>Cantidad Disponible</th>
           <th>Descripción</th>
+          <th>Ubicación</th>
           <th>Acciones</th>
+          
         </tr>
       </thead>
       <tbody>
@@ -33,6 +35,8 @@ const MaterialList = ({ materiales, onEditar, onEliminar }) => {
             <td>{mat.tipo}</td>
             <td>{mat.cantidad_disponible}</td>
             <td>{mat.descripcion}</td>
+            <td>{mat.ubicacion}</td>
+
             <td>
               <div style={{ display: "flex", gap: "10px" }}>
                 <button onClick={() => onEditar(mat)}>
