@@ -3,13 +3,6 @@ import { CiSaveDown2 } from "react-icons/ci";
 import { FaEdit } from "react-icons/fa";
 import { FaTimes } from "react-icons/fa";
 
-
-/**
- *Formulario para agregar materiales
- *
- * @param {*} { onSubmit, materialEditado, cancelar }
- * @return {*} 
- */
 const MaterialForm = ({ onSubmit, materialEditado, cancelar }) => {
   const [formData, setFormData] = useState({
     nombre: "",
@@ -19,9 +12,22 @@ const MaterialForm = ({ onSubmit, materialEditado, cancelar }) => {
     ubicacion: "",
   });
 
+  const [otroUbicacion, setOtroUbicacion] = useState(""); // estado para "otro"
+
   useEffect(() => {
     if (materialEditado) {
       setFormData(materialEditado);
+      if (
+        materialEditado.ubicacion !== "" &&
+        ![
+          "Husky Grande",
+          "Husky Chico",
+          ...Array.from({ length: 9 }, (_, i) => `Gabinete ${i + 1}`),
+        ].includes(materialEditado.ubicacion)
+      ) {
+        setOtroUbicacion(materialEditado.ubicacion);
+        setFormData((prev) => ({ ...prev, ubicacion: "Otro" }));
+      }
     } else {
       setFormData({
         nombre: "",
@@ -30,6 +36,7 @@ const MaterialForm = ({ onSubmit, materialEditado, cancelar }) => {
         descripcion: "",
         ubicacion: "",
       });
+      setOtroUbicacion("");
     }
   }, [materialEditado]);
 
@@ -43,15 +50,23 @@ const MaterialForm = ({ onSubmit, materialEditado, cancelar }) => {
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    onSubmit(formData);
+
+    const dataToSubmit = {
+      ...formData,
+      ubicacion: formData.ubicacion === "Otro" ? otroUbicacion : formData.ubicacion,
+    };
+
+    onSubmit(dataToSubmit);
+
     if (!materialEditado) {
       setFormData({
         nombre: "",
         tipo: "herramienta manual",
         cantidad_disponible: 0,
         descripcion: "",
-        ubicacion:"",
+        ubicacion: "",
       });
+      setOtroUbicacion("");
     }
   };
 
@@ -64,11 +79,13 @@ const MaterialForm = ({ onSubmit, materialEditado, cancelar }) => {
         onChange={handleChange}
         required
       />
+
       <select name="tipo" value={formData.tipo} onChange={handleChange}>
         <option value="herramienta manual">Herramienta Manual</option>
         <option value="herramienta eléctrica">Herramienta Eléctrica</option>
         <option value="insumo">Insumo</option>
       </select>
+
       <input
         type="number"
         name="cantidad_disponible"
@@ -87,17 +104,40 @@ const MaterialForm = ({ onSubmit, materialEditado, cancelar }) => {
         required
       />
 
+      {/* Select de ubicación */}
+      <select
+        name="ubicacion"
+        value={formData.ubicacion}
+        onChange={handleChange}
+        required
+      >
+        <option value="">-- Selecciona ubicación --</option>
+        {Array.from({ length: 9 }, (_, i) => (
+          <option key={`gabinete-${i + 1}`} value={`Gabinete ${i + 1}`}>
+            Gabinete {i + 1}
+          </option>
+        ))}
+        <option value="Husky Grande">Husky Grande</option>
+        <option value="Husky Chico">Husky Chico</option>
+        <option value="Otro">Otro</option>
+      </select>
 
-<input
-  name="ubicacion"
-  placeholder="Ubicación"
-  value={formData.ubicacion}
-  onChange={handleChange}
-  required
-/>
+      {/* Si elige "Otro", mostrar input */}
+      {formData.ubicacion === "Otro" && (
+        <input
+          type="text"
+          placeholder="Especifica ubicación"
+          value={otroUbicacion}
+          onChange={(e) => setOtroUbicacion(e.target.value)}
+          required
+        />
+      )}
 
       {/* Botón Guardar / Actualizar */}
-      <button type="submit" style={{ display: "flex", alignItems: "center", gap: "6px" }}>
+      <button
+        type="submit"
+        style={{ display: "flex", alignItems: "center", gap: "6px" }}
+      >
         {materialEditado ? (
           <>
             <FaEdit /> Actualizar
@@ -109,7 +149,6 @@ const MaterialForm = ({ onSubmit, materialEditado, cancelar }) => {
         )}
       </button>
 
-      {/* Botón Cancelar */}
       {materialEditado && (
         <button
           type="button"
