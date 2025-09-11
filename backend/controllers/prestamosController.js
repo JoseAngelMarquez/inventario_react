@@ -1,6 +1,7 @@
 const pool = require('../config/db');
 const Prestamos = require('../models/prestamosModel');
 const { enviarCorreo } = require('../utils/email');
+const moment = require('moment-timezone');
 require('dotenv').config();
 const excelJS = require('exceljs');
 
@@ -156,6 +157,7 @@ exports.exportarExcel = async (req, res) => {
     const worksheet = workbook.addWorksheet('Préstamos');
 
     worksheet.columns = [
+      { header: 'Matrícula/N° empleado', key: 'matricula_o_empleado', width: 30 },
       { header: 'Solicitante', key: 'nombre_solicitante', width: 30 },
       { header: 'Prestamista', key: 'usuario_prestamista', width: 30 },
       { header: 'Finalizador', key: 'usuario_finalizador', width: 30 },
@@ -168,14 +170,21 @@ exports.exportarExcel = async (req, res) => {
 
     prestamos.forEach(prestamo => {
       worksheet.addRow({
+        matricula_o_empleado: prestamo.tipo_solicitante === 'estudiante' ? prestamo.matricula || 
+        '': prestamo.tipo_solicitante === 'trabajador' ? prestamo.numero_empleado_solicitante || 
+        '': '',
         nombre_solicitante: prestamo.nombre_solicitante || 'Sin solicitante',
         usuario_prestamista: prestamo.usuario_prestamista || 'Desconocido',
         usuario_finalizador: prestamo.usuario_finalizador || 'No finalizado',
         cantidad: prestamo.cantidad,
-        fecha_prestamo: prestamo.fecha_prestamo ? new Date(prestamo.fecha_prestamo) : null,
+        fecha_prestamo: prestamo.fecha_prestamo
+      ? moment(prestamo.fecha_prestamo).tz('America/Mexico_City').format('YYYY-MM-DD HH:mm')
+      : null,
         tipo_material: prestamo.tipo_material || 'Sin tipo',
         nombre_material: prestamo.nombre_material || 'Sin nombre',
-        fecha_devolucion: prestamo.fecha_devolucion ? new Date(prestamo.fecha_devolucion) : null,
+        fecha_devolucion: prestamo.fecha_devolucion
+        ? moment(prestamo.fecha_devolucion).tz('America/Mexico_City').format('YYYY-MM-DD HH:mm')
+        : null,
       });
     });
 
