@@ -80,17 +80,17 @@ class Prestamos {
       if (tipo === "estudiante") {
         matriculaInsert = matricula;
         carreraInsert = carrera;
-      } else if (tipo === "empleado") {
+      } else if (tipo === "trabajador") {
         numeroEmpleadoInsert = numero_empleado;
       }
 
       // Verificar si el solicitante ya existe (por matrícula o número de empleado)
       let id_solicitante;
       const [existing] = await conn.query(
-        tipo === "empleado"
+        tipo === "trabajador"
           ? "SELECT id, nombre_completo FROM solicitantes WHERE numero_empleado = ?"
           : "SELECT id, nombre_completo FROM solicitantes WHERE matricula = ?",
-        [tipo === "empleado" ? numero_empleado : matricula]
+        [tipo === "trabajador" ? numero_empleado : matricula]
       );
 
       if (existing.length) {

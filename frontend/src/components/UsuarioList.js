@@ -31,7 +31,7 @@ const UsuarioList = ({ usuarios, onEditar, onEliminar }) => {
 
               {usuarioLogueado?.usuario === user.usuario ? (
                 <span style={{ fontWeight: "bold", color: "green" }}>
-                  <p>Texto</p>
+                  <p>Usuario logueado</p>
                 </span>
               ) : (
                 <>

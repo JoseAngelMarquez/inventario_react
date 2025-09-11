@@ -26,11 +26,14 @@ function ListaPrestamos({ prestamos, insumoTerminado, setInsumoTerminado, onFina
                         {prestamos.map(prestamo => (
                             <tr key={prestamo.id}>
                                 <td>
-                                    {prestamo.nombre_solicitante || '—'} <br />
-                                    {prestamo.tipo_solicitante === 'estudiante'
-                                        ? `Matrícula: ${prestamo.matricula || '—'}`
-                                        : `Número de empleado: ${prestamo.numero_empleado_solicitante || '—'}`}
+                                    {prestamo.nombre_solicitante || "—"} <br />
+                                    {prestamo.tipo_solicitante === "estudiante" && prestamo.matricula
+                                        ? `Matrícula: ${prestamo.matricula}`
+                                        : prestamo.tipo_solicitante === "trabajador" && prestamo.numero_empleado_solicitante
+                                            ? `Número de empleado: ${prestamo.numero_empleado_solicitante}`
+                                            : ""}
                                 </td>
+
                                 <td>{prestamo.tipo_solicitante}</td>
                                 <td>{prestamo.nombre_material}</td>
                                 <td>{prestamo.cantidad}</td>
@@ -41,7 +44,7 @@ function ListaPrestamos({ prestamos, insumoTerminado, setInsumoTerminado, onFina
                                 <td>
                                     {prestamo.estado === 'prestado'
                                         && prestamo.tipo_material?.toLowerCase() === 'insumo'
-                                        && prestamo.cantidad === 1 && (   // <-- nueva condición
+                                        && prestamo.cantidad === 1 && (   
                                             <label style={{ display: "flex", alignItems: "center", gap: "4px" }}>
                                                 <input
                                                     type="checkbox"
