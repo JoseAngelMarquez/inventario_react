@@ -130,9 +130,6 @@ exports.finalizar = async (req, res) => {
   }
 };
 
-
-
-
 exports.actualizar = async (req, res) => {
   let conn;
   try {

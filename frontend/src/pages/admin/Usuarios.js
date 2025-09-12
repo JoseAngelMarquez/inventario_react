@@ -46,24 +46,32 @@ const Inicio = () => {
     }
 
     try {
-      if (usuarioSeleccionado && usuarioSeleccionado.id) {
-        //console.log("Actualizando usuario ID:", usuarioSeleccionado.id);
+      if (usuarioSeleccionado?.id) {
+        // Actualizar usuario existente
         await actualizarUsuario(usuarioSeleccionado.id, usuario, contrasena, rol);
-        setMensaje("Usuario actualizado correctamente");
+        setMensaje(`Usuario "${usuario}" actualizado correctamente`);
       } else {
-        const data = await crearUsuario(usuario, contrasena, rol);
-        setMensaje(`Usuario creado con ID: ${data.id}`);
+        // Crear nuevo usuario
+        await crearUsuario(usuario, contrasena, rol);
+        setMensaje(`Usuario "${usuario}" creado correctamente`);
       }
+    
+      // Resetear formulario
       setUsuario("");
       setContrasena("");
       setRol("prestamista");
       setUsuarioSeleccionado(null);
+    
+      // Recargar lista de usuarios
       fetchUsuarios(pagina);
+    
     } catch (err) {
-      setMensaje("Error al procesar usuario: " + (err.response?.data?.message || err.message));
-      //console.error(err);
+      setMensaje(
+        "Error al procesar usuario: " + (err.response?.data?.message || err.message)
+      );
     }
-  };
+  };    
+
 
   // Cargar datos de usuario en el formulario
 
@@ -138,7 +146,7 @@ const Inicio = () => {
         </button>
       )}
 
-      {mensaje && <p style={{ color: "green" }}>{mensaje}</p>}
+      {mensaje && <p style={{ color: "#8F3D38" }}>{mensaje}</p>}
 
       <UsuarioList
         usuarios={usuarios.map(u => ({ usuario: u.usuario, rol: u.rol, id: u.id }))}
