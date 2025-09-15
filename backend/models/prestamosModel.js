@@ -178,90 +178,90 @@ class Prestamos {
    * @param {boolean} [insumoTerminado=false]
    * @param {number|null} [cantidadDevuelta=null]
    */
-  static async finalizarPrestamo(conn, idPrestamo, idUsuarioFinaliza, insumoTerminado = false, cantidadDevuelta = null) {
-    await conn.beginTransaction();
-    try {
-      console.log("\n=== 📌 Datos recibidos en finalizarPrestamo ===");
-      console.log("   idPrestamo:", idPrestamo);
-      console.log("   idUsuarioFinaliza:", idUsuarioFinaliza);
-      console.log("   insumoTerminado (original):", insumoTerminado, "tipo:", typeof insumoTerminado);
-      console.log("   cantidadDevuelta:", cantidadDevuelta);
-  
-      const [prestamoRows] = await conn.query(
-        `SELECT 
-           p.id AS id_prestamo,
-           p.id_material,
-           p.cantidad,
-           p.estado,
-           p.insumo_terminado,
-           m.tipo AS tipo_material
-         FROM prestamos p
-         JOIN materiales m ON p.id_material = m.id
-         WHERE p.id = ? FOR UPDATE`,
-        [idPrestamo]
-      );
-  
-      if (prestamoRows.length === 0) throw new Error("Préstamo no encontrado");
-      if (prestamoRows[0].estado === "finalizado") throw new Error("El préstamo ya está finalizado");
-  
-      const prestamo = prestamoRows[0];
-      console.log("   📦 Prestamo obtenido:", prestamo);
-  
-      // Actualizar estado del préstamo y marcar si el insumo está terminado
+static async finalizarPrestamo(conn, idPrestamo, idUsuarioFinaliza, insumoTerminado = false, cantidadDevuelta = null) {
+  await conn.beginTransaction();
+  try {
+    console.log("\n=== 📌 Datos recibidos en finalizarPrestamo ===");
+    console.log("   idPrestamo:", idPrestamo);
+    console.log("   idUsuarioFinaliza:", idUsuarioFinaliza);
+    console.log("   insumoTerminado (original):", insumoTerminado, "tipo:", typeof insumoTerminado);
+    console.log("   cantidadDevuelta:", cantidadDevuelta);
+
+    const [prestamoRows] = await conn.query(
+      `SELECT 
+         p.id AS id_prestamo,
+         p.id_material,
+         p.cantidad,
+         p.estado,
+         p.insumo_terminado,
+         m.tipo AS tipo_material
+       FROM prestamos p
+       JOIN materiales m ON p.id_material = m.id
+       WHERE p.id = ? FOR UPDATE`,
+      [idPrestamo]
+    );
+
+    if (prestamoRows.length === 0) throw new Error("Préstamo no encontrado");
+    if (prestamoRows[0].estado === "finalizado") throw new Error("El préstamo ya está finalizado");
+
+    const prestamo = prestamoRows[0];
+    console.log("   📦 Prestamo obtenido:", prestamo);
+
+    // Actualizar estado del préstamo y marcar si el insumo está terminado
+    await conn.query(
+      `
+      UPDATE prestamos
+      SET estado = 'finalizado',
+          id_finalizado_por = ?,
+          fecha_devolucion = NOW(),
+          insumo_terminado = ?
+      WHERE id = ?
+      `,
+      [idUsuarioFinaliza, insumoTerminado ? 1 : 0, idPrestamo]
+    );
+
+    console.log("   ✅ insumo_terminado guardado en BD:", insumoTerminado ? 1 : 0);
+
+    // Devolver al stock solo si NO se terminó
+    if (!insumoTerminado) {
+      // Si no mandan cantidadDevuelta, usamos la cantidad prestada
+      const cantidadNum = cantidadDevuelta !== null ? Number(cantidadDevuelta) : prestamo.cantidad;
+
+      // Validar
+      const devolver = (!isNaN(cantidadNum) && cantidadNum >= 0) ? cantidadNum : 0;
+
+      console.log("   🔄 Devolviendo al stock:", devolver);
+
       await conn.query(
         `
-        UPDATE prestamos
-        SET estado = 'finalizado',
-            id_finalizado_por = ?,
-            fecha_devolucion = NOW(),
-            insumo_terminado = ?
+        UPDATE materiales
+        SET cantidad_disponible = cantidad_disponible + ?
         WHERE id = ?
         `,
-        [idUsuarioFinaliza, insumoTerminado ? 1 : 0, idPrestamo]
+        [devolver, prestamo.id_material]
       );
-  
-      console.log("   ✅ insumo_terminado guardado en BD:", insumoTerminado ? 1 : 0);
-  
-      // Devolver al stock solo si NO se terminó
-      if (!insumoTerminado) {
-        // Si no mandan cantidadDevuelta, usamos la cantidad prestada
-        const cantidadNum = cantidadDevuelta !== null ? Number(cantidadDevuelta) : prestamo.cantidad;
-  
-        // Validar
-        const devolver = (!isNaN(cantidadNum) && cantidadNum >= 0) ? cantidadNum : 0;
-  
-        console.log("   🔄 Devolviendo al stock:", devolver);
-  
-        await conn.query(
-          `
-          UPDATE materiales
-          SET cantidad_disponible = cantidad_disponible + ?
-          WHERE id = ?
-          `,
-          [devolver, prestamo.id_material]
-        );
-      } else {
-        console.log("   ❌ No se devuelve material porque insumoTerminado = true");
-      }
-  
-      // Obtener datos actualizados para respuesta
-      const [prestamoData] = await conn.query(this.getBaseQuery() + " WHERE p.id = ?", [idPrestamo]);
-  
-      await conn.commit();
-  
-      console.log("=== ✅ Finalización completada con éxito ===\n");
-  
-      return {
-        message: "Préstamo finalizado correctamente",
-        prestamo: prestamoData.length ? prestamoData[0] : null
-      };
-    } catch (error) {
-      await conn.rollback();
-      console.error("❌ Error en finalizarPrestamo:", error.message);
-      throw error;
+    } else {
+      console.log("   ❌ No se devuelve material porque insumoTerminado = true");
     }
+
+    // Obtener datos actualizados para respuesta
+    const [prestamoData] = await conn.query(this.getBaseQuery() + " WHERE p.id = ?", [idPrestamo]);
+
+    await conn.commit();
+
+    console.log("=== ✅ Finalización completada con éxito ===\n");
+
+    return {
+      message: "Préstamo finalizado correctamente",
+      prestamo: prestamoData.length ? prestamoData[0] : null
+    };
+  } catch (error) {
+    await conn.rollback();
+    console.error("❌ Error en finalizarPrestamo:", error.message);
+    throw error;
   }
-  
+}
+
 
   /**
    * Obtiene un reporte completo de todos los préstamos con detalles.
