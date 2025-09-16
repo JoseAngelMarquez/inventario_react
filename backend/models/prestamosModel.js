@@ -15,6 +15,7 @@ class Prestamos {
         s.matricula AS matricula,
         s.numero_empleado AS numero_empleado_solicitante,
         s.tipo AS tipo_solicitante,
+         s.correo AS correo_solicitante,
         m.nombre AS nombre_material,
         m.tipo AS tipo_material,
         m.descripcion AS descripcion_material,
@@ -194,12 +195,16 @@ static async finalizarPrestamo(conn, idPrestamo, idUsuarioFinaliza, insumoTermin
          p.cantidad,
          p.estado,
          p.insumo_terminado,
-         m.tipo AS tipo_material
+         m.tipo AS tipo_material,
+         s.nombre_completo,
+         s.correo AS correo_solicitante
        FROM prestamos p
        JOIN materiales m ON p.id_material = m.id
+       JOIN solicitantes s ON p.id_solicitante = s.id
        WHERE p.id = ? FOR UPDATE`,
       [idPrestamo]
     );
+    
 
     if (prestamoRows.length === 0) throw new Error("Préstamo no encontrado");
     if (prestamoRows[0].estado === "finalizado") throw new Error("El préstamo ya está finalizado");

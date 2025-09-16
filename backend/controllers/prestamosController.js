@@ -108,7 +108,7 @@ exports.finalizar = async (req, res) => {
     if (resultado.prestamo) {
       const p = resultado.prestamo;
       enviarCorreo(
-        p.correo,
+        p.correo_solicitante,
         'Préstamo finalizado',
         `Hola ${p.nombre_solicitante},\n\nTu préstamo del material "${p.nombre_material}" (cantidad: ${p.cantidad}) realizado el ${p.fecha_prestamo} ha sido finalizado.\n\nGracias.`
       );
